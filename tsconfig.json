@@ -1,0 +1,22 @@
+// 根目录 tsconfig.json
+{
+  "compilerOptions": {
+    "composite": true, // 必须：启用复合项目，支持子包关联
+    "noEmit": true, // 根目录仅做类型检查，不生成任何产物
+    "skipLibCheck": true, // 跳过第三方库的类型检查（加速）
+    "strict": true, // 全局严格模式（推荐，子包可继承）
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "ESNext", // 匹配Node.js/ES模块
+    "moduleResolution": "bundler",
+    "target": "ES2020", // 适配Node.js 20+（根据实际Node版本调整）
+    "types": ["node"] // 若用到Node.js API，需加（依赖@types/node）
+  },
+  "files": [], // 根目录无业务源码，空数组即可
+  "references": [
+    // 关联所有子包（按需要检查的顺序排列）
+    { "path": "./packages/core" }, // 子包1：@event-chat/core
+    { "path": "./packages/example" } // 子包2（如有）
+    // { "path": "./packages/app" }    // 子包3（如有）
+  ]
+}

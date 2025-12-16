@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.json", // 继承根目录的基础配置（可选但推荐）
+  "compilerOptions": {
+    "composite": true, // 必须：子包启用复合项目，支持根目录关联
+    "lib": ["DOM", "ES2022"],
+    "module": "ESNext",
+    "jsx": "react-jsx",
+    "strict": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "bundler",
+    "useDefineForClassFields": true,
+    "declaration": true, // 必须：生成.d.ts
+    "declarationMap": true, // 可选：生成.d.ts.map，方便调试
+    "outDir": "./dist", // 类型文件输出目录
+    "rootDir": "./src" // 源码根目录
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist", "**/*.stories.tsx"]
+}

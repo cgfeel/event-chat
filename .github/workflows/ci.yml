@@ -1,0 +1,81 @@
+name: Monorepo React Library CI
+
+# 触发条件：main分支有push/PR，所有PR都触发（和子包一致，可按需扩展）
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# 作业配置
+jobs:
+  # 代码校验 & 构建作业（覆盖所有子包）
+  validate-and-build:
+    runs-on: ubuntu-latest
+    # 可选：指定Node版本矩阵，多版本测试（按需开启）
+    # strategy:
+    #   matrix:
+    #     node-version: [20.x, 18.x]
+
+    steps:
+      # 1. 检出代码（必须带fetch-depth: 0，否则pnpm workspace可能识别异常）
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # 2. 设置Node.js环境（匹配项目Node版本，优先LTS）
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'pnpm' # 关键：改为pnpm缓存（替代原npm）
+          cache-dependency-path: '**/pnpm-lock.yaml' # 指定pnpm锁文件路径
+
+      # 3. 安装pnpm（Ubuntu默认无pnpm，需手动安装）
+      - name: Install pnpm
+        run: |
+          corepack enable # 启用corepack（Node.js 16+内置，管理pnpm/yarn）
+          corepack prepare pnpm@latest --activate # 安装最新版pnpm（可指定版本如pnpm@9.x）
+
+      # 4. 安装monorepo所有依赖（pnpm ci替代npm ci，更适配monorepo）
+      - name: Install dependencies
+        run: |
+          pnpm ci --frozen-lockfile # 严格按pnpm-lock.yaml安装，禁用版本更新
+          pnpm list # 可选：打印依赖列表，方便调试
+
+      # 5. ESLint代码质量检查（执行根目录lint，或指定子包）
+      - name: Run ESLint check
+        # 方式1：执行根目录统一的lint脚本（推荐，需根package.json配置）
+        run: pnpm run lint
+        # 方式2：仅校验指定子包（如@event-chat/core）
+        # run: pnpm --filter @event-chat/core lint
+
+      # 6. Prettier格式校验（同理，支持根目录/指定子包）
+      - name: Run Prettier check
+        run: pnpm run format:check
+        # 方式2：仅校验指定子包
+        # run: pnpm --filter @event-chat/core format:check
+
+      # 7. TypeScript类型检查（monorepo下推荐根目录执行tsc，或子包单独执行）
+      - name: Run TypeScript type check
+        # 方式1：根目录执行tsc（需根tsconfig.json配置"composite": true）
+        run: pnpm tsc --noEmit
+        # 方式2：仅检查指定子包
+        # run: pnpm --filter @event-chat/core tsc --noEmit
+
+      # 8. 执行构建（构建指定子包，或所有子包）
+      - name: Build project
+        # 方式1：构建指定子包（推荐，避免构建无关包）
+        # run: pnpm --filter @event-chat/core build
+        # 方式2：构建所有子包（根package.json配置"build": "pnpm -r build"）
+        run: pnpm run build
+
+      # 9. 上传构建产物（适配monorepo子包的dist路径）
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: core-build-output
+          path: packages/core/dist/ # 关键：改为子包的dist路径
+          retention-days: 7

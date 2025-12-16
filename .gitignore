@@ -1,0 +1,45 @@
+# 依赖
+node_modules/
+**/node_modules/
+packages/**/node_modules/
+.pnpm-store/
+
+# 构建输出
+dist/
+build/
+storybook-static
+*.tsbuildinfo
+
+# 环境变量
+.env
+.env.local
+.env.*.local
+
+# 日志
+*.log
+logs/
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/*
+!.vscode/extensions.json
+.idea
+
+# 测试覆盖率
+coverage/
+.nyc_output/
+
+# 缓存
+.vite/
+.cache/
+.turbo/
+
+# Local
+*.local
+*.log*
+
+# Profile
+.rspack-profile-*/

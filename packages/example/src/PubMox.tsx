@@ -1,4 +1,4 @@
-import { Button } from '@event-chat/core';
+import { Button, useTest } from '@event-chat/core';
 import type { FC } from 'react';
 import { z } from 'zod';
 import { useEventChat } from './hooks';
@@ -15,6 +15,8 @@ const PubMox: FC = () => {
     callback: (detail) =>
       console.log('a----pub-mox', detail, Player.parse({ username: 'billie', xp: 100 })),
   });
+
+  useTest();
 
   return (
     <span>

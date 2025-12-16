@@ -21,13 +21,7 @@ const PubMox: FC = () => {
   return (
     <span>
       <Button label="test" />
-      <button
-        type="button"
-        onClick={() => {
-          /* eslint-disable no-console */
-          console.log('emit', emit);
-        }}
-      >
+      <button type="button" onClick={() => emit({ name: 'sub-mox' })}>
         click it
       </button>
     </span>

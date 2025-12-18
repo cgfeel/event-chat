@@ -35,6 +35,7 @@ export interface EventChatOptions<Name extends string = string, Schema extends Z
   async?: boolean;
   group?: string;
   schema?: Schema;
+  token?: boolean;
   type?: string;
   callback?: (target: DetailType<Name, Schema>) => void;
   debug?: (data: unknown, result?: ResultType) => void;
@@ -54,7 +55,8 @@ export type EventDetailType<Detail = unknown> = Pick<DetailType, '__origin' | 'n
     token?: string;
   };
 
-export type MountOpsType = Omit<EventChatOptions, 'callback'> & Pick<EventDetailType, 'token'>;
+export type MountOpsType = Omit<EventChatOptions, 'callback' | 'token'> &
+  Pick<EventDetailType, 'token'>;
 
 export type ResultType = z.ZodSafeParseResult<unknown>;
 

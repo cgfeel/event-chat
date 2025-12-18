@@ -28,7 +28,7 @@ export const useEventChat = <Name extends string, Schema extends ZodType = ZodTy
   ops: EventChatOptions<Name, Schema>
 ) => {
   const eventName = useMemo(() => getEventName(name), [name]);
-  const { callback, ...opsRecord } = ops;
+  const { token: allowToken, callback, ...opsRecord } = ops;
 
   const callbackFn = useMemoFn(callback);
   const id = useId();
@@ -79,11 +79,11 @@ export const useEventChat = <Name extends string, Schema extends ZodType = ZodTy
   }, [eventName, callbackHandle]);
 
   useEffect(() => {
-    eventBus.mount(callbackHandle, opsRecord);
+    eventBus.mount(callbackHandle, !allowToken ? opsRecord : { ...opsRecord, token });
     return () => {
       eventBus.unmount(callbackHandle);
     };
-  }, [opsRecord, callbackHandle]);
+  }, [allowToken, opsRecord, token, callbackHandle]);
 
   return { token, emit } as const;
 };

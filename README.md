@@ -69,6 +69,13 @@ type DetailType<Name extends string = string, Schema extends ZodType = ZodType> 
 
 > 消息尽管发，但 `callback` 接收到的一定是开始就约定好的结构和类型
 
+`emit` 接受的参数类型如下：
+
+- `detail`：要发送的消息内容，接收方如果有条件限制，消息的类型结构需要完全匹配
+- `global`：群组会话发送公屏消息
+- `name`：接收事件会话的名称
+- `token`：私信令牌
+
 ### 异步消息
 
 对于 `Zod` 是允许异步校验的，这里通过 `async` 来实现，例如：

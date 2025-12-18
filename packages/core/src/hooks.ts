@@ -25,10 +25,10 @@ export const useMemoFn = <T>(fn: T) => {
 
 export const useEventChat = <Name extends string, Schema extends ZodType = ZodType>(
   name: Name,
-  ops: EventChatOptions<Name, Schema>
+  ops?: EventChatOptions<Name, Schema>
 ) => {
   const eventName = useMemo(() => getEventName(name), [name]);
-  const { token: allowToken, callback, ...opsRecord } = ops;
+  const { token: allowToken, callback, ...opsRecord } = ops ?? {};
 
   const callbackFn = useMemoFn(callback);
   const id = useId();

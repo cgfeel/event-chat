@@ -11,7 +11,7 @@ const PubMox: FC = () => {
       ingredients: z.array(z.string()),
     }),
     /* eslint-disable no-console */
-    callback: ({ __origin, detail, name }) => console.log('a----pub-mox', name, __origin, detail),
+    callback: (record) => console.log('a----pub-mox', record),
   });
 
   return (

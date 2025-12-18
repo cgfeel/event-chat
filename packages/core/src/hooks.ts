@@ -34,12 +34,11 @@ export const useEventChat = <Name extends string, Schema extends ZodType = ZodTy
   const id = useId();
 
   // 随业务改变
-  const conditionKey = useMemo(
-    () => getConditionKey(name, id, opsRecord.type),
+  const token = useMemo(
+    () => createToken(getConditionKey(name, id, opsRecord.type)),
     [id, name, opsRecord.type]
   );
 
-  const token = useMemo(() => createToken(conditionKey), [conditionKey]);
   const callbackHandle = useCallback(
     ({ name: subName, ...args }: DetailType<string, Schema>) => {
       if (callbackFn.current && isSafetyType(subName, name)) {
@@ -80,11 +79,11 @@ export const useEventChat = <Name extends string, Schema extends ZodType = ZodTy
   }, [eventName, callbackHandle]);
 
   useEffect(() => {
-    eventBus.mount(conditionKey, opsRecord);
+    eventBus.mount(callbackHandle, opsRecord);
     return () => {
-      eventBus.unmount(conditionKey);
+      eventBus.unmount(callbackHandle);
     };
-  }, [conditionKey, opsRecord]);
+  }, [opsRecord, callbackHandle]);
 
   return { token, emit } as const;
 };

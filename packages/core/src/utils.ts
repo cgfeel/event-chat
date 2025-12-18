@@ -26,6 +26,9 @@ export function mountEvent(event: CustomDetailEvent) {
   }
 }
 
+export const isResultType = (data: unknown): data is ResultType =>
+  typeof data === 'object' && data !== null && 'success' in data && Boolean(data.success);
+
 export const isSafetyType = <T>(target: unknown, origin: T): target is T => target === origin;
 
 export interface EventChatOptions<Name extends string = string, Schema extends ZodType = ZodType> {
@@ -34,7 +37,7 @@ export interface EventChatOptions<Name extends string = string, Schema extends Z
   schema?: Schema;
   type?: string;
   callback?: (target: DetailType<Name, Schema>) => void;
-  debug?: (data: unknown, result: ResultType) => void;
+  debug?: (data: unknown, result?: ResultType) => void;
 }
 
 export type DetailType<Name extends string = string, Schema extends ZodType = ZodType> = {
@@ -47,6 +50,7 @@ export type EventDetailType<Detail = unknown> = Pick<DetailType, '__origin' | 'n
   Pick<EventChatOptions, 'group' | 'type'> & {
     id: string;
     detail?: Detail;
+    global?: boolean;
     token?: string;
   };
 

@@ -3,7 +3,7 @@ import { z } from 'zod';
 
 const checkLiteral: CheckFnType = (data, { group, token }) => {
   const schema = z.object({
-    group: group ? z.literal(group) : z.undefined(),
+    group: group && !data.global ? z.literal(group) : z.undefined(),
     token: token ? z.literal(token) : z.undefined(),
   });
 
@@ -21,11 +21,9 @@ const checkDetail: CheckFnType = ({ detail }, { async, schema: schemaRaw }) => {
   );
 };
 
-export const validate = (data: EventDetailType, record?: MountOpsType) => {
+export const validate: CheckFnType = (data, record) => {
   const result: Promise<ResultType> = Promise.resolve({ success: true, data });
-  return !record
-    ? result
-    : [checkLiteral, checkDetail].reduce((_, checkFn) => checkFn(data, record), result);
+  return [checkLiteral, checkDetail].reduce((_, checkFn) => checkFn(data, record), result);
 };
 
 type CheckFnType = <T extends EventDetailType>(

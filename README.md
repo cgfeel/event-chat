@@ -101,7 +101,9 @@ useEventChat('pub-mox', {
   callback: (record) => console.log('a----pub-mox', record),
 });
 
-const { emit: groupEmit } = useEventChat('sub-mox');
+const { emit: groupEmit } = useEventChat('sub-mox', {
+  group: 'form-detail-edit',
+});
 
 const { emit: outEmit } = useEventChat('out-mox');
 

@@ -59,7 +59,7 @@ const config: Linter.Config[] = [
       // 可添加你原有 .eslintrc.cjs 中的其他TS规则
       '@typescript-eslint/explicit-module-boundary-types': 'off', // 关闭显式返回类型强制要求
       '@typescript-eslint/consistent-type-definitions': 'off',
-      '@stylistic/comma-dangle': 'off'
+      '@stylistic/comma-dangle': 'off',
     },
   },
 

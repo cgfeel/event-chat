@@ -35,6 +35,7 @@
     "@rsbuild/core": "^1.6.14",
     "@rsbuild/plugin-eslint": "^1.2.0",
     "@rsbuild/plugin-react": "^1.4.2",
+    "@trivago/prettier-plugin-sort-imports": "^6.0.0",
     "@types/node": "^25.0.2",
     "@types/react": "^18.3.27",
     "@types/react-dom": "^18.3.7",

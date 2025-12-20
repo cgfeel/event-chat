@@ -1,25 +1,56 @@
 import './App.css';
-import PubMox from './PubMox';
-import SubMox from './SubMox';
+import ChatLayout from './components/ChatLayout';
+import ExtraGuid from './components/ExtraGuid';
+import Layout from './components/Layout';
+import PubNoLimit from './module/PubNoLimit';
+import SubNoLimit from './module/SubNoLimit';
 
 const App = () => {
   return (
-    <div className="content">
-      <h1>Rsbuild with React</h1>
-      <p>Start building amazing things with Rsbuild.</p>
-      <div>
-        <span>
-          <SubMox />
-        </span>
-      </div>
-      <hr />
-      <p>
-        <span>
-          <span>
-            <PubMox />
-          </span>
-        </span>
-      </p>
+    <div className="m-auto max-w-400 p-4">
+      <Layout
+        list={[
+          <ChatLayout
+            extra={<ExtraGuid>直接发型消息，无限制</ExtraGuid>}
+            footer={110}
+            key="pub"
+            title="pub-no-limit"
+          >
+            <PubNoLimit />
+          </ChatLayout>,
+          <ChatLayout
+            extra={<ExtraGuid>直接发送信息，无限制</ExtraGuid>}
+            footer={110}
+            key="sub"
+            title="sub-no-limit"
+          >
+            <SubNoLimit />
+          </ChatLayout>,
+        ]}
+        title="Event-chat-nolimit"
+      />
+      <hr className="mb-4 mt-4" />
+      <Layout
+        list={[
+          <ChatLayout
+            extra={<ExtraGuid>直接发型消息，无限制</ExtraGuid>}
+            footer={110}
+            key="pub"
+            title="pub-no-limit"
+          >
+            <PubNoLimit />
+          </ChatLayout>,
+          <ChatLayout
+            extra={<ExtraGuid>直接发送信息，无限制</ExtraGuid>}
+            footer={110}
+            key="sub"
+            title="sub-no-limit"
+          >
+            <SubNoLimit />
+          </ChatLayout>,
+        ]}
+        title="Event-chat-by-zod-schema"
+      />
     </div>
   );
 };

@@ -1,5 +1,89 @@
 @import url('tailwindcss');
 
+@theme {
+  /* 定义颜色变量 */
+  --color-toast-success: #10b981;
+  --color-toast-error: #ef4444;
+  --color-toast-warning: #f59e0b;
+  --color-toast-info: #3b82f6;
+
+  @keyframes toast-in {
+    0% {
+      opacity: 0;
+      transform: translateX(100%);
+    }
+
+    100% {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes toast-out {
+    0% {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    100% {
+      opacity: 0;
+      transform: translateX(100%);
+    }
+  }
+
+  /* 将关键帧绑定给CSS变量（这是v4使用自定义动画的方式） */
+  --animate-toast-in: toast-in 0.3s ease-out forwards;
+  --animate-toast-out: toast-out 0.3s ease-in forwards;
+  --animate-wiggle: wiggle 1s ease-in-out infinite;
+
+  @keyframes wiggle {
+    0%,
+    100% {
+      transform: rotate(-3deg);
+    }
+
+    50% {
+      transform: rotate(3deg);
+    }
+  }
+
+  --animate-fade-in-scale: fade-in-scale 0.3s ease-out;
+
+  /* 关键帧定义保持不变，可直接嵌套在 @theme 中 */
+  @keyframes fade-in-scale {
+    0% {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+}
+
+/* 2. 使用 @layer utilities 创建自定义工具类 */
+@utility toast-base {
+  @apply flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg text-white max-w-sm w-full cursor-pointer transition-all duration-300;
+}
+
+@utility toast-close {
+  @apply text-sm hover:opacity-80 transition-opacity;
+}
+
+@utility toast-container {
+  @apply fixed top-4 right-4 z-50 flex flex-col gap-3;
+}
+
+@utility toast-content {
+  @apply flex-1 text-sm font-medium;
+}
+
+@utility toast-icon {
+  @apply text-xl w-5 text-center;
+}
+
 body {
   margin: 0;
   color: #fff;

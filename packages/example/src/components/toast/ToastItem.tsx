@@ -13,22 +13,22 @@ import { toastClose, toastItem as toastItemKey } from '@/utils/event';
 import type { toastItem } from './utils';
 
 const error = Object.freeze({
-  bg: 'bg-red-500',
+  bg: 'bg-toast-error',
   icon: faTimesCircle,
 });
 
 const info = Object.freeze({
-  bg: 'bg-blue-500',
+  bg: 'bg-toast-info',
   icon: faInfoCircle,
 });
 
 const success = Object.freeze({
-  bg: 'bg-emerald-500',
+  bg: 'bg-toast-success',
   icon: faCheckCircle,
 });
 
 const warning = Object.freeze({
-  bg: 'bg-amber-500',
+  bg: 'bg-toast-warning',
   icon: faExclamationCircle,
 });
 
@@ -40,7 +40,6 @@ const toastConfig = Object.freeze({
 });
 
 const ToastItem: FC<ToastItemProps> = ({ item: { id, message, title, type } }) => {
-  const { emit } = useEventChat(toastItemKey);
   const toastRef = useRef<HTMLDivElement>(null);
   const config = toastConfig[type];
 
@@ -60,6 +59,13 @@ const ToastItem: FC<ToastItemProps> = ({ item: { id, message, title, type } }) =
     [handleToastClick]
   );
 
+  const { emit } = useEventChat(toastItemKey, {
+    schema: z.string().refine((target) => target === id),
+    callback: () => {
+      handleToastClick();
+    },
+  });
+
   useEffect(() => {
     const wrap = toastRef.current;
     function animationEndHandle() {
@@ -78,11 +84,15 @@ const ToastItem: FC<ToastItemProps> = ({ item: { id, message, title, type } }) =
 
   return (
     <div
-      className={`flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg text-white max-w-sm w-full cursor-pointer transition-all duration-300 ${config.bg}`}
+      className={`inline-flex items-start gap-2 px-4 py-3 rounded-lg shadow-lg text-left text-white max-w-sm cursor-pointer transition-all duration-300 ${config.bg}`}
       ref={toastRef}
+      role="alert"
+      onClick={handleToastClick}
     >
-      <FontAwesomeIcon icon={config.icon} className="text-xl w-5 text-center" />
-      <div className="flex-1 text-sm font-medium">
+      <div className="pt-0.5 text-xl text-center">
+        <FontAwesomeIcon icon={config.icon} />
+      </div>
+      <div className="flex-1 text-sm font-medium wrap-break-word break-all">
         <div className="font-bold">{title}</div>
         {message && <div className="text-opacity-90 text-xs mt-1">{message}</div>}
       </div>

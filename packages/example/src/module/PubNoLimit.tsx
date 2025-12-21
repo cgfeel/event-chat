@@ -15,8 +15,8 @@ const PubNoLimit: FC = () => {
       setList((current) =>
         current.concat({
           content: safetyPrint(record.detail),
-          receive: true,
           time: new Date(),
+          type: 'receive',
         })
       ),
   });
@@ -30,6 +30,7 @@ const PubNoLimit: FC = () => {
           current.concat({
             content: detail,
             time: new Date(),
+            type: 'send',
           })
         );
       }}

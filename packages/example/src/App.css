@@ -36,7 +36,28 @@
   --animate-toast-out: toast-out 0.3s ease-in forwards;
 }
 
-/* 2. 使用 @layer utilities 创建自定义工具类 */
+/* 对话框 */
+@utility chat-container {
+  @apply max-w-[80%] px-4 py-3 relative rounded-lg shadow-sm;
+}
+
+@utility chat-content {
+  @apply break-all wrap-break-word;
+}
+
+@utility chat-corner {
+  @apply absolute border-y-4 border-y-transparent h-0 top-2 w-0;
+}
+
+@utility chat-footer {
+  @apply flex gap-1 justify-end mt-1 text-xs;
+}
+
+@utility chat-wrapper {
+  @apply flex mb-4;
+}
+
+/* 消息框 */
 @utility toast-base {
   @apply inline-flex items-start gap-2 px-4 py-3 rounded-lg shadow-lg text-left text-white max-w-sm cursor-pointer transition-all duration-300;
 }

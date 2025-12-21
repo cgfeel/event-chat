@@ -28,7 +28,7 @@ export function hasSchema<Schema extends ZodType, Name extends string>(
 }
 
 export const isResultType = (data: unknown): data is ResultType =>
-  typeof data === 'object' && data !== null && 'success' in data && Boolean(data.success);
+  typeof data === 'object' && data !== null && 'success' in data && !data.success;
 
 export const isSafetyType = <T>(target: unknown, origin: T): target is T => target === origin;
 
@@ -74,7 +74,7 @@ export type MountOpsType<Name extends string = string, Schema extends ZodType = 
 > &
   Pick<EventDetailType, 'token'>;
 
-export type ResultType<Schema = unknown> = z.ZodSafeParseResult<Schema>;
+export type ResultType<Schema = unknown> = z.ZodSafeParseError<Schema>;
 
 interface CustomDetailEvent extends Event {
   detail?: EventDetailType;
@@ -102,5 +102,5 @@ type EventChatOptionsBase<DetailType> = {
   token?: boolean;
   type?: string;
   callback?: (target: DetailType) => void;
-  debug?: (data: unknown, result?: ResultType) => void;
+  debug?: (result?: ResultType) => void;
 };

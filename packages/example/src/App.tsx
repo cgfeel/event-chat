@@ -4,7 +4,9 @@ import Layout from './components/Layout';
 import ChatLayout from './components/chat/ChatLayout';
 import Toast from './components/toast';
 import PubNoLimit from './module/PubNoLimit';
+import PubSchema from './module/PubSchema';
 import SubNoLimit from './module/SubNoLimit';
+import SubSchema from './module/SubSchema';
 
 const App = () => {
   return (
@@ -40,7 +42,7 @@ const App = () => {
             key="pub"
             title="pub-zod-schema"
           >
-            <PubNoLimit />
+            <PubSchema />
           </ChatLayout>,
           <ChatLayout
             extra={<ExtraGuid>直接发送信息，无限制</ExtraGuid>}
@@ -48,7 +50,7 @@ const App = () => {
             key="sub"
             title="sub-no-limit"
           >
-            <SubNoLimit />
+            <SubSchema />
           </ChatLayout>,
         ]}
         title="Event-chat-by-zod-schema"

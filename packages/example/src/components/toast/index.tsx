@@ -55,6 +55,4 @@ const Toast: FC<PropsWithChildren> = ({ children }) => {
 
 export default memo(Toast, () => true);
 
-export interface ToastItemType extends z.infer<typeof toastItem> {}
-
-export type ToastType = 'success' | 'error' | 'warning' | 'info';
+interface ToastItemType extends z.infer<typeof toastItem> {}

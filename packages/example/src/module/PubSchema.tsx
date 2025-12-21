@@ -1,16 +1,17 @@
 import { useEventChat } from '@event-chat/core';
 import { type FC, useRef, useState } from 'react';
 import { z } from 'zod';
-import { type ChatItemProps } from '../components/ChatItem';
-import ChatList from '../components/ChatList';
-import ChatPanel from '../components/ChatPanel';
+import { pubZodSchema, subNoLimit } from '@/utils/event';
+import { type ChatItemProps } from '../components/chat/ChatItem';
+import ChatList from '../components/chat/ChatList';
+import ChatPanel from '../components/chat/ChatPanel';
 import { safetyPrint } from '../utils';
 
 const PubSchema: FC = () => {
   const [list, setList] = useState<ChatItemProps[]>([]);
   const rollRef = useRef<HTMLDivElement>(null);
 
-  const { emit } = useEventChat('pub-zod-schema', {
+  const { emit } = useEventChat(pubZodSchema, {
     schema: z.object({
       title: z.string(),
       description: z.string().optional(),
@@ -30,7 +31,7 @@ const PubSchema: FC = () => {
     <ChatPanel
       rollRef={rollRef}
       onChange={(detail) => {
-        emit({ name: 'sub-no-limit', detail });
+        emit({ name: subNoLimit, detail });
         setList((current) =>
           current.concat({
             content: detail,

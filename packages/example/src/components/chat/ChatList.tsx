@@ -1,5 +1,5 @@
 import { type FC, type RefObject, useEffect } from 'react';
-import { createKey } from '../utils';
+import { createKey } from '../../utils';
 import ChatItem, { type ChatItemProps } from './ChatItem';
 
 const ChatList: FC<ChatListProps> = ({ list, rollRef }) => {

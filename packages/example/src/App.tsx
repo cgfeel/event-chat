@@ -1,7 +1,7 @@
 import './App.css';
-import ChatLayout from './components/ChatLayout';
 import ExtraGuid from './components/ExtraGuid';
 import Layout from './components/Layout';
+import ChatLayout from './components/chat/ChatLayout';
 import Toast from './components/toast';
 import PubNoLimit from './module/PubNoLimit';
 import SubNoLimit from './module/SubNoLimit';

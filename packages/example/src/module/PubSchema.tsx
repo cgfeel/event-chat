@@ -83,7 +83,7 @@ const PubSchema: FC = () => {
           !result.success || result.data.status === 'waiting'
             ? list
             : list.map((item) =>
-                item.type !== 'receive'
+                item.type !== 'receive' || item.content.status !== 'waiting'
                   ? item
                   : _merge({}, item, { content: { status: result.data.status } })
               );

@@ -2,9 +2,6 @@
 
 @theme {
   /* 定义颜色变量 */
-  --color-light: #f3f4f6;
-  --color-primary: #4b5563;
-  --color-secondary: #f97316;
   --color-toast-success: #10b981;
   --color-toast-error: #ef4444;
   --color-toast-warning: #f59e0b;

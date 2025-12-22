@@ -9,18 +9,34 @@ const statusMap = Object.freeze({
   waiting: '⏳️ [waiting] 处理中',
 });
 
-const colorMap = ['amber-600', 'fuchsia-600', 'gray-600', 'lime-600', 'rose-600'] as const;
-const getColor = (id?: string) =>
+const bgColorMap = [
+  'bg-amber-600',
+  'bg-fuchsia-600',
+  'bg-gray-600',
+  'bg-lime-600',
+  'bg-rose-600',
+] as const;
+
+const textColorMap = [
+  'text-amber-600',
+  'text-fuchsia-600',
+  'text-gray-600',
+  'text-lime-600',
+  'text-rose-600',
+] as const;
+
+const getColor = <T extends string>(colorMap: readonly T[], id?: string) =>
   colorMap[
     (id?.replace(/=/g, '').slice(-1).charCodeAt(0) ?? Number(String(Math.random()).slice(-1))) %
       colorMap.length
   ];
 
 const RenderCard: FC<RenderCardProps> = ({ item: { description, id, ingredients, title } }) => {
-  const color = getColor(id);
+  const bgcolor = getColor(bgColorMap, id);
+  const textcolor = getColor(textColorMap, id);
   return (
     <div className="bg-white rounded-xl card-shadow overflow-hidden transition-transform hover:scale-[1.02] duration-300">
-      <div className={`bg-${color} text-white p-6`}>
+      <div className={`${bgcolor} text-white p-6`}>
         <h2 className="text-2xl font-bold mb-1">{title}</h2>
         <p className="text-amber-200 text-sm">食谱 ID：{id}</p>
       </div>
@@ -28,7 +44,7 @@ const RenderCard: FC<RenderCardProps> = ({ item: { description, id, ingredients,
         <div className="mb-5">
           <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
             <svg
-              className={`w-5 h-5 mr-2 text-${color}`}
+              className={`w-5 h-5 mr-2 ${textcolor}`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -48,7 +64,7 @@ const RenderCard: FC<RenderCardProps> = ({ item: { description, id, ingredients,
               const keyname = `${ingredient}:${idx}`;
               return (
                 <li className="flex items-center" key={keyname}>
-                  <span className={`w-2 h-2 rounded-full bg-${color} mr-2`} />
+                  <span className={`w-2 h-2 rounded-full ${bgcolor} mr-2`} />
                   {ingredient}
                 </li>
               );

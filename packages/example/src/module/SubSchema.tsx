@@ -1,4 +1,5 @@
 import { createToken, useEventChat } from '@event-chat/core';
+import _merge from 'lodash/merge';
 import { type FC, useRef, useState } from 'react';
 import z from 'zod';
 import { pubZodSchema, subZodSchema, subZodSchemaResult, toastOpen } from '@/utils/event';
@@ -32,10 +33,11 @@ const SubSchema: FC = () => {
         detail.status === 'waiting'
           ? list
           : list.map((item) =>
-              item.content.status !== 'waiting'
+              item.type !== 'send' || item.content.status !== 'waiting'
                 ? item
-                : { ...item, content: { ...item.content, status: detail.status } }
+                : _merge({}, item, { content: { status: detail.status } })
             );
+
       setList(
         updateList.concat({
           content: detail,

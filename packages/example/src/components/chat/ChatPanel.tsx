@@ -1,9 +1,14 @@
 import { type FC, type PropsWithChildren, type RefObject, useState } from 'react';
 
-const ChatPanel: FC<PropsWithChildren<ChatPanelProps>> = ({ children, rollRef, onChange }) => {
+const ChatPanel: FC<PropsWithChildren<ChatPanelProps>> = ({
+  children,
+  rollRef,
+  onChange,
+  wraper = 'h-120',
+}) => {
   const [value, setValue] = useState('');
   return (
-    <div className="bg-slate-800 grid grid-rows-[1fr_80px] h-120 p-2 rounded-md shadow-md">
+    <div className={`bg-slate-800 grid grid-rows-[1fr_80px] p-2 rounded-md shadow-md ${wraper}`}>
       <div className="h-full overflow-y-auto p-2" ref={rollRef}>
         {children}
       </div>
@@ -38,5 +43,6 @@ export default ChatPanel;
 
 interface ChatPanelProps {
   rollRef?: RefObject<HTMLDivElement>;
+  wraper?: string;
   onChange?: (message: string) => void;
 }

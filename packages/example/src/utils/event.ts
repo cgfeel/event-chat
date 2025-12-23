@@ -1,10 +1,16 @@
-// pub-group-items
+// pub-sub-group-items
 export const groupName = 'group-items';
 export const subGroupItems = 'sub-group-items';
 
 // pub-sub-no-limit
 export const pubNoLimit = 'pub-no-limit';
 export const subNoLimit = 'sub-no-limit';
+
+// pub-sub-private
+export const pubPrivate = 'pub-private-token';
+export const subPrivate = 'sub-private-token';
+export const subPrivateResult = 'sub-private-result';
+export const syncToken = 'sync-private-token';
 
 // pub-sub-zod-schema
 export const pubZodAllow = 'pub-zod-allow';

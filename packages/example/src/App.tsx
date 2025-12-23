@@ -5,10 +5,12 @@ import ChatLayout from './components/chat/ChatLayout';
 import Toast from './components/toast';
 import PubGroupPanel from './module/PubGroupPanel';
 import PubNoLimit from './module/PubNoLimit';
+import PubPrivate from './module/PubPrivate';
 import PubSchema from './module/PubSchema';
 import PubSchemaExtra from './module/PubSchemaExtra';
 import SubGroup from './module/SubGroupPanel';
 import SubNoLimit from './module/SubNoLimit';
+import SubPrivate from './module/SubPrivate';
 import SubSchema from './module/SubSchema';
 import SubSchemaExtra from './module/SubSchemaExtra';
 
@@ -19,14 +21,14 @@ const App = () => {
       <Layout
         list={[
           <ChatLayout
-            extra={<ExtraGuid>直接发型消息，无限制</ExtraGuid>}
+            extra={<ExtraGuid>无限制收发型消息</ExtraGuid>}
             key="pub"
             title="pub-no-limit"
           >
             <PubNoLimit />
           </ChatLayout>,
           <ChatLayout
-            extra={<ExtraGuid>直接发送信息，无限制</ExtraGuid>}
+            extra={<ExtraGuid>无限制收发型消息</ExtraGuid>}
             key="sub"
             title="sub-no-limit"
           >
@@ -73,6 +75,23 @@ const App = () => {
         ]}
         title="Event-chat-group"
       />
+      <hr className="mb-4 mt-4" />
+      <Layout
+        list={[
+          <ChatLayout extra={<ExtraGuid>无限制收发型消息</ExtraGuid>} key="pub" title="pub-private">
+            <PubPrivate />
+          </ChatLayout>,
+          <ChatLayout
+            extra={<ExtraGuid>接消息无限制，发送消息需先同步 pub-private 的 token</ExtraGuid>}
+            key="sub"
+            title="sub-no-private"
+          >
+            <SubPrivate />
+          </ChatLayout>,
+        ]}
+        title="Event-chat-private"
+      />
+      <hr className="mb-4 mt-4" />
     </div>
   );
 };

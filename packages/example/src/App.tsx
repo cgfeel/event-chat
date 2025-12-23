@@ -7,10 +7,10 @@ import PubGroup from './module/PubGroup';
 import PubNoLimit from './module/PubNoLimit';
 import PubSchema from './module/PubSchema';
 import PubSchemaExtra from './module/PubSchemaExtra';
+import SubGroup from './module/SubGroupPanel';
 import SubNoLimit from './module/SubNoLimit';
 import SubSchema from './module/SubSchema';
 import SubSchemaExtra from './module/SubSchemaExtra';
-import SubGroup from './module/subGroup';
 
 const App = () => {
   return (

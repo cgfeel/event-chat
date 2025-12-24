@@ -1,15 +1,21 @@
 import { createToken, useEventChat } from '@event-chat/core';
 import { faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import _merge from 'lodash/merge';
 import { type FC, useRef, useState } from 'react';
 import z from 'zod';
 import { chatMap } from '@/components/chat/utils';
 import { pubPrivate, subPrivate, subPrivateResult, syncToken } from '@/utils/event';
-import { objectKeys, safetyPrint } from '@/utils/fields';
+import { isKey, objectKeys, safetyPrint } from '@/utils/fields';
 import ChatList from '../components/chat/ChatList';
 import ChatPanel from '../components/chat/ChatPanel';
 import RenderSchema from './RenderSchema';
 import type { ChatItemType } from './utils';
+
+const statusMap = Object.freeze({
+  faild: 'error',
+  send: 'success',
+});
 
 const SubPrivate: FC = () => {
   const [list, setList] = useState<ChatRecordType[]>([]);
@@ -44,7 +50,14 @@ const SubPrivate: FC = () => {
       const index = list.findIndex(({ content }) => content.id === id);
       const result = [...list];
       if (index > -1) {
-        result.splice(index, 1, { ...result[index], type });
+        const detail = _merge({}, result[index], {
+          content: {
+            status: isKey(type, statusMap) ? statusMap[type] : type,
+          },
+          type,
+        });
+
+        result.splice(index, 1, detail);
         setList(result);
       }
     },
@@ -69,17 +82,20 @@ const SubPrivate: FC = () => {
       <ChatPanel
         rollRef={rollRef}
         onChange={(detail) => {
-          const content = Object.freeze({
-            id: createToken('sub-private'),
-            message: detail,
-            status: 'waiting',
-          });
           const uplist = list.concat({
             time: new Date(),
             type: 'send',
-            content,
+            content: {
+              id: createToken('sub-private'),
+              message: detail,
+              status: 'waiting',
+            },
           });
-          emit({ detail: content, name: pubPrivate, token: token || undefined });
+          emit({
+            detail: uplist.slice(-1)[0].content,
+            name: pubPrivate,
+            token: token || undefined,
+          });
           setList(uplist);
         }}
       >

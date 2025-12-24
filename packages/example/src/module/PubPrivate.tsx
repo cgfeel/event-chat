@@ -13,10 +13,24 @@ const PubPrivate: FC = () => {
   const rollRef = useRef<HTMLDivElement>(null);
 
   const { token, emit } = useEventChat(pubPrivate, {
-    schema: z.object({
-      id: z.string(),
-      message: z.string(),
-    }),
+    schema: z.object(
+      {
+        id: z.string({
+          error: (issue) => (issue.input === undefined ? '未提供信息编号' : '提供的信息编号不正确'),
+        }),
+        message: z
+          .string({
+            error: (issue) => (issue.input === undefined ? '未提供消息' : '提供的消息类型不正确'),
+          })
+          .min(5, {
+            error: '提供的消息最少 5 个字符',
+          }),
+      },
+      {
+        error: '提供的数据类型不正确',
+      }
+    ),
+    token: true,
     callback: ({ __origin, detail }) => {
       const uplist = list.concat({
         content: {

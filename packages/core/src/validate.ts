@@ -18,10 +18,10 @@ export const checkLiteral = <Detail, Name extends string = string>(
 ) => {
   const schema = z.object({
     group:
-      (group ? z.literal(group) : undefined) ??
+      (group ? z.literal(group, { error: '非群组成员' }) : undefined) ??
       (!group && (!data.global || !data.group) ? z.undefined() : undefined) ??
       z.any(),
-    token: token ? z.literal(token) : z.undefined(),
+    token: token ? z.literal(token, { error: '未提供 token' }) : z.undefined(),
   });
 
   const cause = schema.safeParse(data);

@@ -23,7 +23,9 @@
     "lint:fix": "eslint \"src/**/*.{ts,tsx,js,jsx}\" --fix",
     "storybook": "storybook dev",
     "test": "rstest",
-    "test:coverage": "rstest --coverage"
+    "test:all": "tsd && rstest --coverage",
+    "test:coverage": "rstest --coverage",
+    "test:type": "tsd"
   },
   "devDependencies": {
     "@rslib/core": "^0.18.4",
@@ -38,6 +40,7 @@
     "storybook": "^10.1.4",
     "storybook-addon-rslib": "^3.1.0",
     "storybook-react-rsbuild": "^3.1.0",
+    "tsd": "^0.33.0",
     "typescript-eslint": "^8.48.0"
   },
   "private": true

@@ -34,6 +34,30 @@ const SubMox: FC = () => {
 };
 ```
 
+## 单元测试全覆盖
+
+```shell
+$ pnpm --filter @event-chat/core run test:all
+
+> @event-chat/core@0.1.0 test:coverage /Volumes/develope/app/test/react-dev-exp/event-chat/packages/core
+> rstest --coverage
+
+  Rstest v0.7.2
+
+ Coverage enabled with istanbul
+
+ ✓ tests/eventBus.test.tsx (10)
+ ✓ tests/utils.test.tsx (10)
+ ✓ tests/validate.test.tsx (9)
+ ✓ tests/index.test.tsx (4)
+ ✓ tests/hooks.test.tsx (7)
+ ✓ tests/emit.test.tsx (7)
+
+ Test Files 6 passed
+      Tests 47 passed
+   Duration 2.92s (build 646ms, tests 2.28s)
+```
+
 ## 特性
 
 ### 只接收指定类型的消息

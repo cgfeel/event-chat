@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, rstest, test } from '@rstest/core';
-import { act, renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 import eventBus from '../src/eventBus';
 import { useEventChat } from '../src/hooks';
 import { EventName, getEventName, mountEvent } from '../src/utils';

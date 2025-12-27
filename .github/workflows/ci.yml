@@ -44,104 +44,64 @@ jobs:
           cache: 'pnpm' # 关键：改为pnpm缓存（替代原npm）
           cache-dependency-path: '**/pnpm-lock.yaml' # 指定pnpm锁文件路径
 
-      # 4. 安装monorepo所有依赖（pnpm ci替代npm ci，更适配monorepo）
+      # 3. 安装monorepo所有依赖（pnpm ci替代npm ci，更适配monorepo）
       - name: Install dependencies
         run: |
           pnpm install --frozen-lockfile # 严格按pnpm-lock.yaml安装，禁用版本更新
           pnpm list # 可选：打印依赖列表，方便调试
 
-      # 6. Prettier格式校验（同理，支持根目录/指定子包）
+      # 4. Prettier格式校验（同理，支持根目录/指定子包）
       - name: Run Prettier check
         run: pnpm run format:check
         # 方式2：仅校验指定子包
         # run: pnpm --filter @event-chat/core format:check
 
-      # 7. TypeScript类型检查（monorepo下推荐根目录执行tsc，或子包单独执行）
+      # 5. TypeScript类型检查（monorepo下推荐根目录执行tsc，或子包单独执行）
       - name: Run TypeScript type check
         # 方式1：根目录执行tsc（需根tsconfig.json配置"composite": true）
         run: pnpm tsc --noEmit
         # 方式2：仅检查指定子包
         # run: pnpm --filter @event-chat/core tsc --noEmit
 
-      # 8. 执行构建（构建指定子包，或所有子包）
+      # 6. 执行构建（构建指定子包，或所有子包）
       - name: Build project
         # 方式1：构建指定子包（推荐，避免构建无关包）
         # run: pnpm --filter @event-chat/core build
         # 方式2：构建所有子包（根package.json配置"build": "pnpm -r build"）
         run: pnpm run build
 
-      # 5. ESLint代码质量检查（执行根目录lint，或指定子包）
+      # 7. ESLint代码质量检查（执行根目录lint，或指定子包）
       - name: Run ESLint check
         # 方式1：执行根目录统一的lint脚本（推荐，需根package.json配置）
         run: pnpm run lint
         # 方式2：仅校验指定子包（如@event-chat/core）
         # run: pnpm --filter @event-chat/core lint
 
+      # 8. 构建子包的Storybook
+      - name: Build Storybook for subpackage
+        run: pnpm --filter @event-chat/example run build-storybook
+
       # 9. 上传构建产物（适配monorepo子包的dist路径）
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         if: success()
         with:
-          name: core-build-output
+          name: storybook-github-pages
           path: packages/core/dist/ # 关键：改为子包的dist路径
           retention-days: 7
 
-    # 新增：Storybook部署到GitHub Pages作业
-  deploy-storybook:
-    # 依赖：仅当validate-and-build作业成功完成后，才执行该作业
-    needs: [validate-and-build]
-    # 运行环境：与原有作业一致
-    runs-on: ubuntu-latest
-    # 触发筛选：仅在「main分支push」时执行（排除PR触发，避免冗余部署）
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    steps:
-      # 1. 检出代码（与原有作业一致，需fetch-depth: 0）
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      # 2. 安装pnpm（与原有作业一致）
-      - name: Install pnpm
-        run: |
-          corepack enable
-          corepack prepare pnpm@latest --activate
-
-      # 3. 设置Node.js环境（复用缓存，提升效率）
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20.x
-          cache: 'pnpm'
-          cache-dependency-path: '**/pnpm-lock.yaml'
-
-      # 4. 安装依赖（复用缓存，无需重新下载）
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      # 4.1 其他操作同上
-      - name: Run Prettier check
-        run: pnpm run format:check
-
-      - name: Run TypeScript type check
-        run: pnpm tsc --noEmit
-
-      - name: Build project
-        run: pnpm run build
-
-      # 5. 构建子包的Storybook
-      - name: Build Storybook for subpackage
-        run: pnpm --filter @event-chat/example run build-storybook
-
-      # 6. 上传Storybook静态文件为Pages工件
+      # 10. 上传Storybook静态文件为Pages工件
       - name: Upload Storybook Pages artifact
         uses: actions/upload-pages-artifact@v3
+        if: success()
         with:
+          name: 'storybook-github-pages'
           path: 'packages/example/storybook-static'
 
-      # 7. 部署到GitHub Pages（官方套件，无需额外指定目录）
+      # 11. 部署到GitHub Pages（官方套件，无需额外指定目录）
       - id: deploy
         name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
         with:
+          artifact_name: 'storybook-github-pages'
           token: ${{ github.token }}

@@ -27,10 +27,12 @@
     "declaration": true, // 必须：composite 模式要求生成声明文件（仅检查不生成）
     "declarationMap": true,
     "declarationDir": "./dist/types",
-    "outDir": "./dist",
-    "rootDir": "./src",
+    "baseUrl": ".",
+    "outDir": "dist",
+    "rootDir": "src",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["src/*"],
+      "@event-chat/*": ["../packages/*/src"]
     }
   },
   "include": ["src"],

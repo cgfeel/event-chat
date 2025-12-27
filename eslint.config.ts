@@ -1,3 +1,6 @@
+// For more info, see https://github.com/storybookjs/eslint-plugin-storybook#configuration-flat-config-format
+// import storybook from "eslint-plugin-storybook";
+
 // eslint.config.ts
 import js from '@eslint/js';
 import { base as aliBase, react as aliReact } from 'eslint-config-ali';
@@ -121,13 +124,15 @@ const config: Linter.Config[] = [
       '*.config.js',
       '*.config.ts',
       '**/.storybook/**',
-      '**/rslib.config.ts'
+      '**/rslib.config.ts',
+      "**/storybook-config-entry.js", // 排除报错的临时文件
+      "**/storybook-stories.js"
     ],
   },
 
   // 新增：集成 eslint-config-prettier（必须放在最后！）
   prettierConfig,
-  
+
   // 可选：禁用 Prettier 不处理的 ESLint 格式规则（兜底）
   {
     files: ['**/*.{js,jsx,ts,tsx}'],
@@ -147,6 +152,13 @@ const config: Linter.Config[] = [
       '@typescript-eslint/semi': 'off',
     },
   },
+
+  // {
+  //   ...storybook.configs["flat/recommended"] as Linter.Config,
+  //   // 可选：指定规则生效的文件范围，避免全局应用
+  //   files: ["**/*.stories.@(js|jsx|ts|tsx)", "**/*.story.@(js|jsx|ts|tsx)"],
+  //   ignores: ["**/storybook-config-entry.js"], // 再次确认排除
+  // }
 ];
 
 export default config;

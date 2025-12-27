@@ -16,6 +16,6 @@
     "outDir": "./dist", // 类型文件输出目录
     "rootDir": "./src" // 源码根目录
   },
-  "include": ["src"],
+  "include": ["src", "stories"],
   "exclude": ["node_modules", "dist", "**/*.stories.tsx", "test-d"]
 }

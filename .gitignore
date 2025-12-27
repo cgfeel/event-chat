@@ -43,3 +43,5 @@ coverage/
 
 # Profile
 .rspack-profile-*/
+
+*storybook.log

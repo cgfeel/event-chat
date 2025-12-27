@@ -47,7 +47,7 @@ const config: StorybookConfig = {
       ...config,
       output: {
         ...output,
-        assetPrefix: './event-chat/',
+        assetPrefix: '/event-chat/',
       },
     };
   },

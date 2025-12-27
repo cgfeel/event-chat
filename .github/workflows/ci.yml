@@ -119,6 +119,16 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # 4.1 其他操作同上
+      - name: Run Prettier check
+        run: pnpm run format:check
+
+      - name: Run TypeScript type check
+        run: pnpm tsc --noEmit
+
+      - name: Build project
+        run: pnpm run build
+
       # 5. 构建子包的Storybook
       - name: Build Storybook for subpackage
         run: pnpm --filter @event-chat/example run build-storybook

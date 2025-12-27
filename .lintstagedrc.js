@@ -1,4 +1,4 @@
-const ignoreList = ['packages/ignore-package', 'config.ts'];
+const ignoreList = ['packages/ignore-package', 'config.ts', '.d.ts'];
 
 module.exports = {
   // 匹配所有子包的 js/ts 文件，执行 eslint

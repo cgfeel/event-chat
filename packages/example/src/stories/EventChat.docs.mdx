@@ -1,0 +1,51 @@
+import { ArgsTable, Meta, Story } from '@storybook/addon-docs/blocks';
+import EventChat from './EventChat';
+import EventChatStories from './EventChat.stories';
+
+# 按钮组件（useEventChat）
+
+## 组件介绍
+
+这是一个用于用户交互的通用按钮组件，支持主/次/危险三种类型，可配置禁用状态和点击事件。
+
+## 元信息配置
+
+<Meta
+  component={EventChat}
+  of={EventChatStories}
+  parameters={{
+    layout: 'centered',
+    // 可选：补充文档相关参数，确保 autodocs 正常生效
+    docs: {
+      description: {
+        component: '这是 EventChat 组件的详细文档，用于展示事件聊天功能。',
+      },
+    },
+    backgrounds: {
+      default: 'dark-blue', // 启用自定义的深蓝色背景（覆盖全局默认）
+      // 也可单独为该MDX文件定义专属背景选项
+      options: [
+        { name: 'custom-pink', value: '#fef2f2' },
+        { name: 'dark-blue', value: '#1e3a8a' },
+      ],
+    },
+  }}
+  tags={['autodocs']}
+  title="useEventChat"
+/>
+
+## 基础使用示例
+
+<div className="demo-wrap">
+  <Story name="default">
+    <EventChat />
+  </Story>
+</div>
+
+<style>
+  {`
+  .demo-wrap {
+    background-color: #020917;
+  }
+`}
+</style>

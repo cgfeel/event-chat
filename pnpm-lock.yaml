@@ -189,6 +189,9 @@ importers:
       '@storybook/addon-onboarding':
         specifier: ^10.1.8
         version: 10.1.8(storybook@10.1.8(@testing-library/dom@10.4.1)(prettier@3.7.4)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))
+      '@storybook/addon-themes':
+        specifier: ^10.1.10
+        version: 10.1.10(storybook@10.1.8(@testing-library/dom@10.4.1)(prettier@3.7.4)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))
       '@storybook/react':
         specifier: ^10.1.8
         version: 10.1.8(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@10.1.8(@testing-library/dom@10.4.1)(prettier@3.7.4)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(typescript@5.9.3)
@@ -1559,6 +1562,11 @@ packages:
     resolution: {integrity: sha512-AJEeo7QRvWB4DJtYtaOrh7bP08Iwfb2lWG9oxu+VGJ/nTQ7TloiqhOXQgNe8pdpWQtWT+40Eth2IOCJ7H3e4BQ==}
     peerDependencies:
       storybook: ^10.1.8
+
+  '@storybook/addon-themes@10.1.10':
+    resolution: {integrity: sha512-YlTzREQnUFZ6wepo4MppiobkFrsF1EuObh+vaEhjEj5Cs1oH+kqP5Db+rXi8rbrxnVXaWKmDgqZMtB7kVN4Dnw==}
+    peerDependencies:
+      storybook: ^10.1.10
 
   '@storybook/csf-plugin@10.1.8':
     resolution: {integrity: sha512-n4hcgGE9tm0y7OaV/DzbyFWuvyh0BkHRcNiCuN85kKJPcKqxhuBz4SYWSSTeO0kIw2eXQTM8oB/TJ0O+vLjvwQ==}
@@ -6230,6 +6238,11 @@ snapshots:
   '@storybook/addon-onboarding@10.1.8(storybook@10.1.8(@testing-library/dom@10.4.1)(prettier@3.7.4)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))':
     dependencies:
       storybook: 10.1.8(@testing-library/dom@10.4.1)(prettier@3.7.4)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+
+  '@storybook/addon-themes@10.1.10(storybook@10.1.8(@testing-library/dom@10.4.1)(prettier@3.7.4)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))':
+    dependencies:
+      storybook: 10.1.8(@testing-library/dom@10.4.1)(prettier@3.7.4)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      ts-dedent: 2.2.0
 
   '@storybook/csf-plugin@10.1.8(esbuild@0.27.1)(storybook@10.1.8(@testing-library/dom@10.4.1)(prettier@3.7.4)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(webpack@5.103.0(esbuild@0.27.1))':
     dependencies:

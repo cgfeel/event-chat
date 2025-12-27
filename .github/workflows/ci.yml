@@ -7,6 +7,12 @@ on:
   pull_request:
     branches: [main]
 
+# 顶层配置：部署GitHub Pages所需权限（所有作业可复用，也可在部署作业内单独配置）
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 # 作业配置
 jobs:
   # 代码校验 & 构建作业（覆盖所有子包）
@@ -79,3 +85,53 @@ jobs:
           name: core-build-output
           path: packages/core/dist/ # 关键：改为子包的dist路径
           retention-days: 7
+
+    # 新增：Storybook部署到GitHub Pages作业
+  deploy-storybook:
+    # 依赖：仅当validate-and-build作业成功完成后，才执行该作业
+    needs: [validate-and-build]
+    # 运行环境：与原有作业一致
+    runs-on: ubuntu-latest
+    # 触发筛选：仅在「main分支push」时执行（排除PR触发，避免冗余部署）
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      # 1. 检出代码（与原有作业一致，需fetch-depth: 0）
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # 2. 安装pnpm（与原有作业一致）
+      - name: Install pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@latest --activate
+
+      # 3. 设置Node.js环境（复用缓存，提升效率）
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'pnpm'
+          cache-dependency-path: '**/pnpm-lock.yaml'
+
+      # 4. 安装依赖（复用缓存，无需重新下载）
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # 5. 构建子包的Storybook
+      - name: Build Storybook for subpackage
+        run: pnpm --filter @event-chat/example run build-storybook
+
+      # 6. 上传Storybook静态文件为Pages工件
+      - name: Upload Storybook Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'packages/example/storybook-static'
+
+      # 7. 部署到GitHub Pages（官方套件，无需额外指定目录）
+      - id: deploy
+        name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
+        with:
+          token: ${{ github.token }}

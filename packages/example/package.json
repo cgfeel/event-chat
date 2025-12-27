@@ -42,6 +42,7 @@
     "@storybook/addon-a11y": "^10.1.10",
     "@storybook/addon-docs": "^10.1.8",
     "@storybook/addon-onboarding": "^10.1.8",
+    "@storybook/addon-themes": "^10.1.10",
     "@storybook/react": "^10.1.8",
     "@tailwindcss/postcss": "^4.1.18",
     "storybook": "^10.1.8",

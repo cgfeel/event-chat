@@ -2,13 +2,13 @@ import { ArgsTable, Meta, Story } from '@storybook/addon-docs/blocks';
 import EventChat from './EventChat';
 import EventChatStories from './EventChat.stories';
 
-# 按钮组件（useEventChat）
+# `useEventChat`: 组件通信 `Hooks`
 
-## 组件介绍
+## 介绍
 
-这是一个用于用户交互的通用按钮组件，支持主/次/危险三种类型，可配置禁用状态和点击事件。
-
-## 元信息配置
+- 提供名字和回调方法，`Hooks` 会返回一个 `emit`
+- 用 `emit` 可以向指定名称发送消息，也可以给事件名提供 `callback` 用于接收消息
+- 无论是否是父子层级都能相互通信，不会引发不必要的 `rerender`
 
 <Meta
   component={EventChat}
@@ -18,16 +18,8 @@ import EventChatStories from './EventChat.stories';
     // 可选：补充文档相关参数，确保 autodocs 正常生效
     docs: {
       description: {
-        component: '这是 EventChat 组件的详细文档，用于展示事件聊天功能。',
+        component: '这是 EventChat 组件的详细文档，用于展示 Hooks 特性。',
       },
-    },
-    backgrounds: {
-      default: 'dark-blue', // 启用自定义的深蓝色背景（覆盖全局默认）
-      // 也可单独为该MDX文件定义专属背景选项
-      options: [
-        { name: 'custom-pink', value: '#fef2f2' },
-        { name: 'dark-blue', value: '#1e3a8a' },
-      ],
     },
   }}
   tags={['autodocs']}

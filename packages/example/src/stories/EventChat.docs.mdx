@@ -2,6 +2,8 @@ import { ArgsTable, Canvas, Controls, Description, Meta } from '@storybook/addon
 import EventChat from './EventChat';
 import EventChatStories, { Default } from './EventChat.stories';
 import ListObserver from './components/ListObserver';
+import TableList from './components/TableList';
+import Tag from './components/Tag';
 
 # `useEventChat`: 组件通信 `Hooks`
 
@@ -64,23 +66,123 @@ import ListObserver from './components/ListObserver';
 
 > 由于 `Storybook` 限制 `useEventChat` 返回的数据类型，切换上方 `tab` 至 `EventChatResult` 查看
 
-### 参数 `callback`：回调函数（指定 `schema`）
+### `callback`：回调函数
+
+回调函数的参数类型如下：
+
+<TableList
+  data={[
+    { desc: '发送消息的事件名', keyname: '__origin', type: ['string'] },
+    {
+      desc: (
+        <>
+          根据配置 <Tag>schema</Tag> 推导具体类型，没有提供则为 <Tag>unknown</Tag>
+        </>
+      ),
+      keyname: 'detail',
+      type: ['z.output<Schema>', 'unknown'],
+    },
+    {
+      desc: (
+        <>
+          收到的消息是否发有发送到公屏，来自 <Tag>emit</Tag>
+        </>
+      ),
+      keyname: 'global',
+      type: ['boolean', 'undefined'],
+    },
+    {
+      desc: (
+        <>
+          根据配置 <Tag>group</Tag> 推导具体类型，没有提供则为 <Tag>unknown</Tag>
+        </>
+      ),
+      keyname: 'group',
+      type: ['Group', 'undefined'],
+    },
+    { desc: '内部生成的唯一字符', keyname: 'id', type: ['string'] },
+    {
+      desc: (
+        <>
+          接收消息的事件名，根据配置 <Tag>name</Tag> 推导具体名称
+        </>
+      ),
+      keyname: 'name',
+      type: ['Name'],
+    },
+    {
+      desc: (
+        <>
+          根据配置 <Tag>token</Tag> 为 <Tag>true</Tag> 时类型为 <Tag>string</Tag>，否则为{' '}
+          <Tag>undefined</Tag>
+        </>
+      ),
+      keyname: 'token',
+      type: ['string', 'undefined'],
+    },
+    {
+      desc: (
+        <>
+          根据配置 <Tag>type</Tag> 推导具体类型，没有提供则为 <Tag>unknown</Tag>
+        </>
+      ),
+      keyname: 'type',
+      type: ['Type', 'undefined'],
+    },
+  ]}
+/>
+
+其中 `group` 和 `token` 将会根据接收消息的配置决定收到的值
+
+- 接收消息没有配置 `group`，回调函数 `callback` 参数中的 `group` 为 `undefined`
+- 接收消息 `token` 不为 `true`，回调函数 `callback` 参数中的 `token` 为 `undefined`
+
+> 也就意味着，即便发送消息时通过 `global` 发送到公屏，同时也提供了 `group` 和 `token`，但接收方没有配置，那么回调函数中 `group` 和 `token` 为 `undefined`
+
+### `debug`：调试方法
+
+接收的参数来自 `zod` 校验失败后的对象
 
 ```typescript
-type DetailBaseType<Name extends string = string> = {
-  __origin: string;
-  name: Name;
-};
-
-type DetailTypeWithSchema<
-  Name extends string = string,
-  Schema extends ZodType = ZodType,
-> = DetailBaseType<Name> & {
-  detail: z.output<Schema>;
+type ResultType<Schema = unknown> = Omit<z.ZodSafeParseError<Schema>, 'data'> & {
+  data: unknown;
 };
 ```
 
-### 参数 `callback`：回调函数（不指定 `schema`）
+### `emit`：发送消息的方法
+
+送消息方法的参数类型如下：
+
+<TableList
+  data={[
+    {
+      desc: '发送的消息内容，可以是任意值，这里作为泛型进行收集。只有接收方匹配才能收到消息',
+      keyname: 'detail',
+      type: ['Detail', 'undefined'],
+    },
+    {
+      desc: '用于群组成员是否发送消息到公屏',
+      keyname: 'global',
+      type: ['boolean', 'undefined'],
+    },
+    {
+      desc: '接收消息的事件名',
+      keyname: 'name',
+      type: ['Name'],
+    },
+    {
+      desc: '接收事件消息的密钥',
+      keyname: 'token',
+      type: ['string', 'undefined'],
+    },
+  ]}
+/>
+
+额外说明：
+
+- `__origin`、`type` 将根据 `useEventChat` 配置自动添加
+- `id` 为内部生成
+- `group`、`token` 仅用于接收方比对，接收方最终根据自身配置，透传给 `callback` 作为参数
 
 <style>
   {`

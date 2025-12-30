@@ -1,14 +1,13 @@
-import type { EventChatOptions } from '@event-chat/core';
+import type { EventChatOptions as EventChatOptionsType } from '@event-chat/core';
 import type { ComponentProps } from 'react';
 import type { Meta, StoryObj } from 'storybook-react-rsbuild';
 import type { ZodType } from 'zod';
 import EventChat from './EventChat';
+import EventChatOptions from './components/EventChatOptions';
 import EventChatResult from './components/EventChatResult';
-import OptionsWithSchema from './components/OptionsWithSchema';
-import OptionsWithoutSchema from './components/OptionsWithoutSchema';
 
 type EventChatAdditionalProps = ComponentProps<typeof EventChat> & {
-  options?: EventChatOptions<string, ZodType, string, string, true>;
+  options?: EventChatOptionsType<string, ZodType, string, string, true>;
 };
 
 const meta = {
@@ -25,15 +24,14 @@ const meta = {
     },
     options: {
       control: false,
-      description:
-        '配置选项，详细切换上方 Tab 到 `OptionsWithSchema` 选项（指定 `schema`）和 `OptionsWithoutSchema` 选项（不指定 `schema`）',
+      description: '配置选项，详细切换上方 Tab 到 `EventChatOptions` 选项',
       table: {
         defaultValue: { summary: 'undefined' },
       },
     },
   },
   component: EventChat,
-  subcomponents: { OptionsWithSchema, OptionsWithoutSchema, EventChatResult },
+  subcomponents: { EventChatOptions, EventChatResult },
 } satisfies Meta<EventChatAdditionalProps>;
 
 export default meta;

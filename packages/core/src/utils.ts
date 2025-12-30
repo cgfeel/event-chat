@@ -90,7 +90,7 @@ export type WasProvided<T, Default = undefined> =
   [T] extends [Default]
     ? false
     : [T] extends [undefined]
-      ? false // 单独处理只传了 undefined 的情况，如果你想将其视为“已提供但值为空”
+      ? false // 单独处理只传了 undefined 的情况，如果将其视为“已提供但值为空”
       : true;
 
 interface CustomDetailEvent extends Event {

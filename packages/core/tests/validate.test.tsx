@@ -89,12 +89,13 @@ describe('验证方法单元测试', () => {
 
     // group 都为空，但 global 为 true
     checkLiteral({ ...baseWithOutGroup, global: true }, {}).then((result) => {
-      expect(result.token).toBeUndefined();
+      expect(result.global).toBeTruthy();
     });
 
-    // emit 的 group 不为空，但 global 为 true
+    // emit 的 group 不为空，但 global 为 true，拿到的 token 和 global 也为空
     checkLiteral({ ...baseTestData, global: true }, {}).then((result) => {
-      expect(result.global).toBeTruthy();
+      expect(result.token).toBeUndefined();
+      expect(result.group).toBeUndefined();
     });
   });
 

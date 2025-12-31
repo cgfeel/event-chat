@@ -308,7 +308,7 @@ emit({ global: true, name: 'pub-mox' });
 
 方式 2：通过 `schema` 做区分
 
-如果分组过多，同组件同事件名声明不同的 `group`，可能会造成业务复杂度上升，通过 `schema` 做区分会更合适，例如：
+分组过多同组件同事件名，声明不同 `group` 可能会造成业务复杂度上升，通过 `schema` 做区分会更合适，全部示例：
 
 ```typescript
 useEventChat('multiple-event', {
@@ -319,7 +319,7 @@ useEventChat('multiple-event', {
   }),
   callback: ({ detail }) => {
     if (detail.type === 'color') {
-      // 1. manual: do something
+      // 1. manual checked
     }
   },
 });
@@ -331,7 +331,18 @@ useEventChat('multiple-event', {
     type: z.never(),
   }),
   callback: ({ detail }) => {
-    // 2. auto: do somethine
+    // 2. auto checked by schema
+  },
+});
+
+useEventChat('multiple-event', {
+  group: 'other-group',
+  schema: z.object({
+    name: z.string(),
+    type: z.enum(['color', 'size', 'byte']),
+  }),
+  callback: ({ detail }) => {
+    // 3. auto checked by different group names
   },
 });
 ```

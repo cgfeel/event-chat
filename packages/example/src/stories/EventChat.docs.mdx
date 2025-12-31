@@ -80,7 +80,7 @@ import Tag from './components/Tag';
         </>
       ),
       keyname: 'detail',
-      type: ['z.output<Schema>', 'unknown'],
+      type: ['Schema', 'unknown'],
     },
     {
       desc: (
@@ -184,7 +184,7 @@ type ResultType<Schema = unknown> = Omit<z.ZodSafeParseError<Schema>, 'data'> & 
 - `id` 为内部生成
 - `group`、`token` 仅用于接收方比对，接收方最终根据自身配置，透传给 `callback` 作为参数
 
-## 只接收指定类型的消息
+## `schema`：指定消息类型
 
 通过 `Zod` 来实现，提供一个 `schema` 后只有类型匹配的消息才会被接收。
 
@@ -244,7 +244,7 @@ const { emit } = useEventChat('pub-mox', {
 
 通过 `Zod` 的 `refine` 可以实现异步或同步的自定义校验规则，例如 `return type === 'customType'`
 
-## 群组消息
+## `group`：群组消息
 
 设置 `group` 后将只接受来自成员组的组内消息：
 
@@ -295,7 +295,7 @@ emit({ global: true, name: 'pub-mox' });
 
 > 发送到“公屏“时，同名非同组的组内事件无法收到消息，组内消息只能组内传递，或通过 `global` 同步发送给非组内的“公屏“同名事件。同理非组内成员除非通过 `group` 设为组内成员，否则无法向组内发送消息。
 
-## 私信
+## `token`：私信
 
 配置参数 `token: true` 后，将只接受 `emit` 带有对应的 `token` 发送的消息。
 
@@ -323,6 +323,24 @@ emit({ global: true, name: 'pub-mox' });
   of={Token}
   sourceState="none"
 />
+
+每次创建会话时 `token` 会连同 `emit` 一起返回，将拿到的 `token` 提供给发送方（例如：`props`、`context`...），通过 `emit` 发送消息时携带 `token` 即可发送私信
+
+> 私信发送允许和 `group` 一样，通过 `group` 同时发送到 “公屏“，操作流程见 `group`
+
+## `debug`：调试
+
+和 `callback` 一样，提供一个 `debug` 回调函数，将收集所有通过 `emit` 发送的同名事件，但未能匹配接收消息的规则，而触发的消息，例如：
+
+```typescript
+useEventChat('pub-mox', {
+  group: 'form-detail-edit',
+  callback: (record) => console.log('a----pub-mox', record),
+  debug: (result) => console.log('a----pub-log', result),
+});
+```
+
+调试方法中的参数 `result` 来自 `z.safeParse` 得到的错误结果，包含了 `emit` 发送的信息，以及错误原因等情况
 
 <style>
   {`

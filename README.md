@@ -1,6 +1,6 @@
 # 像聊天一样跨组建通信
 
-<img width="1160" height="360" alt="EventChatBgWhite" src="https://github.com/user-attachments/assets/db33f365-5abb-4041-a95c-fe3fe0acfa16" />
+<img width="100%" alt="EventChatBgWhite" src="https://github.com/user-attachments/assets/db33f365-5abb-4041-a95c-fe3fe0acfa16" />
 
 - 提供一个自己的名字，和回调方法，`hooks` 会返回一个 `emit`
 - 用 `emit` 可以向指定名称发送特定消息，任意组件也可以提供事件名用于接收消息

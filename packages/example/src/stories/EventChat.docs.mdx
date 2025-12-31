@@ -64,7 +64,7 @@ import Tag from './components/Tag';
 
 <Controls />
 
-> 由于 `Storybook` 限制 `useEventChat` 返回的数据类型，切换上方 `tab` 至 `EventChatResult` 查看
+> 参数 `options` 的类型，切换上方 `tab` 至 `EventChatOptions` 查看，返回的类型切换至 `EventChatResult`
 
 ### `callback`：回调函数
 
@@ -294,6 +294,36 @@ emit({ global: true, name: 'pub-mox' });
 由于“公屏“同名事件并没有提供 `group`，所以在回调函数的参数中属性 `group` 将得到 `undefined`，除非将其设为组内成员，否则无法拿到 `group` 具体值。
 
 > 发送到“公屏“时，同名非同组的组内事件无法收到消息，组内消息只能组内传递，或通过 `global` 同步发送给非组内的“公屏“同名事件。同理非组内成员除非通过 `group` 设为组内成员，否则无法向组内发送消息。
+
+### 同事件名多个群组
+
+方式 1：一个组件中可以声明多个 `hooks` 来实现多个群组
+
+考虑过让 `group` 支持类型包含：`string | string[] | undefined`，但这就有两个问题：
+
+- `emit` 时自动附带配置的 `group`，当发送消息时是否希望所有群组都收到相同消息，应由业务决定
+- `emit` 也可以发送自定义 `group`，但这样会存在一个问题，`emit` 时添加了自身以外的群组，是直接报错或忽略当前 `detail`？显然业务来决定更合适（这两种方案都不能在接收方通过 `debug` 收集错误，增加了调试复杂度）
+
+> 因此目前来看，如果一个组件要加入多个群组，在同一个业务组件里同时声明多个 `hooks` 更合适。
+
+方式 2：通过 `schema` 做区分
+
+如果分组过多，同组件同事件名声明不同的 `group`，可能会造成业务复杂度上升，通过 `schema` 做区分会更合适，例如：
+
+```typescript
+useEventChat('multiple-event', {
+  group: 'edit-group',
+  schema: z.object({
+    name: z.string(),
+    type: z.enum(['color', 'size', 'byte']),
+  }),
+  callback: ({ detail }) => {
+    if (detail.type === 'color') {
+      // do something
+    }
+  },
+});
+```
 
 ## `token`：私信
 

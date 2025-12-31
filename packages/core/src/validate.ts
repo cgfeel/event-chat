@@ -23,6 +23,14 @@ const checkDetail = <
   return Promise.reject(new Error('validate faild'));
 };
 
+const literalCondition = (value?: string | boolean, error?: string, empty?: string) => {
+  return (
+    (typeof value === 'string' && value !== ''
+      ? z.literal(value, !error ? undefined : { error })
+      : undefined) ?? (value ? z.any() : z.undefined(!empty ? undefined : { error: empty }))
+  );
+};
+
 export const checkLiteral = <
   Name extends string,
   Schema extends ZodType,
@@ -35,16 +43,16 @@ export const checkLiteral = <
   currentToken?: string
 ) => {
   const schema = z.object({
-    group:
-      (group ? z.literal(group, { error: 'Non group members.' }) : undefined) ??
-      (!group && (!data.global || !data.group) ? z.undefined() : undefined) ??
-      z.any(),
-    token:
-      (token
-        ? z.literal(currentToken, { error: 'Not providing tokens as expected.' })
-        : undefined) ??
-      (!token && (!data.global || !data.token) ? z.undefined() : undefined) ??
-      z.any(),
+    group: literalCondition(
+      group ?? data.global,
+      'Non group members.',
+      'Do not accept record with group.'
+    ),
+    token: literalCondition(
+      token ? currentToken : data.global,
+      'Not providing tokens as expected.',
+      'Do not accept record with token.'
+    ),
   });
 
   const cause = schema.safeParse(data);

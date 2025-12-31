@@ -1,6 +1,6 @@
 import { ArgsTable, Canvas, Controls, Description, Meta } from '@storybook/addon-docs/blocks';
 import EventChat from './EventChat';
-import EventChatStories, { Default, Group, Schema } from './EventChat.stories';
+import EventChatStories, { Default, Group, Schema, Token } from './EventChat.stories';
 import ListObserver from './components/ListObserver';
 import TableList from './components/TableList';
 import Tag from './components/Tag';
@@ -208,6 +208,15 @@ type ResultType<Schema = unknown> = Omit<z.ZodSafeParseError<Schema>, 'data'> & 
         );
       },
     },
+    {
+      title: 'Toast in GitHub',
+      onClick: () => {
+        window.open(
+          'https://github.com/cgfeel/event-chat/tree/main/packages/example/src/components/toast',
+          '_blank'
+        );
+      },
+    },
   ]}
   of={Schema}
   sourceState="none"
@@ -245,7 +254,7 @@ const { emit } = useEventChat('pub-mox', {
       title: 'Pub in GitHub',
       onClick: () => {
         window.open(
-          'https://github.com/cgfeel/event-chat/blob/main/packages/example/src/module/PubSchema.tsx',
+          'https://github.com/cgfeel/event-chat/blob/main/packages/example/src/module/PubGroupPanel.tsx',
           '_blank'
         );
       },
@@ -254,13 +263,64 @@ const { emit } = useEventChat('pub-mox', {
       title: 'Sub in GitHub',
       onClick: () => {
         window.open(
-          'https://github.com/cgfeel/event-chat/blob/main/packages/example/src/module/SubSchema.tsx',
+          'https://github.com/cgfeel/event-chat/blob/main/packages/example/src/module/SubGroupPanel.tsx',
           '_blank'
         );
       },
     },
   ]}
   of={Group}
+  sourceState="none"
+/>
+
+### “公屏“喊话
+
+对于组内的成员，如果需要在 “公屏” 喊话，调用 `emit` 时可以提供一个 `global`，这样发送到群组内部的同时会将信息发送到“公屏“同名事件中，例如：
+
+```typescript
+useEventChat('pub-mox', {
+  callback: (record) => {
+    // receive undefined
+    console.log('a----pub-mox', record.group);
+  },
+});
+
+const { emit } = useEventChat('sub-mox', {
+  group: 'form-detail-edit',
+});
+emit({ global: true, name: 'pub-mox' });
+```
+
+由于“公屏“同名事件并没有提供 `group`，所以在回调函数的参数中属性 `group` 将得到 `undefined`，除非将其设为组内成员，否则无法拿到 `group` 具体值。
+
+> 发送到“公屏“时，同名非同组的组内事件无法收到消息，组内消息只能组内传递，或通过 `global` 同步发送给非组内的“公屏“同名事件。同理非组内成员除非通过 `group` 设为组内成员，否则无法向组内发送消息。
+
+## 私信
+
+配置参数 `token: true` 后，将只接受 `emit` 带有对应的 `token` 发送的消息。
+
+<Canvas
+  additionalActions={[
+    {
+      title: 'Pub in GitHub',
+      onClick: () => {
+        window.open(
+          'https://github.com/cgfeel/event-chat/blob/main/packages/example/src/module/PubPrivate.tsx',
+          '_blank'
+        );
+      },
+    },
+    {
+      title: 'Sub in GitHub',
+      onClick: () => {
+        window.open(
+          'https://github.com/cgfeel/event-chat/blob/main/packages/example/src/module/SubPrivate.tsx',
+          '_blank'
+        );
+      },
+    },
+  ]}
+  of={Token}
   sourceState="none"
 />
 

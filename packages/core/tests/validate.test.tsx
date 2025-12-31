@@ -59,7 +59,7 @@ describe('验证方法单元测试', () => {
       'validate faild'
     );
 
-    checkLiteral(baseTestData, upConfig).catch((error) => {
+    checkLiteral(baseTestData, upConfig, config.token).catch((error) => {
       const { cause } = error instanceof Error ? error : {};
       expect(cause).toMatchObject({ success: false });
 
@@ -68,10 +68,39 @@ describe('验证方法单元测试', () => {
     });
   });
 
-  test('checkLiteral：token不匹配，校验失败并抛出错误', async () => {
-    const upConfig = { ...options, token: true };
-    await expect(checkLiteral(baseTestData, upConfig)).rejects.toThrow('validate faild');
-    checkLiteral(baseTestData, upConfig).catch((error) => {
+  test('checkLiteral：发送消息带有 group，而接收方不需要 group', async () => {
+    const upConfig = { ...options, group: undefined };
+    await expect(checkLiteral(baseTestData, upConfig, config.token)).rejects.toThrow(
+      'validate faild'
+    );
+
+    checkLiteral(baseTestData, upConfig, config.token).catch((error) => {
+      const { cause } = error instanceof Error ? error : {};
+      expect(cause).toMatchObject({ success: false });
+
+      const issue = getPath(cause, 'error.issues.0.message');
+      expect(issue).toBe('Do not accept record with group.');
+    });
+  });
+
+  test('checkLiteral：token不匹配，发送的消息带有 token，接收的消息不需要', async () => {
+    await expect(checkLiteral(baseTestData, options)).rejects.toThrow('validate faild');
+    checkLiteral(baseTestData, options).catch((error) => {
+      const { cause } = error instanceof Error ? error : {};
+      expect(cause).toMatchObject({ success: false });
+
+      const issue = getPath(cause, 'error.issues.0.message');
+      expect(issue).toBe('Do not accept record with token.');
+    });
+  });
+
+  test('checkLiteral：token不匹配，发送的消息没有带 token', async () => {
+    const noTokenData = { ...baseTestData, token: undefined };
+    await expect(checkLiteral(noTokenData, options, config.token)).rejects.toThrow(
+      'validate faild'
+    );
+
+    checkLiteral(noTokenData, options, config.token).catch((error) => {
       const { cause } = error instanceof Error ? error : {};
       expect(cause).toMatchObject({ success: false });
 

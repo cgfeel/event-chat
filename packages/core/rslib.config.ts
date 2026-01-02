@@ -22,7 +22,7 @@ export default defineConfig({
   ],
   output: {
     target: 'web',
-    externals: ['react', 'react-dom']
+    externals: ['react', 'react-dom', 'zod']
   },
   plugins: [pluginReact(),
     pluginEslint({

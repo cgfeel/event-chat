@@ -395,6 +395,12 @@ useEventChat('multiple-event', {
 
 > 私信发送允许和 `group` 一样，通过 `group` 同时发送到 “公屏“，操作流程见 `group`
 
+### 携带 `token` 发送消息
+
+和接收消息同理，当 `emit` 发送消息携带了 `token` 但没有设置 `global` 的情况下，只能向指定 `token` 对应的接收方发送消息，其他同名事件无法获取到消息。
+
+> `emit` 发送消息时 `group` 和 `token` 一样，不同的是 `group` 按照配置自动携带，而 `token` 需要手动配置
+
 ## `debug`：调试
 
 和 `callback` 一样，提供一个 `debug` 回调函数，将收集所有通过 `emit` 发送的同名事件，但未能匹配接收消息的规则，而触发的消息，例如：

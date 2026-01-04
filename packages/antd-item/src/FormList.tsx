@@ -34,6 +34,7 @@ const FormList = <
     <Form.Item name={props.name}>
       <FormInput
         async={async}
+        name={props.name}
         schema={schema}
         type={type}
         callback={callback}

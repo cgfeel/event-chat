@@ -18,6 +18,11 @@ export const pubZodSchema = 'pub-zod-schema';
 export const subZodSchema = 'sub-zod-schema';
 export const subZodSchemaResult = 'sub-zod-schema-result';
 
+// tabs
+export const tabItem = 'tab-item';
+export const tabsContainer = 'tabs-container';
+export const tabsPick = 'tabs-pick';
+
 // toast
 export const toastClose = 'toast-close';
 export const toastItem = 'toast-item';

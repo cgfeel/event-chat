@@ -2,6 +2,13 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+@layer components {
+  .tabs-container {
+    --selected-item-width: 0;
+    --selected-item-position: 0;
+  }
+}
+
 @theme {
   /* 定义颜色变量 */
   --color-toast-success: #10b981;

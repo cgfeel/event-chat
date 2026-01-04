@@ -13,7 +13,7 @@
     "at-rule-no-unknown": [
       true,
       {
-        "ignoreAtRules": ["custom-variant", "theme", "utility"]
+        "ignoreAtRules": ["custom-variant", "layer", "theme", "utility"]
       }
     ]
   }

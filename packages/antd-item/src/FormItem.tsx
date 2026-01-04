@@ -1,37 +1,32 @@
-import { createToken, useEventChat } from '@event-chat/core';
 import { Form, FormItemProps as FormItemRawProps } from 'antd';
-import { FC, memo, useMemo } from 'react';
-import z from 'zod';
-import { getStringValue, namepathSchema, useFormEvent } from './utils';
+import { ZodType } from 'zod';
+import FormInput, { FormInputProps } from './FormInput';
 
-const isDefined = <T,>(value: T | undefined): value is T => value !== undefined;
-const convertPath = (path?: InputProps['name']) =>
-  (Array.isArray(path) ? path : [getStringValue([String(path)])]).filter(isDefined);
-
-const InputInner: FC<InputProps> = ({ name }) => {
-  const { group, parent } = useFormEvent();
-  const formName = useMemo(() => {
-    const namePaths = convertPath(name);
-    const parentName = convertPath(parent);
-    const inputName = namePaths.length === 0 ? [createToken('input-name')] : namePaths;
-
-    try {
-      return JSON.stringify(parentName.concat(inputName));
-    } catch {
-      return `["${createToken('input-name')}"]`;
-    }
-  }, [name, parent]);
-  useEventChat(formName, { callback: () => {}, group });
-  return null;
-};
-
-const Input = memo(InputInner);
-const FormItem: FC<FormItemProps> = ({ children, ...props }) => {
+const FormItem = <
+  Schema extends ZodType | undefined = undefined,
+  Type extends string | undefined = undefined,
+>({
+  async,
+  children,
+  schema,
+  type,
+  callback,
+  debug,
+  onChange,
+  ...props
+}: FormItemProps<Schema, Type>) => {
   return (
     <>
       <Form.Item {...props}>{children}</Form.Item>
       <Form.Item name={props.name}>
-        <Input />
+        <FormInput
+          async={async}
+          schema={schema}
+          type={type}
+          callback={callback}
+          debug={debug}
+          onChange={onChange}
+        />
       </Form.Item>
     </>
   );
@@ -39,10 +34,8 @@ const FormItem: FC<FormItemProps> = ({ children, ...props }) => {
 
 export default FormItem;
 
-interface FormItemProps extends Omit<FormItemRawProps, 'name'>, InputProps {
-  //   parent: string | (string | number);
-}
-
-interface InputProps {
-  name?: z.infer<typeof namepathSchema>;
-}
+interface FormItemProps<
+  Schema extends ZodType | undefined = undefined,
+  Type extends string | undefined = undefined,
+>
+  extends Omit<FormItemRawProps, 'name'>, FormInputProps<Schema, Type> {}

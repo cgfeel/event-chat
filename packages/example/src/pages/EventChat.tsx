@@ -2,7 +2,6 @@ import type { FC } from 'react';
 import ExtraGuid from '../components/ExtraGuid';
 import Layout from '../components/Layout';
 import ChatLayout from '../components/chat/ChatLayout';
-import Toast from '../components/toast';
 import PubGroupPanel from '../module/PubGroupPanel';
 import PubNoLimit from '../module/PubNoLimit';
 import PubPrivate from '../module/PubPrivate';
@@ -16,7 +15,6 @@ import SubSchemaExtra from '../module/SubSchemaExtra';
 
 const EventChat: FC = () => (
   <>
-    <Toast />
     <Layout
       list={[
         <ChatLayout extra={<ExtraGuid>无限制收发型消息</ExtraGuid>} key="pub" title="pub-no-limit">

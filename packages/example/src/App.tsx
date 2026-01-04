@@ -1,6 +1,7 @@
 import { type FC, Suspense, lazy, useState } from 'react';
 import './App.css';
 import Tabs, { TabItem } from './components/Tabs';
+import Toast from './components/toast';
 import { isKey } from './utils/fields';
 
 const AntdForm = lazy(() => import('./pages/AntdForm'));
@@ -15,6 +16,7 @@ const App: FC = () => {
 
   return (
     <>
+      <Toast />
       <div className="flex justify-center items-center py-4 w-full">
         <Tabs defaultActive="EventChat" onChange={(detail) => setCurrent(String(detail))}>
           <TabItem name="EventChat">eventChat</TabItem>
@@ -24,9 +26,13 @@ const App: FC = () => {
         </Tabs>
       </div>
       <Suspense
-        fallback={<div className="flex justify-center items-center w-full">loading...</div>}
+        fallback={
+          <div className="animate-fade-in-up flex justify-center items-center w-full">
+            loading...
+          </div>
+        }
       >
-        <div className="m-auto max-w-400 p-4">
+        <div className="animate-fade-in-up m-auto max-w-400 p-4">
           <IndexCom />
         </div>
       </Suspense>

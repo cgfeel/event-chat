@@ -4,20 +4,10 @@ import { createContext, useContext, useMemo } from 'react';
 import z from 'zod';
 
 export const FormEventContext = createContext<FormEventContextInstance>({});
-export const namepathSchema = z.union([
-  z.string(),
-  z.number(),
-  z.array(z.union([z.string(), z.number()])),
-]);
-
 export const getStringValue = <T extends NamepathType | undefined>(values: T[]) =>
   values.find((item) => item !== undefined && (!Array.isArray(item) || item.length > 0));
 
-export const convertNamepath = (path: z.infer<typeof namepathSchema>) => {
-  const namepath = Array.isArray(path) ? path : [path];
-  return namepath.join('.');
-};
-
+export const convertName = (path?: NamepathType) => (typeof path === 'object' ? [...path] : path);
 export const useForm = <
   ValueType,
   Name extends NamepathType,
@@ -34,11 +24,15 @@ export const useForm = <
   );
 
   const { emit } = useEventChat(formName, {
-    schema: z.array(z.object({ name: namepathSchema, value: z.unknown() })),
+    schema: z.array(
+      z.object({
+        name: z.union([z.string(), z.number(), z.array(z.union([z.string(), z.number()]))]),
+        value: z.unknown(),
+      })
+    ),
     callback: ({ detail }) =>
       detail.forEach((item) => {
-        const target = convertNamepath(item.name);
-        emit({ detail: item.value, name: target });
+        emit({ detail: item.value, name: item.name });
       }),
     group: getStringValue([group, options?.group]),
   });
@@ -55,7 +49,7 @@ export const useFormEvent = () => {
 export interface FormEventContextInstance {
   group?: string;
   name?: NamepathType; // 用于向 form 传递 detail
-  parent?: string | number | Array<string | number>;
+  parent?: NamepathType;
   emit?: <Detail, CustomName extends NamepathType>(
     record: EventDetailType<Detail, CustomName>
   ) => void;

@@ -71,6 +71,7 @@ const FormEvent = <ValuesType, Name extends string, Group extends string | undef
 
 export default FormEvent;
 
+// 这里的 Name 要适配 Form 组件，所以取 string
 interface FormProps<
   ValuesType,
   Name extends string,

@@ -1,6 +1,7 @@
 import { Form, FormItemProps as FormItemRawProps } from 'antd';
 import { ZodType } from 'zod';
 import FormInput, { FormInputProps } from './FormInput';
+import { convertName } from './utils';
 
 const FormItem = <
   Schema extends ZodType | undefined = undefined,
@@ -18,7 +19,7 @@ const FormItem = <
   return (
     <>
       <Form.Item {...props}>{children}</Form.Item>
-      <Form.Item name={props.name}>
+      <Form.Item name={convertName(props.name)}>
         <FormInput
           async={async}
           name={props.name}

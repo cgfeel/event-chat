@@ -22,7 +22,6 @@ const App: FC = () => {
           <TabItem name="EventChat">eventChat</TabItem>
           <TabItem name="AntdForm">antdForm</TabItem>
           <TabItem name="antd-form1">antdForm1</TabItem>
-          <TabItem name="antd-form2">antdForm2</TabItem>
         </Tabs>
       </div>
       <Suspense

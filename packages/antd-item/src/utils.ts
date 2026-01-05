@@ -1,4 +1,4 @@
-import { EventDetailType, createToken, useEventChat } from '@event-chat/core';
+import { EventDetailType, NamepathType, createToken, useEventChat } from '@event-chat/core';
 import { Form, FormInstance } from 'antd';
 import { createContext, useContext, useMemo } from 'react';
 import z from 'zod';
@@ -10,8 +10,8 @@ export const namepathSchema = z.union([
   z.array(z.union([z.string(), z.number()])),
 ]);
 
-export const getStringValue = <T extends string | undefined>(values: T[]) =>
-  values.find((item) => Boolean(item));
+export const getStringValue = <T extends NamepathType | undefined>(values: T[]) =>
+  values.find((item) => item !== undefined && (!Array.isArray(item) || item.length > 0));
 
 export const convertNamepath = (path: z.infer<typeof namepathSchema>) => {
   const namepath = Array.isArray(path) ? path : [path];
@@ -20,7 +20,7 @@ export const convertNamepath = (path: z.infer<typeof namepathSchema>) => {
 
 export const useForm = <
   ValueType,
-  Name extends string,
+  Name extends NamepathType,
   Group extends string | undefined = undefined,
 >(
   formInit?: FormEventInstance<ValueType, Name, Group>,
@@ -54,21 +54,25 @@ export const useFormEvent = () => {
 
 export interface FormEventContextInstance {
   group?: string;
-  name?: string; // 用于向 form 传递 detail
+  name?: NamepathType; // 用于向 form 传递 detail
   parent?: string | number | Array<string | number>;
-  emit?: <Detail, CustomName extends string>(record: EventDetailType<Detail, CustomName>) => void;
+  emit?: <Detail, CustomName extends NamepathType>(
+    record: EventDetailType<Detail, CustomName>
+  ) => void;
 }
 
 export interface FormEventInstance<
   ValueType,
-  Name extends string,
+  Name extends NamepathType,
   Group extends string | undefined = undefined,
 >
   extends FormInstance<ValueType>, FormOptions<Name, Group> {
-  emit?: <Detail, CustomName extends string>(record: EventDetailType<Detail, CustomName>) => void;
+  emit?: <Detail, CustomName extends NamepathType>(
+    record: EventDetailType<Detail, CustomName>
+  ) => void;
 }
 
-type FormOptions<Name extends string, Group extends string | undefined = undefined> = {
+type FormOptions<Name extends NamepathType, Group extends string | undefined = undefined> = {
   group?: Group;
   name?: Name;
 };

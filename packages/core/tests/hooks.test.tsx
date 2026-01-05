@@ -28,7 +28,7 @@ afterEach(() => {
 describe('useEventChat 基础功能', () => {
   const testName = 'test-event-chat';
 
-  test('返应返回有效的 token 字符串和 emit 函数', () => {
+  test('返回有效的 token 字符串和 emit 函数', () => {
     const { result } = renderHook(() => useEventChat(testName));
     const { token, emit } = result.current;
 
@@ -119,9 +119,11 @@ describe('useEventChat 基础功能', () => {
     expect(eventBus.off).toHaveBeenCalledTimes(1);
   });
 
-  test('事件名称为空时不注册监听器', () => {
+  test('事件名称为空时也会订阅回调', () => {
     renderHook(() => useEventChat(''));
-    expect(eventBus.on).not.toHaveBeenCalled();
+    const eventName = getEventName('');
+
+    expect(eventBus.on).toHaveBeenCalledWith(eventName, expect.any(Function));
   });
 
   test('document.body 只会添加一次全局 EventName 监听', () => {

@@ -180,4 +180,58 @@ describe('useEventChat 通信', () => {
     expect(mockCallback1).toBeCalledTimes(1);
     expect(mockCallback2).toBeCalledTimes(1);
   });
+
+  test('回调函数接收的参数类型: 数据事件名', async () => {
+    const name = ['sub-mox', 'list', 0, 'name'] as const;
+    const origin = ['pub-mox', 0, 'test'] as const;
+    const group = 'test-group';
+
+    const mockCallback = rstest.fn();
+    renderHook(() => useEventChat(name, { callback: mockCallback, group }));
+
+    const { result } = renderHook(() => useEventChat(origin, { group }));
+    const record = {
+      detail: { message: 'test' },
+      name,
+    };
+
+    await act(() => {
+      result.current.emit(record);
+    });
+
+    expect(mockCallback).toHaveBeenCalledWith(
+      expect.objectContaining({
+        ...record,
+        group,
+        name,
+        origin,
+      })
+    );
+  });
+
+  test('回调函数接收的参数类型: 字符事件名', async () => {
+    const group = 'test-group';
+    const mockCallback = rstest.fn();
+
+    renderHook(() => useEventChat('sub-mox', { callback: mockCallback, group }));
+
+    const { result } = renderHook(() => useEventChat('pub-mox', { group }));
+    const record = {
+      detail: { message: 'test' },
+      name: 'sub-mox',
+    };
+
+    await act(() => {
+      result.current.emit(record);
+    });
+
+    expect(mockCallback).toHaveBeenCalledWith(
+      expect.objectContaining({
+        ...record,
+        name: 'sub-mox',
+        origin: 'pub-mox',
+        group,
+      })
+    );
+  });
 });

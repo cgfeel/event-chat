@@ -2,7 +2,7 @@ import { ZodType, z } from 'zod';
 import eventBus from './eventBus';
 
 export const EventName = 'custom-event-chat-11.18';
-export const createEvent = <Detail, Name extends string = string>(
+export const createEvent = <Detail, Name extends NamepathType = string>(
   detail: EventDetailType<Detail, Name>
 ) =>
   new CustomEvent(EventName, {
@@ -18,13 +18,29 @@ export const getConditionKey = (name: string, id: string, type?: string) =>
   [name, id, type].filter(Boolean).join('-');
 
 // 考虑空字符的情况
-export const getEventName = <T extends string>(name: T) =>
-  name ? `event-chart-${name}` : undefined;
+export const getEventName = (name: NamepathType) => {
+  const path = Array.isArray(name) ? name : [name];
+  try {
+    // 如果传入空字符会得到 event-chart_[""]
+    return `event-chart_${JSON.stringify(path)}`;
+  } catch {
+    return `event-chart_[]`;
+  }
+};
 
 export const isResultType = (data: unknown): data is ResultType =>
   typeof data === 'object' && data !== null && 'success' in data && !data.success;
 
-export const isSafetyType = <T>(target: unknown, origin: T): target is T => target === origin;
+export const isSafetyType = <T>(target: unknown, origin: T): target is T => {
+  if (target && origin && typeof origin === 'object') {
+    try {
+      return JSON.stringify(target) === JSON.stringify(origin);
+    } catch {
+      return false;
+    }
+  }
+  return target === origin;
+};
 
 export function mountEvent(event: CustomDetailEvent) {
   const { name: detailName } = event.detail ?? {};
@@ -35,7 +51,7 @@ export function mountEvent(event: CustomDetailEvent) {
 }
 
 export interface EventChatOptions<
-  Name extends string,
+  Name extends NamepathType,
   Schema extends ZodType | undefined = undefined,
   Group extends string | undefined = undefined,
   Type extends string | undefined = undefined,
@@ -51,7 +67,7 @@ export interface EventChatOptions<
 }
 
 export type DetailType<
-  Name extends string,
+  Name extends NamepathType,
   Schema extends ZodType | undefined = undefined,
   Group extends string | undefined = undefined,
   Type extends string | undefined = undefined,
@@ -67,16 +83,22 @@ export type DetailType<
   global?: boolean;
 };
 
-export type EventDetailType<Detail = unknown, Name extends string = string> = {
+export type EventDetailType<Detail = unknown, Name extends NamepathType = NamepathType> = {
   id: string;
   name: Name;
-  origin: string;
+  origin: NamepathType;
   detail?: Detail;
   global?: boolean;
   group?: string;
   type?: string;
   token?: string;
 };
+
+export type NamepathType =
+  | number
+  | string
+  | Array<string | number>
+  | Readonly<Array<string | number>>;
 
 export type ResultType<Schema = unknown> = Omit<z.ZodSafeParseError<Schema>, 'data'> & {
   data: unknown;

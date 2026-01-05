@@ -5,6 +5,7 @@ import {
   EventChatOptions,
   EventDetailType,
   EventName,
+  NamepathType,
   createEvent,
   createToken,
   getConditionKey,
@@ -25,7 +26,7 @@ export const useMemoFn = <T>(fn: T) => {
 };
 
 export function useEventChat<
-  Name extends string,
+  Name extends NamepathType,
   Schema extends ZodType | undefined = undefined,
   Group extends string | undefined = undefined,
   Type extends string | undefined = undefined,
@@ -36,10 +37,11 @@ export function useEventChat<
 
   // 随业务改变
   const token = useMemo(
-    () => createToken(getConditionKey(name, id, ops?.type)),
-    [id, name, ops?.type]
+    () => createToken(getConditionKey(eventName, id, ops?.type)),
+    [eventName, id, ops?.type]
   );
 
+  const nameRc = useMemoFn(name);
   const options = useMemoFn(ops);
   const tokenRc = useMemoFn(token);
 
@@ -56,7 +58,7 @@ export function useEventChat<
       const { name: subName, ...args } = data;
       const opitem = options.current;
 
-      if (!opitem || !isSafetyType(subName, name)) return;
+      if (!opitem || !isSafetyType(subName, nameRc.current)) return;
       const upRecord = { ...args, name: subName };
 
       if (opitem.schema !== undefined) {
@@ -69,25 +71,24 @@ export function useEventChat<
           .catch((error) => errorHandle(error, data.detail));
       }
     },
-    [name, options, tokenRc, errorHandle]
+    [nameRc, options, tokenRc, errorHandle]
   );
 
   const emit = useCallback(
-    <Detail, CustomName extends string>(
+    <Detail, CustomName extends NamepathType>(
       detail: Omit<EventDetailType<Detail, CustomName>, 'group' | 'id' | 'origin' | 'type'>
     ) => {
       // 业务提交 name 是空的，那么 origin 就是空，当做匿名处理
-      // 匿名事件只允许通过 emit 发送消息，不能通过 callback 接收消息
       const event = createEvent({
         ...detail,
         group: ops?.group,
-        origin: name,
+        origin: nameRc.current,
         type: ops?.type,
         id,
       });
       document.body.dispatchEvent(event);
     },
-    [id, name, ops?.group, ops?.type]
+    [id, nameRc, ops?.group, ops?.type]
   );
 
   useEffect(() => {

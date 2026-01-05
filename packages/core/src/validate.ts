@@ -1,8 +1,8 @@
 import { ZodType, z } from 'zod';
-import { EventChatOptions, EventDetailType } from './utils';
+import { EventChatOptions, EventDetailType, NamepathType } from './utils';
 
 const checkDetail = <
-  Name extends string,
+  Name extends NamepathType,
   Schema extends ZodType,
   Group extends string | undefined = undefined,
   Type extends string | undefined = undefined,
@@ -32,7 +32,7 @@ const literalCondition = (value?: string | boolean, error?: string, empty?: stri
 };
 
 export const checkLiteral = <
-  Name extends string,
+  Name extends NamepathType,
   Schema extends ZodType,
   Group extends string | undefined = undefined,
   Type extends string | undefined = undefined,
@@ -70,7 +70,7 @@ export const checkLiteral = <
 };
 
 export const validate = <
-  Name extends string,
+  Name extends NamepathType,
   Schema extends ZodType,
   Group extends string | undefined = undefined,
   Type extends string | undefined = undefined,
@@ -91,7 +91,7 @@ export const validate = <
 // 即便使用类型缩窄也是通过判断后通过 is 进行断言
 // 也可以使用重载替代断言，但结果就意味着 useEventChat，validate 每增加一个方法就要重载一次
 type CallbackPropsType<
-  Name extends string,
+  Name extends NamepathType,
   Schema extends ZodType,
   Group extends string | undefined = undefined,
   Type extends string | undefined = undefined,

@@ -69,9 +69,9 @@ describe('工具函数单元测试', () => {
     expect(getConditionKey('name', '', 'type')).toBe('name-type');
   });
 
-  test('getEventName: 当name不为空时，应该返回拼接后的事件名称，否则返回 undefined', () => {
-    expect(getEventName('test')).toBe('event-chart-test');
-    expect(getEventName('')).toBeUndefined();
+  test('getEventName: 获取事件名', () => {
+    expect(getEventName('test')).toBe(`event-chart_${JSON.stringify(['test'])}`);
+    expect(getEventName('')).toBe(`event-chart_${JSON.stringify([''])}`);
   });
 
   test('isResultType: 获取校验失败的对象', () => {
@@ -94,8 +94,8 @@ describe('工具函数单元测试', () => {
     expect(isSafetyType(testObj, testObj)).toBeTruthy();
     expect(isSafetyType(123, 123)).toBeTruthy();
     expect(isSafetyType('test', 'test')).toBeTruthy();
+    expect(isSafetyType({ a: 1 }, { a: 1 })).toBeTruthy();
 
-    expect(isSafetyType({ a: 1 }, { a: 1 })).toBeFalsy();
     expect(isSafetyType(123, 456)).toBeFalsy();
     expect(isSafetyType('test', 'test2')).toBeFalsy();
   });

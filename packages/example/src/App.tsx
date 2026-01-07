@@ -1,10 +1,9 @@
-import { StyleProvider } from '@ant-design/cssinjs';
-import { ConfigProvider, theme } from 'antd';
+import { FormEvent } from '@event-chat/antd-item';
+import { ConfigProvider, Form, theme } from 'antd';
 import { type FC, Suspense, lazy, useState } from 'react';
 import './App.css';
 import Tabs, { TabItem } from './components/Tabs';
 import Toast from './components/toast';
-import FormModule from './module/FormModule';
 import { isKey } from './utils/fields';
 
 const AntdForm = lazy(() => import('./pages/AntdForm'));
@@ -12,6 +11,7 @@ const EventChat = lazy(() => import('./pages/EventChat'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 const Router = Object.freeze({ AntdForm, EventChat });
+FormEvent.observer(Form);
 
 const App: FC = () => {
   const [current, setCurrent] = useState('EventChat');
@@ -27,35 +27,23 @@ const App: FC = () => {
           <TabItem name="antd-form1">antdForm1</TabItem>
         </Tabs>
       </div>
-      <StyleProvider layer>
-        <ConfigProvider
-          theme={{
-            algorithm: theme.darkAlgorithm,
-            token: {
-              colorPrimary: '#1890ff',
-              colorTextSecondary: '#6610f2',
-            },
-            components: {
-              Form: {
-                labelColor: '#1890ff',
-              },
-            },
-          }}
-        >
-          <FormModule />
-          <Suspense
-            fallback={
-              <div className="animate-fade-in-up flex justify-center items-center w-full">
-                loading...
-              </div>
-            }
-          >
-            <div className="animate-fade-in-up m-auto max-w-400 p-4">
-              <IndexCom />
+      <ConfigProvider
+        theme={{
+          algorithm: theme.darkAlgorithm,
+        }}
+      >
+        <Suspense
+          fallback={
+            <div className="animate-fade-in-up flex justify-center items-center w-full">
+              loading...
             </div>
-          </Suspense>
-        </ConfigProvider>
-      </StyleProvider>
+          }
+        >
+          <div className="animate-fade-in-up m-auto max-w-400 p-4">
+            <IndexCom />
+          </div>
+        </Suspense>
+      </ConfigProvider>
     </>
   );
 };

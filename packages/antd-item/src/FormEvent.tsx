@@ -1,4 +1,4 @@
-import { Form, FormProps as FormRawProps } from 'antd';
+import { FormProps as FormRawProps } from 'antd';
 import { FC, PropsWithChildren, memo, useMemo } from 'react';
 import {
   FormEventContext,
@@ -6,6 +6,7 @@ import {
   FormEventInstance,
   getStringValue,
   useForm,
+  useFormCom,
 } from './utils';
 
 const FormProviderInner: FC<PropsWithChildren<FormEventContextInstance>> = ({
@@ -30,6 +31,7 @@ const FormInitialization = <
   name,
   ...props
 }: PropsWithChildren<FormProps<ValuesType, Name, Group>>) => {
+  const Form = useFormCom();
   const [formInstance] = useForm(form, { group, name });
   return (
     <Form {...props} form={formInstance} name={formInstance.name}>
@@ -51,6 +53,7 @@ const FormEvent = <ValuesType, Name extends string, Group extends string | undef
   // 而 group 外部配置 useForm 优先于当前组件配置，减少不必要的 rerender，如果配置不一样可以在 FormItem 通过 callback 进行排查
   const formName = useMemo(() => getStringValue([name, form?.name]), [form?.name, name]);
   const formGroup = useMemo(() => getStringValue([form?.group, group]), [form?.group, group]);
+  const Form = useFormCom();
 
   if (form?.emit && form.name && form.name === formName) {
     return (
@@ -77,7 +80,7 @@ interface FormProps<
   Name extends string,
   Group extends string | undefined = undefined,
 > extends Omit<FormRawProps<ValuesType>, 'form'> {
-  form?: FormEventInstance<ValuesType, Name, Group>;
+  form?: FormEventInstance<Name, Group>;
   group?: Group;
   name?: Name;
 }

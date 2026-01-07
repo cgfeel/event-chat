@@ -1,19 +1,19 @@
 import { EventDetailType, NamepathType, createToken, useEventChat } from '@event-chat/core';
-import { Form, FormInstance } from 'antd';
-import { createContext, useContext, useMemo } from 'react';
+import { Form, FormInstance, FormItemProps } from 'antd';
+import { ComponentProps, FC, ReactNode, createContext, useContext, useMemo } from 'react';
 import z from 'zod';
+
+export const AntdCom: {
+  form?: FormBaseInstance;
+} = {};
 
 export const FormEventContext = createContext<FormEventContextInstance>({});
 export const getStringValue = <T extends NamepathType | undefined>(values: T[]) =>
   values.find((item) => item !== undefined && (!Array.isArray(item) || item.length > 0));
 
 export const convertName = (path?: NamepathType) => (typeof path === 'object' ? [...path] : path);
-export const useForm = <
-  ValueType,
-  Name extends NamepathType,
-  Group extends string | undefined = undefined,
->(
-  formInit?: FormEventInstance<ValueType, Name, Group>,
+export const useForm = <Name extends NamepathType, Group extends string | undefined = undefined>(
+  formInit?: FormEventInstance<Name, Group>,
   options?: FormOptions<Name, Group>
 ) => {
   const { group, name } = formInit ?? {};
@@ -41,6 +41,10 @@ export const useForm = <
   return [formInstance] as const;
 };
 
+export const useFormCom = (): FormBaseInstance => {
+  return AntdCom.form ?? Form;
+};
+
 export const useFormEvent = () => {
   const record = useContext(FormEventContext);
   return record;
@@ -56,11 +60,10 @@ export interface FormEventContextInstance {
 }
 
 export interface FormEventInstance<
-  ValueType,
   Name extends NamepathType,
   Group extends string | undefined = undefined,
 >
-  extends FormInstance<ValueType>, FormOptions<Name, Group> {
+  extends FormInstance, FormOptions<Name, Group> {
   emit?: <Detail, CustomName extends NamepathType>(
     record: EventDetailType<Detail, CustomName>
   ) => void;
@@ -69,4 +72,20 @@ export interface FormEventInstance<
 type FormOptions<Name extends NamepathType, Group extends string | undefined = undefined> = {
   group?: Group;
   name?: Name;
+};
+
+export interface FormBaseInstance extends FC<
+  Pick<ComponentProps<typeof Form>, 'children' | 'form' | 'name'>
+> {
+  Item: FC<
+    Pick<FormItemProps, 'hidden' | 'name'> & {
+      children?: ReactNode | ((form: FormInsType) => ReactNode);
+    }
+  >;
+  List: FC<Pick<ComponentProps<typeof Form.List>, 'children' | 'name'>>;
+}
+
+// 内部剔除掉 6 的新特新改为可选项，保留公共属性
+export type FormInsType = Omit<NonNullable<ComponentProps<typeof Form>['form']>, 'focusField'> & {
+  focusField?: NonNullable<ComponentProps<typeof Form>['form']>['focusField'];
 };

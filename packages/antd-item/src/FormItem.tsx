@@ -1,7 +1,8 @@
-import { Form, FormItemProps as FormItemRawProps } from 'antd';
+import { FormItemProps as FormItemRawProps } from 'antd';
+import { ReactNode } from 'react';
 import { ZodType } from 'zod';
 import FormInput, { FormInputProps } from './FormInput';
-import { convertName } from './utils';
+import { FormInsType, convertName, useFormCom } from './utils';
 
 const FormItem = <
   Schema extends ZodType | undefined = undefined,
@@ -16,20 +17,23 @@ const FormItem = <
   onChange,
   ...props
 }: FormItemProps<Schema, Type>) => {
+  const Form = useFormCom();
   return (
     <>
       <Form.Item {...props}>{children}</Form.Item>
-      <Form.Item name={convertName(props.name)} hidden>
-        <FormInput
-          async={async}
-          name={props.name}
-          schema={schema}
-          type={type}
-          callback={callback}
-          debug={debug}
-          onChange={onChange}
-        />
-      </Form.Item>
+      {props.name && (
+        <Form.Item name={convertName(props.name)} hidden>
+          <FormInput
+            async={async}
+            name={props.name}
+            schema={schema}
+            type={type}
+            callback={callback}
+            debug={debug}
+            onChange={onChange}
+          />
+        </Form.Item>
+      )}
     </>
   );
 };
@@ -40,4 +44,6 @@ interface FormItemProps<
   Schema extends ZodType | undefined = undefined,
   Type extends string | undefined = undefined,
 >
-  extends Omit<FormItemRawProps, 'name'>, FormInputProps<Schema, Type> {}
+  extends Omit<FormItemRawProps, 'children' | 'name'>, FormInputProps<Schema, Type> {
+  children: ReactNode | ((form: FormInsType) => ReactNode);
+}

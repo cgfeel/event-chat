@@ -1,5 +1,5 @@
 import { EventDetailType, NamepathType, createToken, useEventChat } from '@event-chat/core';
-import { Form, FormInstance, FormItemProps } from 'antd';
+import { Form, FormItemProps } from 'antd';
 import { ComponentProps, FC, ReactNode, createContext, useContext, useMemo } from 'react';
 import z from 'zod';
 
@@ -13,16 +13,20 @@ export const getStringValue = <T extends NamepathType | undefined>(values: T[]) 
 
 export const convertName = (path?: NamepathType) => (typeof path === 'object' ? [...path] : path);
 export const useForm = <Name extends NamepathType, Group extends string | undefined = undefined>(
-  formInit?: FormEventInstance<Name, Group>,
-  options?: FormOptions<Name, Group>
+  options?: FormOptions<Name, Group>,
+  formInit?: FormEventInstance<Name, Group>
 ) => {
-  const { group, name } = formInit ?? {};
-  const [form] = Form.useForm(formInit);
+  const { group, name, focusField } = formInit ?? {};
+  const [form] = Form.useForm(
+    formInit ? { ...formInit, focusField: focusField ?? (() => {}) } : undefined
+  );
+
   const formName = useMemo(
     () => getStringValue([name, options?.name]) ?? createToken('form-event'),
     [name, options?.name]
   );
 
+  const groupName = useMemo(() => getStringValue([group, options?.group]), [group, options?.group]);
   const { emit } = useEventChat(formName, {
     schema: z.array(
       z.object({
@@ -34,10 +38,10 @@ export const useForm = <Name extends NamepathType, Group extends string | undefi
       detail.forEach((item) => {
         emit({ detail: item.value, name: item.name });
       }),
-    group: getStringValue([group, options?.group]),
+    group: groupName,
   });
 
-  const formInstance = Object.assign(form, { group, name, emit });
+  const formInstance = Object.assign(form, { group: groupName, name: formName, emit });
   return [formInstance] as const;
 };
 
@@ -63,7 +67,7 @@ export interface FormEventInstance<
   Name extends NamepathType,
   Group extends string | undefined = undefined,
 >
-  extends FormInstance, FormOptions<Name, Group> {
+  extends FormInsType, FormOptions<Name, Group> {
   emit?: <Detail, CustomName extends NamepathType>(
     record: EventDetailType<Detail, CustomName>
   ) => void;

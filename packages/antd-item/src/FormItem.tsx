@@ -45,5 +45,5 @@ interface FormItemProps<
   Type extends string | undefined = undefined,
 >
   extends Omit<FormItemRawProps, 'children' | 'name'>, FormInputProps<Schema, Type> {
-  children: ReactNode | ((form: FormInsType) => ReactNode);
+  children?: ReactNode | ((form: FormInsType) => ReactNode);
 }

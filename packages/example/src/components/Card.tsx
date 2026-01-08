@@ -1,6 +1,6 @@
 import type { FC, PropsWithChildren, ReactNode } from 'react';
 
-const Card: FC<PropsWithChildren<CardProps>> = ({ children, title }) =>
+const Card: FC<PropsWithChildren<CardProps>> = ({ children, footer, title }) =>
   title ? (
     <div className="relative p-4">
       <div className="absolute inset-[-1] border border-gray-600 rounded-md bg-transparent [clip-path:polygon(0_0,20px_0,20px_2px,calc(100%-20px)_2px,calc(100%-20px)_0,100%_0,100%_100%,0_100%)] -z-1" />
@@ -11,13 +11,18 @@ const Card: FC<PropsWithChildren<CardProps>> = ({ children, title }) =>
         <hr className="border-0 border-gray-600 border-t w-full translate-y-[-0.5px] grow shrink flex-basis-auto" />
       </div>
       {children}
+      {footer}
     </div>
   ) : (
-    <div className="relative p-4 rounded-md border border-gray-600">{children}</div>
+    <div className="relative p-4 rounded-md border border-gray-600">
+      {children}
+      {footer}
+    </div>
   );
 
 export default Card;
 
 interface CardProps {
+  footer?: ReactNode;
   title?: ReactNode;
 }

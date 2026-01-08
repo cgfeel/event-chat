@@ -32,7 +32,7 @@ const FormInitialization = <
   ...props
 }: PropsWithChildren<FormProps<ValuesType, Name, Group>>) => {
   const Form = useFormCom();
-  const [formInstance] = useForm(form, { group, name });
+  const [formInstance] = useForm({ group, name }, form);
   return (
     <Form {...props} form={formInstance} name={formInstance.name}>
       <FormProvider group={formInstance.group} name={formInstance.name} emit={formInstance.emit}>
@@ -56,8 +56,9 @@ const FormEvent = <ValuesType, Name extends string, Group extends string | undef
   const Form = useFormCom();
 
   if (form?.emit && form.name && form.name === formName) {
+    const { focusField, ...formIns } = form;
     return (
-      <Form {...props} form={form}>
+      <Form {...props} form={{ ...formIns, focusField: focusField ?? (() => {}) }}>
         <FormProvider group={formGroup} name={formName} emit={form.emit}>
           {children}
         </FormProvider>

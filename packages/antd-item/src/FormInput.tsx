@@ -1,5 +1,5 @@
 import { EventChatOptions, NamepathType, createToken, useEventChat } from '@event-chat/core';
-import { memo, useMemo } from 'react';
+import { ForwardedRef, forwardRef, useMemo } from 'react';
 import { ZodType } from 'zod';
 import { useFormEvent } from './utils';
 
@@ -10,15 +10,10 @@ const convertPath = (path?: NamepathType) =>
 const InputInner = <
   Schema extends ZodType | undefined = undefined,
   Type extends string | undefined = undefined,
->({
-  async,
-  name,
-  schema,
-  type,
-  callback,
-  debug,
-  onChange,
-}: FormInputProps<Schema, Type>) => {
+>(
+  { async, name, schema, type, callback, debug, onChange }: FormInputProps<Schema, Type>,
+  ref?: ForwardedRef<HTMLInputElement>
+) => {
   const { group, parent } = useFormEvent();
   const formName = useMemo(() => {
     const itemName = convertPath(name);
@@ -29,10 +24,10 @@ const InputInner = <
     );
   }, [name, parent]);
 
-  useEventChat(formName, {
+  const result = useEventChat(formName, {
     callback: (record) => {
       callback?.(record);
-      onChange?.(record.detail);
+      onChange?.(record.detail, result);
     },
     async,
     group,
@@ -41,14 +36,14 @@ const InputInner = <
     debug,
   });
 
-  return null;
+  return <input ref={ref} />;
 };
 
-const FormInput = memo(InputInner) as (<
+const FormInput = forwardRef(InputInner) as (<
   Schema extends ZodType | undefined = undefined,
   Type extends string | undefined = undefined,
 >(
-  props: FormInputProps<Schema, Type>
+  props: FormInputProps<Schema, Type> & { ref?: ForwardedRef<HTMLInputElement> }
 ) => ReturnType<typeof InputInner>) & { displayName?: string };
 
 if (process.env.NODE_ENV !== 'production') {
@@ -65,6 +60,7 @@ export interface FormInputProps<
   onChange?: (
     value: Parameters<
       NonNullable<EventChatOptions<NamepathType, Schema, string, Type, undefined>['callback']>
-    >[0]['detail']
+    >[0]['detail'],
+    options: ReturnType<typeof useEventChat>
   ) => void;
 }

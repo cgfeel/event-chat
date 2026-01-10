@@ -39,8 +39,9 @@ const toastConfig = Object.freeze({
   warning,
 });
 
-const ToastItem: FC<ToastItemProps> = ({ item: { id, message, title, type } }) => {
+const ToastItem: FC<ToastItemProps> = ({ group, item }) => {
   const toastRef = useRef<HTMLDivElement>(null);
+  const { id, message, title, type } = item;
   const config = toastConfig[type];
 
   const handleToastClick = useCallback(() => {
@@ -64,6 +65,7 @@ const ToastItem: FC<ToastItemProps> = ({ item: { id, message, title, type } }) =
     callback: () => {
       handleToastClick();
     },
+    group,
   });
 
   useEffect(() => {
@@ -107,4 +109,5 @@ export default ToastItem;
 
 interface ToastItemProps {
   item: z.infer<typeof toastItem>;
+  group?: string;
 }

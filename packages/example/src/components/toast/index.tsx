@@ -5,7 +5,7 @@ import { toastClose, toastItem as toastItemKey, toastOpen, toastOpenResult } fro
 import ToastItem from './ToastItem';
 import { toastItem } from './utils';
 
-const Toast: FC<PropsWithChildren> = ({ children }) => {
+const Toast: FC<PropsWithChildren<{ group?: string }>> = ({ children, group }) => {
   const [toasts, setToasts] = useState<ToastItemType[]>([]);
   const { emit } = useEventChat(toastOpen, {
     schema: toastItem.omit({ id: true }).partial().required({ title: true }).extend({
@@ -26,6 +26,7 @@ const Toast: FC<PropsWithChildren> = ({ children }) => {
         name: toastOpenResult,
       });
     },
+    group,
   });
 
   useEventChat(toastClose, {
@@ -37,6 +38,7 @@ const Toast: FC<PropsWithChildren> = ({ children }) => {
         const update = current.filter((item) => item.id !== detail.id);
         return update.length === current.length ? current : update;
       }),
+    group,
   });
 
   return (
@@ -45,7 +47,7 @@ const Toast: FC<PropsWithChildren> = ({ children }) => {
       <div className="toast-container">
         {toasts.map((toast) => (
           <div key={toast.id} className="pointer-events-auto text-right">
-            <ToastItem item={toast} />
+            <ToastItem group={group} item={toast} />
           </div>
         ))}
       </div>
@@ -53,6 +55,6 @@ const Toast: FC<PropsWithChildren> = ({ children }) => {
   );
 };
 
-export default memo(Toast, () => true);
+export default memo(Toast, (pre, next) => pre.group === next.group);
 
 interface ToastItemType extends z.infer<typeof toastItem> {}

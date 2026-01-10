@@ -11,17 +11,17 @@ const meta: Meta<typeof Tabs> = {
   argTypes: {
     active: {
       options: ['EventChat', 'AntdForm', 'Formily'],
-      description: '自定义事件名，用于接受消息',
+      description: '选中项名称，用于接受消息',
     },
     defaultActive: {
       options: ['EventChat', 'AntdForm', 'Formily'],
-      description: '自定义事件名，用于接受消息',
+      description: '默认选中项名称，用于接受消息',
     },
     group: {
-      description: '自定义事件名，用于接受消息',
+      description: '标签组名称，避免存在多个标签组时操作混淆',
     },
     onChange: {
-      description: '自定义事件名，用于接受消息',
+      description: '切换标签后的回调事件',
     },
   },
   component: Tabs,

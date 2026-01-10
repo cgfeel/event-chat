@@ -1,0 +1,184 @@
+import { Canvas, Controls, Meta } from '@storybook/addon-docs/blocks';
+import Toast from './Toast';
+import ToastStories, { DurationZero, Error, Info, Success, Warning } from './Toast.stories';
+import ListObserver from './components/ListObserver';
+import TableList from './components/TableList';
+import Tag from './components/Tag';
+
+<Meta component={Toast} of={ToastStories} />
+
+# 示例：`Toast` 悬浮提示
+
+## 介绍
+
+`event-chat` 的一个 `Toast` 演示案例，依赖 `@event-chat/core`
+
+## 目录
+
+<ListObserver />
+
+## 基础使用示例
+
+<Canvas
+  additionalActions={[
+    {
+      title: 'code in GitHub',
+      onClick: () => {
+        window.open(
+          'https://github.com/cgfeel/event-chat/tree/main/packages/example/src/components/toast',
+          '_blank'
+        );
+      },
+    },
+  ]}
+  of={Info}
+/>
+
+## API 参数
+
+<Controls />
+
+### `Toast` 组件属性
+
+通常 `Toast` 只需要在顶层设置一次，并且无需配置 `group`。本次指南几个例子不同在于：`storybook` 的每一个演示 (`canvas`) 都是一个 `iframe`，也就造成多个 `body`。对于这种情况可以分别设置 `Toast` 的 `group` 来实现指定群组内部消息发送。
+
+<TableList
+  data={[
+    {
+      desc: '子级组件',
+      keyname: 'children',
+      type: ['ReactNode'],
+    },
+    {
+      desc: (
+        <>
+          <Tag>toast</Tag> 组名
+        </>
+      ),
+      keyname: 'group',
+      type: ['string'],
+    },
+  ]}
+/>
+
+### 包含事件
+
+回调函数的参数类型如下：
+
+<TableList
+  data={[
+    {
+      desc: '插入一条提示',
+      keyname: 'toastOpen',
+      type: ['toast-open'],
+    },
+    {
+      desc: '删除一条提示',
+      keyname: 'toastClose',
+      type: ['toast-close'],
+    },
+    {
+      desc: '用于定时关闭提示',
+      keyname: 'toastItemKey',
+      type: ['toast-item'],
+    },
+    {
+      desc: '获取插入的提示信息，用于自定义处理逻辑',
+      keyname: 'toastOpenResult',
+      type: ['toast-open-result'],
+    },
+  ]}
+/>
+
+## 其他演示
+
+成功提示 `type: success`
+
+<Canvas
+  additionalActions={[
+    {
+      title: 'code in GitHub',
+      onClick: () => {
+        window.open(
+          'https://github.com/cgfeel/event-chat/tree/main/packages/example/src/components/toast',
+          '_blank'
+        );
+      },
+    },
+  ]}
+  of={Success}
+/>
+
+错误提示 `type: error`
+
+<Canvas
+  additionalActions={[
+    {
+      title: 'code in GitHub',
+      onClick: () => {
+        window.open(
+          'https://github.com/cgfeel/event-chat/tree/main/packages/example/src/components/toast',
+          '_blank'
+        );
+      },
+    },
+  ]}
+  of={Error}
+/>
+
+警告提示 `type: warning`
+
+<Canvas
+  additionalActions={[
+    {
+      title: 'code in GitHub',
+      onClick: () => {
+        window.open(
+          'https://github.com/cgfeel/event-chat/tree/main/packages/example/src/components/toast',
+          '_blank'
+        );
+      },
+    },
+  ]}
+  of={Warning}
+/>
+
+持续时间设为 `0` 将关闭自动隐藏 `duration: 0`
+
+<Canvas
+  additionalActions={[
+    {
+      title: 'code in GitHub',
+      onClick: () => {
+        window.open(
+          'https://github.com/cgfeel/event-chat/tree/main/packages/example/src/components/toast',
+          '_blank'
+        );
+      },
+    },
+  ]}
+  of={DurationZero}
+/>
+
+<style>
+  {`
+  .category-item > a:first-child {
+    float: none;
+    left: -18px;
+    margin-left: 0;
+    position: absolute;
+    transform: translateY(-50%);
+    top: 50%;
+  }
+  .docs-story, .demo-wrap {
+    background-color: #020917;
+  }
+  .docs-story > div:first-child {
+    padding: 0;
+    padding-bottom: 22px;
+  }
+  .floatingList ul {
+    margin: 0;
+  }
+`}
+</style>

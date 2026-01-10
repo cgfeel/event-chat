@@ -3,9 +3,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { forwardRef } from 'react';
 
 const sizeClasses = Object.freeze({
-  sm: 'px-3 py-1.5 text-sm',
-  md: 'px-4 py-2 text-base',
-  lg: 'px-6 py-2.5 text-lg',
+  sm: 'px-3 py-1.5 rounded-md text-sm',
+  md: 'px-4 py-2 rounded-md text-base',
+  lg: 'px-6 py-2.5 rounded-lg text-lg',
 });
 
 const variantClasses = Object.freeze({
@@ -13,7 +13,9 @@ const variantClasses = Object.freeze({
   danger: 'button-danger',
   primary: 'button-primary',
   secondary: 'button-secondary',
+  success: 'button-success',
   text: 'button-text',
+  warning: 'button-warning',
 });
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -55,5 +57,5 @@ export default Button;
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   loading?: boolean;
   size?: 'sm' | 'md' | 'lg';
-  variant?: 'primary' | 'secondary' | 'danger' | 'outline' | 'text';
+  variant?: keyof typeof variantClasses;
 }

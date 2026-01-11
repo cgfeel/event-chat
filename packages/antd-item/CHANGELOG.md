@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.3](https://github.com/cgfeel/event-chat/compare/antd-item@v0.2.2...antd-item@v0.2.3) (2026-01-11)
+
+
+### Bug Fixes
+
+* up form init ([96d6ad1](https://github.com/cgfeel/event-chat/commit/96d6ad1d29d4e9b83a607d79bfec035c48600b88))
+* up form init ([0b52242](https://github.com/cgfeel/event-chat/commit/0b5224240a040e16d2efa8de90c62c86646c5ebd))
+
 ## [0.2.2](https://github.com/cgfeel/event-chat/compare/antd-item@v0.2.1...antd-item@v0.2.2) (2026-01-11)
 
 

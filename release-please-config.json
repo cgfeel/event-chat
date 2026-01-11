@@ -5,11 +5,11 @@
   "tag-separator": "@",
   "separate-pull-requests": true,
   "packages": {
-    "antd-item": {
+    "packages/antd-item": {
       "path": "packages/antd-item",
       "release-type": "node"
     },
-    "core": {
+    "packages/core": {
       "path": "packages/core",
       "release-type": "node"
     }

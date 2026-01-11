@@ -9,9 +9,10 @@ on:
 
 # 顶层配置：部署GitHub Pages所需权限（所有作业可复用，也可在部署作业内单独配置）
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write # 从read改为write，允许创建/推送分支
+  pull-requests: write # 新增：允许创建/管理PR
+  pages: write # 保留：部署GitHub Pages所需
+  id-token: write # 保留：Pages部署的身份验证
 
 # 作业配置
 jobs:

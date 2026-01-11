@@ -21,12 +21,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: googleapis/release-please-action@v4
+        id: release
         with:
-          # 适配你的项目类型（支持 node/ocaml/ruby/java 等，见测试代码）
-          release-type: node
+          token: ${{ secrets.GITHUB_TOKEN }}
           include-component-in-tag: true
           config-file: release-please-config.json
-          target-branch: main
+          manifest-file: .release-please-manifest.json
+      - name: Print release outputs for debugging
+        continue-on-error: true
+        run: |
+          echo "Release outputs (write to file first):"
+          # 方案1：将JSON输出到文件，再cat查看（推荐，避免特殊字符解析）
+          echo '${{ toJson(steps.release.outputs) }}' > release-outputs.json
+          cat release-outputs.json
 
   # 代码校验 & 构建作业（覆盖所有子包）
   validate-and-build:

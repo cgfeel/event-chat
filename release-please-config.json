@@ -3,20 +3,22 @@
     "packages/antd-item": {
       "release-type": "node",
       "package-name": "@event-chat/antd-item",
-      "changelog-path": "CHANGELOG.md",
+      "changelog-path": "packages/antd-item/CHANGELOG.md",
       "skip-changelog": false,
-      "version-file": "package.json",
+      "version-file": "packages/antd-item/package.json",
       "bump-minor-pre-major": true,
-      "include-v-in-tag": true
+      "include-v-in-tag": true,
+      "release-name": "@event-chat/antd-item"
     },
     "packages/core": {
       "release-type": "node",
       "package-name": "@event-chat/core",
-      "changelog-path": "CHANGELOG.md",
+      "changelog-path": "packages/core/CHANGELOG.md",
       "skip-changelog": false,
-      "version-file": "package.json",
+      "version-file": "packages/core/package.json",
       "bump-minor-pre-major": true,
-      "include-v-in-tag": true
+      "include-v-in-tag": true,
+      "release-name": "@event-chat/core"
     }
   }
 }

@@ -6,6 +6,8 @@
 ### Features
 
 * add antd-item ([f618ac1](https://github.com/cgfeel/event-chat/commit/f618ac1099d4ebc66837b6d997292ded4032b520))
+* **core:** 新增消息解析功能 ([aeb942f](https://github.com/cgfeel/event-chat/commit/aeb942f45240e6bcf1d3a99af6f0fb1c637cbc66))
+* **core:** 新增消息解析功能 ([10270b4](https://github.com/cgfeel/event-chat/commit/10270b4eb215a3722e154117451edcd9d03e5dec))
 
 
 ### Bug Fixes

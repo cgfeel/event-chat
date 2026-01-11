@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.2](https://github.com/cgfeel/event-chat/compare/antd-item@v0.2.1...antd-item@v0.2.2) (2026-01-11)
+
+
+### Bug Fixes
+
+* update FormEvent.tsx ([2f289bc](https://github.com/cgfeel/event-chat/commit/2f289bc4191be417b2d06d141f814d98b9784d3d))
+* update FormEvent.tsx ([ba98309](https://github.com/cgfeel/event-chat/commit/ba98309c1c70d05d6d89f852ffc7fc24ea64da0f))
+
 ## [0.2.1](https://github.com/cgfeel/event-chat/compare/antd-item@v0.2.0...antd-item@v0.2.1) (2026-01-11)
 
 

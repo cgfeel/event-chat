@@ -1,0 +1,22 @@
+{
+  "packages": {
+    "packages/antd-item": {
+      "release-type": "node",
+      "package-name": "@event-chat/antd-item",
+      "changelog-path": "CHANGELOG.md",
+      "skip-changelog": false,
+      "version-file": "package.json",
+      "bump-minor-pre-major": true,
+      "include-v-in-tag": true
+    },
+    "packages/core": {
+      "release-type": "node",
+      "package-name": "@event-chat/core",
+      "changelog-path": "CHANGELOG.md",
+      "skip-changelog": false,
+      "version-file": "package.json",
+      "bump-minor-pre-major": true,
+      "include-v-in-tag": true
+    }
+  }
+}

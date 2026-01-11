@@ -15,8 +15,18 @@ permissions:
 
 # 作业配置
 jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: googleapis/release-please-action@v4
+        with:
+          # 适配你的项目类型（支持 node/ocaml/ruby/java 等，见测试代码）
+          release-type: node
+
   # 代码校验 & 构建作业（覆盖所有子包）
   validate-and-build:
+    # 依赖：仅当release-please作业成功完成后，才执行该作业
+    needs: [release-please]
     runs-on: ubuntu-latest
     # 可选：指定Node版本矩阵，多版本测试（按需开启）
     # strategy:
@@ -86,7 +96,7 @@ jobs:
           path: packages/core/dist/ # 关键：改为子包的dist路径
           retention-days: 7
 
-    # 新增：Storybook部署到GitHub Pages作业
+  # 新增：Storybook部署到GitHub Pages作业
   deploy-storybook:
     # 依赖：仅当validate-and-build作业成功完成后，才执行该作业
     needs: [validate-and-build]

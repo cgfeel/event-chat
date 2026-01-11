@@ -4,6 +4,7 @@
   "packages": {
     "packages/antd-item": {
       "release-type": "node",
+      "component": "antd-item",
       "package-name": "@event-chat/antd-item",
       "changelog-path": "packages/antd-item/CHANGELOG.md",
       "skip-changelog": false,
@@ -14,6 +15,7 @@
     },
     "packages/core": {
       "release-type": "node",
+      "component": "core",
       "package-name": "@event-chat/core",
       "changelog-path": "packages/core/CHANGELOG.md",
       "skip-changelog": false,

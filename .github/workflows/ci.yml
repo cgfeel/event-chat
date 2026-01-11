@@ -23,7 +23,7 @@ jobs:
       - uses: googleapis/release-please-action@v4
         with:
           # 适配你的项目类型（支持 node/ocaml/ruby/java 等，见测试代码）
-          release-type: node
+          release-type: none
           include-component-in-tag: true
           config-file: release-please-config.json
           target-branch: main

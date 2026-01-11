@@ -1,4 +1,4 @@
 {
-  "antd-item": "0.1.0",
-  "core": "0.1.0"
+  "packages/antd-item": "0.1.0",
+  "packages/core": "0.1.0"
 }

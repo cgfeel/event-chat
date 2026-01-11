@@ -19,11 +19,6 @@ jobs:
   # 更新 release
   release-please:
     runs-on: ubuntu-latest
-    outputs:
-      antd-item--tag_name: ${{ steps.release.outputs.antd-item--tag_name}}
-      antd-item--release_created: ${{ steps.release.outputs.antd-item--release_created}}
-      core--tag_name: ${{ steps.release.outputs.core--tag_name}}
-      core--release_created: ${{ steps.release.outputs.core--release_created}}
     steps:
       - uses: googleapis/release-please-action@v4
         id: release

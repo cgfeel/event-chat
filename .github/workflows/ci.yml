@@ -19,14 +19,24 @@ jobs:
   # 更新 release
   release-please:
     runs-on: ubuntu-latest
+    outputs:
+      antd-item--tag_name: ${{ steps.release.outputs.antd-item--tag_name}}
+      antd-item--release_created: ${{ steps.release.outputs.antd-item--release_created}}
+      core--tag_name: ${{ steps.release.outputs.core--tag_name}}
+      core--release_created: ${{ steps.release.outputs.core--release_created}}
     steps:
       - uses: googleapis/release-please-action@v4
+        id: release
         with:
-          # 适配你的项目类型（支持 node/ocaml/ruby/java 等，见测试代码）
-          release-type: none
+          token: ${{ secrets.GITHUB_TOKEN }}
           include-component-in-tag: true
           config-file: release-please-config.json
-          target-branch: main
+          manifest-file: .release-please-manifest.json
+      - name: Print release outputs for debugging
+        continue-on-error: true
+        run: |
+          echo "Release outputs:"
+          echo "${{ toJson(steps.release.outputs) }}"
 
   # 代码校验 & 构建作业（覆盖所有子包）
   validate-and-build:

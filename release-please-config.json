@@ -1,26 +1,17 @@
 {
   "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
-  "release-type": "none",
+  "include-component-in-tag": true,
+  "include-v-in-tag": true,
+  "tag-separator": "@",
+  "separate-pull-requests": true,
   "packages": {
-    "packages/antd-item": {
-      "release-type": "node",
-      "package-name": "@event-chat/antd-item",
-      "changelog-path": "packages/antd-item/CHANGELOG.md",
-      "skip-changelog": false,
-      "version-file": "packages/antd-item/package.json",
-      "bump-minor-pre-major": true,
-      "include-v-in-tag": true,
-      "release-name": "@event-chat/antd-item"
+    "antd-item": {
+      "path": "packages/antd-item",
+      "release-type": "node"
     },
-    "packages/core": {
-      "release-type": "node",
-      "package-name": "@event-chat/core",
-      "changelog-path": "packages/core/CHANGELOG.md",
-      "skip-changelog": false,
-      "version-file": "packages/core/package.json",
-      "bump-minor-pre-major": true,
-      "include-v-in-tag": true,
-      "release-name": "@event-chat/core"
+    "core": {
+      "path": "packages/core",
+      "release-type": "node"
     }
   }
 }

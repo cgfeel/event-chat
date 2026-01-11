@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.1](https://github.com/cgfeel/event-chat/compare/antd-item@v0.2.0...antd-item@v0.2.1) (2026-01-11)
+
+
+### Bug Fixes
+
+* change log path ([34ba042](https://github.com/cgfeel/event-chat/commit/34ba042af66531ad662c8968729333f1cf785946))
+* change log path ([639abf2](https://github.com/cgfeel/event-chat/commit/639abf26e0e94f4c11f93cc90d7e5252afcaaaaf))
+
 ## [0.2.0](https://github.com/cgfeel/event-chat/compare/antd-item@v0.1.0...antd-item@v0.2.0) (2026-01-11)
 
 

@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.5](https://github.com/event-chat/event-chat/compare/antd-item@v0.2.4...antd-item@v0.2.5) (2026-01-12)
+
+
+### Bug Fixes
+
+* update antd-item index, reduce export target ([f18377f](https://github.com/event-chat/event-chat/commit/f18377fd2a1fff1b3bc0bdcc0b02497d524d6c55))
+* update module add form ([d0fbaf1](https://github.com/event-chat/event-chat/commit/d0fbaf140150322da9af7c7725a945a3768ca493))
+
 ## [0.2.4](https://github.com/event-chat/event-chat/compare/antd-item@v0.2.3...antd-item@v0.2.4) (2026-01-12)
 
 

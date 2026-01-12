@@ -1,0 +1,22 @@
+.category-item > a:first-child {
+  float: none;
+  left: -18px;
+  margin-left: 0;
+  position: absolute;
+  transform: translateY(-50%);
+  top: 50%;
+}
+
+.docs-story,
+.demo-wrap {
+  background-color: #020917;
+}
+
+.docs-story > div:first-child {
+  padding: 0;
+  padding-bottom: 22px;
+}
+
+.floating-list ul {
+  margin: 0;
+}

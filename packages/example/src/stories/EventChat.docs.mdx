@@ -1,6 +1,7 @@
 import { ArgsTable, Canvas, Controls, Description, Meta } from '@storybook/addon-docs/blocks';
 import EventChat from './EventChat';
 import EventChatStories, { Default, Group, Schema, Token } from './EventChat.stories';
+import './assets/story-styles.css';
 import ListObserver from './components/ListObserver';
 import TableList from './components/TableList';
 import Tag from './components/Tag';
@@ -441,26 +442,3 @@ useEventChat('pub-mox', {
 ```
 
 调试方法中的参数 `result` 来自 `z.safeParse` 得到的错误结果，包含了 `emit` 发送的信息，以及错误原因等情况
-
-<style>
-  {`
-  .category-item > a:first-child {
-    float: none;
-    left: -18px;
-    margin-left: 0;
-    position: absolute;
-    transform: translateY(-50%);
-    top: 50%;
-  }
-  .docs-story, .demo-wrap {
-    background-color: #020917;
-  }
-  .docs-story > div:first-child {
-    padding: 0;
-    padding-bottom: 22px;
-  }
-  .floatingList ul {
-    margin: 0;
-  }
-`}
-</style>

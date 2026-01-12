@@ -1,6 +1,7 @@
 import { Canvas, Controls, Meta } from '@storybook/addon-docs/blocks';
 import Toast from './Toast';
 import ToastStories, { DurationZero, Error, Info, Success, Warning } from './Toast.stories';
+import './assets/story-styles.css';
 import ListObserver from './components/ListObserver';
 import TableList from './components/TableList';
 import Tag from './components/Tag';
@@ -159,26 +160,3 @@ import Tag from './components/Tag';
   ]}
   of={DurationZero}
 />
-
-<style>
-  {`
-  .category-item > a:first-child {
-    float: none;
-    left: -18px;
-    margin-left: 0;
-    position: absolute;
-    transform: translateY(-50%);
-    top: 50%;
-  }
-  .docs-story, .demo-wrap {
-    background-color: #020917;
-  }
-  .docs-story > div:first-child {
-    padding: 0;
-    padding-bottom: 22px;
-  }
-  .floatingList ul {
-    margin: 0;
-  }
-`}
-</style>

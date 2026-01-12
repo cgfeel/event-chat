@@ -13,6 +13,6 @@ const Form: FC<FormProps> = ({ name }) => {
 
 export default Form;
 
-interface FormProps {
+export interface FormProps {
   name?: keyof typeof formMap;
 }

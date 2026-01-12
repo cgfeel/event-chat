@@ -20,7 +20,7 @@ const FloatingList: FC<CategoryListProps> = ({ list, scrollTo }) => {
         setIsExpanded((current) => !current);
       }
     }
-    const floatingList = document.querySelector('.floatingList');
+    const floatingList = document.querySelector('.floating-list');
     if (floatingList) floatingList.addEventListener('click', stopClose);
     document.body.addEventListener('click', closeHandle);
     return () => {
@@ -31,8 +31,9 @@ const FloatingList: FC<CategoryListProps> = ({ list, scrollTo }) => {
       setIsExpanded(false);
     };
   }, [setIsExpanded]);
+
   return (
-    <div className="floatingList fixed right-6 bottom-6 z-50">
+    <div className="floating-list fixed right-6 bottom-6 z-50">
       <div className="relative flex flex-col items-end">
         <button
           className={`

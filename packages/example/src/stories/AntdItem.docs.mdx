@@ -1,0 +1,66 @@
+import { Canvas, Controls, Meta } from '@storybook/addon-docs/blocks';
+import AntdItem from './AntdItem';
+import AntdItemStories, { FormEmit } from './AntdItem.stories';
+import './assets/story-styles.css';
+import ListObserver from './components/ListObserver';
+
+<Meta component={AntdItem} of={AntdItemStories} />
+
+# 扩展 `Antd` 的 `Form` 组件能力
+
+## 介绍
+
+是否遇到过这样的场景：
+
+- 当更新字段 `A` 的时候，字段 `B` 需要根据 `A` 的结果做出反应
+- 一个字段的值要在不同业务交互下，根据配置做出相应反应
+- 不同的业务需要经过不同的逻辑交付相同类型的字段
+
+现有的 `antd` 有这么几个问题：
+
+- 受控能力有限，不能对每次设置做出精准的反应
+- 不同的业务场景下，需要写多套逻辑，且不能复用
+- 表单交互逻辑无法解耦，多个无关的 `state` 堆砌在一个组件中
+
+`@event-chat/antd-item` 目的就是为抽离这块逻辑，能够解耦表单交互，让组件最小到字段去单独处理逻辑
+
+## 安装
+
+`@event-chat/antd-item` 允许单独安装，不过建议搭配 `zod` 和 `@event-chat/core`，因为 `zod` 可以提供字段接受的类型，而 `@event-chat/core` 允许在封装之外更灵活的自定义表单交互
+
+```shell
+# npm
+npm install @event-chat/item
+
+# yarn
+yarn add @event-chat/item
+
+# pnpm
+pnpm add @event-chat/item
+```
+
+## 目录
+
+<ListObserver />
+
+## 基础使用示例
+
+<Canvas
+  additionalActions={[
+    {
+      title: 'code in GitHub',
+      onClick: () => {
+        window.open(
+          'https://github.com/cgfeel/event-chat/tree/main/packages/example/src/components/toast',
+          '_blank'
+        );
+      },
+    },
+  ]}
+  of={FormEmit}
+  sourceState="none"
+/>
+
+## API 参数
+
+<Controls />

@@ -3,12 +3,12 @@ import _merge from 'lodash/merge';
 import { type FC, useRef, useState } from 'react';
 import z from 'zod';
 import { pubZodSchema, subZodSchema, subZodSchemaResult, toastOpen } from '@/utils/event';
-import ChatList from '../components/chat/ChatList';
-import ChatPanel from '../components/chat/ChatPanel';
-import { chatMap } from '../components/chat/utils';
-import { objectKeys, safetyParse } from '../utils/fields';
+import ChatList from '../../components/chat/ChatList';
+import ChatPanel from '../../components/chat/ChatPanel';
+import { chatMap } from '../../components/chat/utils';
+import { objectKeys, safetyParse } from '../../utils/fields';
+import { type ChatItemType, checkStatus, pubSchema, subSchema } from '../utils';
 import RenderSchema from './RenderSchema';
-import { type ChatItemType, checkStatus, pubSchema, subSchema } from './utils';
 
 const parseSchema = (data: Record<string, unknown>): data is z.infer<typeof pubSchema> =>
   data !== undefined && pubSchema.safeParse(data).success;

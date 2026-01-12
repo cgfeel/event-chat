@@ -20,7 +20,6 @@ const FormProviderInner: FC<PropsWithChildren<FormEventContextInstance>> = ({
 
 const FormProvider = memo(FormProviderInner);
 
-// 初始表单-2
 const FormInitialization = <
   ValuesType,
   Name extends string,

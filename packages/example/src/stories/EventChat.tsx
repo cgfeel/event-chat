@@ -1,13 +1,15 @@
-import PubGroupPanel from '@/module/PubGroupPanel';
-import PubNoLimit from '@/module/PubNoLimit';
-import PubPrivate from '@/module/PubPrivate';
-import PubSchema from '@/module/PubSchema';
-import PubSchemaExtra from '@/module/PubSchemaExtra';
-import SubGroup from '@/module/SubGroupPanel';
-import SubNoLimit from '@/module/SubNoLimit';
-import SubPrivate from '@/module/SubPrivate';
-import SubSchema from '@/module/SubSchema';
-import SubSchemaExtra from '@/module/SubSchemaExtra';
+import {
+  PubGroupPanel,
+  PubNoLimit,
+  PubPrivate,
+  PubSchema,
+  PubSchemaExtra,
+  SubGroupPanel as SubGroup,
+  SubNoLimit,
+  SubPrivate,
+  SubSchema,
+  SubSchemaExtra,
+} from '@/module/pubsub';
 import type { NamepathType } from '@event-chat/core';
 import type { FC } from 'react';
 import ExtraGuid from '@/components/ExtraGuid';

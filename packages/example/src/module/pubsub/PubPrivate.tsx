@@ -3,10 +3,10 @@ import { type FC, useRef, useState } from 'react';
 import z from 'zod';
 import { pubPrivate, subPrivate, subPrivateResult, syncToken, toastOpen } from '@/utils/event';
 import { safetyPrint } from '@/utils/fields';
-import ChatList from '../components/chat/ChatList';
-import ChatPanel from '../components/chat/ChatPanel';
+import ChatList from '../../components/chat/ChatList';
+import ChatPanel from '../../components/chat/ChatPanel';
+import type { ChatItemType } from '../utils';
 import RenderSchema from './RenderSchema';
-import type { ChatItemType } from './utils';
 
 const PubPrivate: FC = () => {
   const [list, setList] = useState<ChatRecordType[]>([]);

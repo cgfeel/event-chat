@@ -3,7 +3,7 @@ import { type FC, useState } from 'react';
 import z from 'zod';
 import ExtraGuid from '@/components/ExtraGuid';
 import { pubZodAllow } from '@/utils/event';
-import { type ChatItemType, statusEnum } from './utils';
+import { type ChatItemType, statusEnum } from '../utils';
 
 const PubSchemaExtra: FC = () => {
   const [status, setState] = useState<Array<ChatItemType['content']['status']>>(['waiting']);

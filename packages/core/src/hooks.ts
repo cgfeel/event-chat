@@ -35,7 +35,7 @@ export function useEventChat<
   const eventName = useMemo(() => getEventName(name), [name]);
   const id = useId();
 
-  // 随业务改变-1
+  // 随业务改变
   const token = useMemo(
     () => createToken(getConditionKey(eventName, id, ops?.type)),
     [eventName, id, ops?.type]

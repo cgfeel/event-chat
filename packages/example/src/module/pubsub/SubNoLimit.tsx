@@ -1,10 +1,10 @@
 import { useEventChat } from '@event-chat/core';
 import { type FC, useRef, useState } from 'react';
 import { pubNoLimit, subNoLimit } from '@/utils/event';
-import ChatList from '../components/chat/ChatList';
-import ChatPanel from '../components/chat/ChatPanel';
-import { type ChatItemProps } from '../components/chat/utils';
-import { safetyPrint } from '../utils/fields';
+import ChatList from '../../components/chat/ChatList';
+import ChatPanel from '../../components/chat/ChatPanel';
+import { type ChatItemProps } from '../../components/chat/utils';
+import { safetyPrint } from '../../utils/fields';
 
 const SubNoLimit: FC = () => {
   const [list, setList] = useState<ChatItemProps[]>([]);

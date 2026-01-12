@@ -7,10 +7,10 @@ import z from 'zod';
 import { chatMap } from '@/components/chat/utils';
 import { pubPrivate, subPrivate, subPrivateResult, syncToken } from '@/utils/event';
 import { isKey, objectKeys, safetyPrint } from '@/utils/fields';
-import ChatList from '../components/chat/ChatList';
-import ChatPanel from '../components/chat/ChatPanel';
+import ChatList from '../../components/chat/ChatList';
+import ChatPanel from '../../components/chat/ChatPanel';
+import type { ChatItemType } from '../utils';
 import RenderSchema from './RenderSchema';
-import type { ChatItemType } from './utils';
 
 const statusMap = Object.freeze({
   faild: 'error',

@@ -8,11 +8,11 @@ import {
   subZodSchemaResult,
   toastOpen,
 } from '@/utils/event';
-import ChatList from '../components/chat/ChatList';
-import ChatPanel from '../components/chat/ChatPanel';
-import { safetyPrint } from '../utils/fields';
+import ChatList from '../../components/chat/ChatList';
+import ChatPanel from '../../components/chat/ChatPanel';
+import { safetyPrint } from '../../utils/fields';
+import { type ChatItemType, checkStatus, pubSchema, subSchema } from '../utils';
 import RenderSchema from './RenderSchema';
-import { type ChatItemType, checkStatus, pubSchema, subSchema } from './utils';
 
 const PubSchema: FC = () => {
   const [list, setList] = useState<ChatItemType[]>([]);

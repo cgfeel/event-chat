@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import { isKey } from '@/utils/fields';
-import type { ChatItemType } from './utils';
+import type { ChatItemType } from '../utils';
 
 const statusMap = Object.freeze({
   error: '👾 [error] 操作异常',

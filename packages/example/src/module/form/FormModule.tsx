@@ -92,13 +92,13 @@ const FormModule: FC<PropsWithChildren<FormModuleProps>> = ({ children, footer, 
   );
 };
 
-const FormOrigin: FC<Pick<InputProps, 'onChange'>> = ({ onChange }) => (
+export const FormOrigin: FC<Pick<InputProps, 'onChange'>> = ({ onChange }) => (
   <FormItem label="主控表单" name={fieldOrigin}>
     <Input onChange={onChange} />
   </FormItem>
 );
 
-const FormWrapper: FC<PropsWithChildren<FormWrapper>> = ({
+export const FormWrapper: FC<PropsWithChildren<FormWrapper>> = ({
   children,
   footer,
   form,

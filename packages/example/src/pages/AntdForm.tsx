@@ -1,4 +1,5 @@
-import { FooterTips, FormEmit, FormUpdate, FormUpdateFields } from '@/module/FormModule';
+import { FormEmit } from '@/module/form';
+import { FooterTips, FormUpdate, FormUpdateFields } from '@/module/form/FormModule';
 import { Tag } from 'antd';
 import type { FC } from 'react';
 import Card from '@/components/Card';

@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.2](https://github.com/event-chat/event-chat/compare/core@v0.2.1...core@v0.2.2) (2026-01-12)
+
+
+### Bug Fixes
+
+* update core-test ([e359f8a](https://github.com/event-chat/event-chat/commit/e359f8ad5a687c0d7044c8d9b13a1d559c8be94b))
+* update core-test ([0cc8e5c](https://github.com/event-chat/event-chat/commit/0cc8e5c1bdf9455961a7f45a98fff664e6215223))
+
 ## [0.2.1](https://github.com/cgfeel/event-chat/compare/core@v0.2.0...core@v0.2.1) (2026-01-11)
 
 

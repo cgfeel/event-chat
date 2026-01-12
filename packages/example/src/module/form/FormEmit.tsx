@@ -1,11 +1,11 @@
-import { useForm } from '@event-chat/antd-item';
+import FormEvent from '@event-chat/antd-item';
 import { Divider, Form, Tag } from 'antd';
 import type { FC } from 'react';
 import { FormOrigin, FormWrapper } from './FormModule';
 import { fieldInput, fieldRate } from './utils';
 
 const FormEmit: FC = () => {
-  const [formEvent] = useForm({ group: 'form-emit' });
+  const [formEvent] = FormEvent.useForm({ group: 'form-emit' });
   const [formRaw] = Form.useForm();
   return (
     <>

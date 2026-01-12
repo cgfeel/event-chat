@@ -1,4 +1,4 @@
-import { FormEvent } from '@event-chat/antd-item';
+import FormEvent from '@event-chat/antd-item';
 import { ConfigProvider, Form, theme } from 'antd';
 import { type FC, Suspense, lazy, useState } from 'react';
 import './App.css';

@@ -1,4 +1,4 @@
-import { FormEvent, FormItem, useForm, useFormInstance } from '@event-chat/antd-item';
+import FormEvent from '@event-chat/antd-item';
 import {
   Divider,
   Flex,
@@ -40,7 +40,7 @@ const FormButtonEmit: FC<PropsWithChildren<FormButtonProps>> = ({
   onClick,
   ...props
 }) => {
-  const form = useFormInstance();
+  const form = FormEvent.useFormInstance();
   return (
     <FormButton
       {...props}
@@ -66,7 +66,7 @@ const FormModule: FC<PropsWithChildren<FormModuleProps>> = ({ children, footer, 
   return (
     <FormEvent {...props} labelCol={{ span: 8 }} wrapperCol={{ span: 16 }}>
       {children}
-      <FormItem
+      <FormEvent.Item
         label="受控表单"
         name={fieldInput}
         onChange={(rate, { emit }) => {
@@ -77,10 +77,10 @@ const FormModule: FC<PropsWithChildren<FormModuleProps>> = ({ children, footer, 
         }}
       >
         <Input disabled />
-      </FormItem>
-      <FormItem name={fieldRate} hidden>
+      </FormEvent.Item>
+      <FormEvent.Item name={fieldRate} hidden>
         <InputNumber />
-      </FormItem>
+      </FormEvent.Item>
       <Form.Item dependencies={[fieldRate]} label="受控响应">
         {(formIns) => {
           const value = (Number(formIns.getFieldValue(fieldRate) ?? 0) % 10) / 2;
@@ -93,9 +93,9 @@ const FormModule: FC<PropsWithChildren<FormModuleProps>> = ({ children, footer, 
 };
 
 export const FormOrigin: FC<Pick<InputProps, 'onChange'>> = ({ onChange }) => (
-  <FormItem label="主控表单" name={fieldOrigin}>
+  <FormEvent.Item label="主控表单" name={fieldOrigin}>
     <Input onChange={onChange} />
-  </FormItem>
+  </FormEvent.Item>
 );
 
 export const FormWrapper: FC<PropsWithChildren<FormWrapper>> = ({
@@ -125,7 +125,7 @@ export const FooterTips: FC<PropsWithChildren> = ({ children }) => (
 );
 
 export const FormEmit: FC = () => {
-  const [formEvent] = useForm({ group: 'form-emit' });
+  const [formEvent] = FormEvent.useForm({ group: 'form-emit' });
   const [formRaw] = Form.useForm();
   return (
     <>
@@ -163,7 +163,7 @@ export const FormEmit: FC = () => {
 };
 
 export const FormUpdate: FC = () => {
-  const [formEvent] = useForm({ group: 'form-update' });
+  const [formEvent] = FormEvent.useForm({ group: 'form-update' });
   const [formRaw] = Form.useForm();
   const [alldata, setData] = useState<unknown[]>([]);
   return (
@@ -230,7 +230,7 @@ export const FormUpdate: FC = () => {
 };
 
 export const FormUpdateFields: FC = () => {
-  const [formEvent] = useForm({ group: 'form-update-fields', name: 'fields-update' });
+  const [formEvent] = FormEvent.useForm({ group: 'form-update-fields', name: 'fields-update' });
   const [formRaw] = Form.useForm();
   const [alldata, setData] = useState<unknown[]>([]);
   return (

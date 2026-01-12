@@ -1,9 +1,10 @@
-import { FormEvent } from '@event-chat/antd-item';
+import FormEventRaw from '@event-chat/antd-item';
 import { ConfigProvider, Form, theme } from 'antd';
 import type { Meta, StoryObj } from 'storybook-react-rsbuild';
 import AntdItem from './AntdItem';
+import FormEvent from './components/FormEvent';
 
-FormEvent.observer(Form);
+FormEventRaw.observer(Form);
 
 const meta = {
   args: {
@@ -29,6 +30,7 @@ const meta = {
       </ConfigProvider>
     ),
   ],
+  subcomponents: { FormEvent },
   title: 'Document/AntdItem',
 } satisfies Meta<typeof AntdItem>;
 

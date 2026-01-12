@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.3](https://github.com/event-chat/event-chat/compare/core@v0.2.2...core@v0.2.3) (2026-01-12)
+
+
+### Bug Fixes
+
+* update module add form ([d0fbaf1](https://github.com/event-chat/event-chat/commit/d0fbaf140150322da9af7c7725a945a3768ca493))
+
 ## [0.2.2](https://github.com/event-chat/event-chat/compare/core@v0.2.1...core@v0.2.2) (2026-01-12)
 
 

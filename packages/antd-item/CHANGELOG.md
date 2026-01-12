@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.4](https://github.com/event-chat/event-chat/compare/antd-item@v0.2.3...antd-item@v0.2.4) (2026-01-12)
+
+
+### Bug Fixes
+
+* test-event ([971c65d](https://github.com/event-chat/event-chat/commit/971c65da80f24c406f4abfd34e084111fef78f69))
+* test-event ([cab5769](https://github.com/event-chat/event-chat/commit/cab57693afe6751fad84d5a1ed0af9a0cf27ed79))
+
 ## [0.2.3](https://github.com/cgfeel/event-chat/compare/antd-item@v0.2.2...antd-item@v0.2.3) (2026-01-11)
 
 

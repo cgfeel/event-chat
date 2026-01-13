@@ -39,3 +39,21 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const FormEmit: Story = {};
+
+export const FormUpdate: Story = {
+  args: {
+    name: 'FormUpdate',
+  },
+};
+
+export const FormUpdateFields: Story = {
+  args: {
+    name: 'FormUpdateFields',
+  },
+};
+
+export const FormList: Story = {
+  args: {
+    name: 'FormList',
+  },
+};

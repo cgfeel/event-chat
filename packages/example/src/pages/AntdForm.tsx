@@ -1,5 +1,4 @@
-import { FormEmit } from '@/module/form';
-import { FooterTips, FormUpdate, FormUpdateFields } from '@/module/form/FormModule';
+import { FooterTips, FormEmit, FormList, FormUpdate, FormUpdateFields } from '@/module/form';
 import { Tag } from 'antd';
 import type { FC } from 'react';
 import Card from '@/components/Card';
@@ -62,6 +61,18 @@ const AntdForm: FC = () => (
       title="通过表单向指定字段发起更新"
     >
       <FormUpdateFields />
+    </Card>
+    <Card
+      footer={
+        <FooterTips>
+          设置列表项的具体值，并希望追踪更新的值做出相应的反应。<Tag>Antd</Tag>{' '}
+          原有的能力需要根据业务逻辑挨个赋值，而 <Tag>emit</Tag>{' '}
+          允许将赋值和受控分离开，当指定表单项更新后受控字段再做出反应。
+        </FooterTips>
+      }
+      title="追踪列表项更新"
+    >
+      <FormList />
     </Card>
   </div>
 );

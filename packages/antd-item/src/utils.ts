@@ -12,7 +12,7 @@ export const getStringValue = <T extends NamepathType | undefined>(values: T[]) 
   values.find((item) => item !== undefined && (!Array.isArray(item) || item.length > 0));
 
 export const convertName = (path?: NamepathType) => (typeof path === 'object' ? [...path] : path);
-export const useForm = <Name extends NamepathType, Group extends string | undefined = undefined>(
+export const useForm = <Name extends string, Group extends string | undefined = undefined>(
   options?: FormOptions<Name, Group>,
   formInit?: FormEventInstance<Name, Group>
 ) => {

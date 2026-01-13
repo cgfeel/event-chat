@@ -2,7 +2,7 @@ import { FormItemProps as FormItemRawProps } from 'antd';
 import { ReactNode } from 'react';
 import { ZodType } from 'zod';
 import FormInput, { FormInputProps } from './FormInput';
-import { FormInsType, convertName, useFormCom } from './utils';
+import { FormInsType, convertName, useFormCom, useFormInstance } from './utils';
 
 const FormItem = <
   Schema extends ZodType | undefined = undefined,
@@ -17,11 +17,14 @@ const FormItem = <
   onChange,
   ...props
 }: FormItemProps<Schema, Type>) => {
+  const formInstance = useFormInstance();
   const Form = useFormCom();
   return (
     <>
-      <Form.Item {...props}>{children}</Form.Item>
-      {props.name && (
+      <Form.Item {...props}>
+        {typeof children === 'function' ? children(formInstance) : children}
+      </Form.Item>
+      {props.name !== undefined && (
         <Form.Item name={convertName(props.name)} hidden>
           <FormInput
             async={async}

@@ -1,8 +1,9 @@
 import { NamepathType } from '@event-chat/core';
+import { Form as FormRaw } from 'antd';
 import { ComponentProps, FC, PropsWithChildren, memo } from 'react';
 import { ZodType } from 'zod';
 import FormInput, { FormInputProps } from './FormInput';
-import { FormBaseInstance, FormEventContext, convertName, useFormCom, useFormEvent } from './utils';
+import { FormEventContext, convertName, useFormCom, useFormEvent } from './utils';
 
 const FormListInner: FC<PropsWithChildren<FormListInnerProps>> = ({ children, name: parent }) => {
   const record = useFormEvent();
@@ -34,7 +35,7 @@ const FormList = <
           <ListItem name={name}>{children(fields, options, metas)}</ListItem>
         )}
       </Form.List>
-      <Form.Item name={convertName(name)}>
+      <Form.Item name={convertName(name)} hidden>
         <FormInput
           async={async}
           name={convertName(name)}
@@ -58,7 +59,7 @@ interface FormListProps<
   Type extends string | undefined = undefined,
 >
   extends
-    Omit<ComponentProps<NonNullable<FormBaseInstance['List']>>, 'name'>,
+    Omit<ComponentProps<typeof FormRaw.List>, 'name'>,
     Omit<FormInputProps<Schema, Type>, 'name'> {
   name: NamepathType;
 }

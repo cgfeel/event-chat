@@ -1,9 +1,12 @@
-import { FormEmit } from '@/module/form';
+import { FormEmit, FormList, FormUpdate, FormUpdateFields } from '@/module/form';
 import type { FC } from 'react';
 import { isKey } from '@/utils/fields';
 
 const formMap = Object.freeze({
   FormEmit,
+  FormUpdate,
+  FormUpdateFields,
+  FormList,
 });
 
 const Form: FC<FormProps> = ({ name }) => {

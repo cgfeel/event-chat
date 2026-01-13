@@ -55,8 +55,9 @@ const FormEvent = <ValuesType, Name extends string, Group extends string | undef
   const formGroup = useMemo(() => getStringValue([form?.group, group]), [form?.group, group]);
   const Form = useFormCom();
 
-  if (form?.emit && form.name && form.name === formName) {
+  if (form?.emit && form.name === formName) {
     const { focusField, ...formIns } = form;
+    formIns.group = formGroup;
     return (
       <Form {...props} form={{ ...formIns, focusField: focusField ?? (() => {}) }}>
         <FormProvider group={formGroup} name={formName} emit={form.emit}>

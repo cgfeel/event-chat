@@ -8,6 +8,9 @@ export const isKey = <T extends Record<string, unknown>>(key: unknown, data: T):
 export const isPropertyKey = (value: unknown): value is PropertyKey =>
   ['number', 'string', 'symbol'].includes(typeof value);
 
+export const objectEntries = <T extends object, K = keyof T>(obj: T) =>
+  Object.entries(obj) as Array<[K, T[keyof T]]>;
+
 export const objectKeys = <T extends object, K = keyof T>(obj: T) => Object.keys(obj) as K[];
 
 export const safetyParse = (value: string) => {

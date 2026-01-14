@@ -57,3 +57,15 @@ export const FormList: Story = {
     name: 'FormList',
   },
 };
+
+export const FormSchema: Story = {
+  args: {
+    name: 'FormSchema',
+  },
+};
+
+export const FormRate: Story = {
+  args: {
+    name: 'FormRate',
+  },
+};

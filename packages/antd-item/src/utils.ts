@@ -66,7 +66,7 @@ export interface FormEventContextInstance {
   name?: NamepathType; // 用于向 form 传递 detail
   parent?: NamepathType;
   emit?: <Detail, CustomName extends NamepathType>(
-    record: Omit<EventDetailType<Detail, CustomName>, 'group' | 'id' | 'origin' | 'type'>
+    record: Omit<EventDetailType<Detail, CustomName>, 'group' | 'id' | 'origin' | 'time' | 'type'>
   ) => void;
 }
 
@@ -76,7 +76,7 @@ export interface FormEventInstance<
 >
   extends FormInsType, FormOptions<Name, Group> {
   emit?: <Detail, CustomName extends NamepathType>(
-    record: Omit<EventDetailType<Detail, CustomName>, 'group' | 'id' | 'origin' | 'type'>
+    record: Omit<EventDetailType<Detail, CustomName>, 'group' | 'id' | 'origin' | 'time' | 'type'>
   ) => void;
 }
 

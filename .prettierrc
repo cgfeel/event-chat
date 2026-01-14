@@ -7,7 +7,7 @@
   "bracketSpacing": true,
   "arrowParens": "always",
   "endOfLine": "lf",
-  "plugins": ["@trivago/prettier-plugin-sort-imports"],
+  "plugins": ["@trivago/prettier-plugin-sort-imports", "prettier-plugin-tailwindcss"],
   "importOrder": [
     "^node:(.*)$",
     "^@?\\w",
@@ -18,5 +18,6 @@
   ],
   "importOrderSeparation": false,
   "importOrderSortSpecifiers": true,
-  "importOrderCaseInsensitive": false
+  "importOrderCaseInsensitive": false,
+  "tailwindFunctions": ["tv"]
 }

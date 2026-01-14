@@ -12,6 +12,7 @@ const testEventData: EventDetailType = {
   id: 'test-id-123',
   name: 'test-evet',
   origin: 'test-origin',
+  time: new Date(),
   token: 'test-token-456',
   type: 'test-type',
 };

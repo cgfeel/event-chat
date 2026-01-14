@@ -134,6 +134,11 @@ pnpm add @event-chat/core
       type: ['string', 'undefined'],
     },
     {
+      desc: '事件促发事件',
+      keyname: 'time',
+      type: ['Date'],
+    },
+    {
       desc: (
         <>
           根据配置 <Tag>type</Tag> 推导具体类型，没有提供则为 <Tag>unknown</Tag>
@@ -159,6 +164,7 @@ pnpm add @event-chat/core
 ```typescript
 type ResultType<Schema = unknown> = Omit<z.ZodSafeParseError<Schema>, 'data'> & {
   data: unknown;
+  time: Date;
 };
 ```
 
@@ -194,7 +200,7 @@ type ResultType<Schema = unknown> = Omit<z.ZodSafeParseError<Schema>, 'data'> & 
 额外说明：
 
 - `group`、`token` 仅用于接收方比对，接收方最终根据自身配置，透传给 `callback` 作为参数
-- `id` 为内部生成
+- `id`、`time` 为内部生成
 - `origin`、`type` 将根据 `useEventChat` 配置自动添加
 
 ### `NamepathType`：事件名

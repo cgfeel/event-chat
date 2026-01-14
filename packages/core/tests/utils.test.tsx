@@ -25,6 +25,7 @@ const baseTestData: EventDetailType<{ message: string }> = {
   detail: { message },
   id: 'test-id-123',
   origin: 'test-origin',
+  time: new Date(),
   type: 'test-type',
   name,
 };

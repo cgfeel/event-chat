@@ -14,10 +14,10 @@ const PubSchemaExtra: FC = () => {
   return (
     <ExtraGuid title="只接受以下类型的字符：">
       <pre>{`[${status.join('|')}]: string`}</pre>
-      <div className="pb-1 pt-4">例如：</div>
+      <div className="pt-4 pb-1">例如：</div>
       <pre>{'waiting: 正在执行操作'}</pre>
-      <div className="pb-1 pt-4">也可以传一个错误的数据试试，注意：状态根据回复动态改变的</div>
-      <div className="pb-1 pt-4">因为 useEeventChat 会自动为你收集参数的更新</div>
+      <div className="pt-4 pb-1">也可以传一个错误的数据试试，注意：状态根据回复动态改变的</div>
+      <div className="pt-4 pb-1">因为 useEeventChat 会自动为你收集参数的更新</div>
     </ExtraGuid>
   );
 };

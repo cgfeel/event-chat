@@ -72,21 +72,19 @@ export type DetailType<
   Group extends string | undefined = undefined,
   Type extends string | undefined = undefined,
   Token extends boolean | undefined = undefined,
-> = {
-  id: string;
-  name: Name;
+> = Pick<EventDetailType<unknown, Name>, 'global' | 'id' | 'name' | 'time'> & {
   detail: WasProvided<Schema> extends true ? z.output<Exclude<Schema, undefined>> : unknown;
   group: WasProvided<Group> extends true ? Exclude<Group, undefined> : undefined;
   origin: string;
   type: WasProvided<Type> extends true ? Exclude<Type, undefined> : undefined;
   token: Token extends true ? string : undefined;
-  global?: boolean;
 };
 
 export type EventDetailType<Detail = unknown, Name extends NamepathType = NamepathType> = {
   id: string;
   name: Name;
   origin: NamepathType;
+  time: Date;
   detail?: Detail;
   global?: boolean;
   group?: string;
@@ -102,6 +100,7 @@ export type NamepathType =
 
 export type ResultType<Schema = unknown> = Omit<z.ZodSafeParseError<Schema>, 'data'> & {
   data: unknown;
+  time: Date;
 };
 
 // 工具类型：判断在调用中，泛型 T 是否“实际上被提供了参数”

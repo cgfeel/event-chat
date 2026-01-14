@@ -96,7 +96,7 @@ const ToastItem: FC<ToastItemProps> = ({ group, item }) => {
       </div>
       <div className="toast-content">
         <div className="font-bold">{title}</div>
-        {message && <div className="text-opacity-90 text-xs mt-1">{message}</div>}
+        {message && <div className="text-opacity-90 mt-1 text-xs">{message}</div>}
       </div>
       <span className="toast-close" onClick={handleClose}>
         <FontAwesomeIcon icon={faTimes} />

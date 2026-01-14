@@ -75,10 +75,10 @@ const PubPrivate: FC = () => {
 
   return (
     <>
-      <div className="border border-dashed break-all h-13 mb-2 text-xs wrap-break-word p-2">
+      <div className="mb-2 h-13 border border-dashed p-2 text-xs wrap-break-word break-all">
         Token: {token}{' '}
         <button
-          className="bg-amber-700 cursor-pointer rounded-xs px-2"
+          className="cursor-pointer rounded-xs bg-amber-700 px-2"
           type="button"
           onClick={() => emit({ detail: token, name: syncToken })}
         >

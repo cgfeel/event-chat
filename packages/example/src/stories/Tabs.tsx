@@ -13,7 +13,7 @@ export const TabContent: FC<TabContentProps> = ({ active, defaultActive, group }
 
   // test commit
   return (
-    <div className="animate-fade-in-up flex justify-center w-full">{safetyPrint(current)}</div>
+    <div className="animate-fade-in-up flex w-full justify-center">{safetyPrint(current)}</div>
   );
 };
 

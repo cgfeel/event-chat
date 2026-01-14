@@ -20,7 +20,7 @@ const App: FC = () => {
   return (
     <>
       <Toast />
-      <div className="flex justify-center items-center py-4 w-full">
+      <div className="flex w-full items-center justify-center py-4">
         <Tabs defaultActive="EventChat" onChange={(detail) => setCurrent(String(detail))}>
           <TabItem name="EventChat">eventChat</TabItem>
           <TabItem name="AntdForm">antdForm</TabItem>
@@ -34,7 +34,7 @@ const App: FC = () => {
       >
         <Suspense
           fallback={
-            <div className="animate-fade-in-up flex justify-center items-center w-full">
+            <div className="animate-fade-in-up flex w-full items-center justify-center">
               loading...
             </div>
           }

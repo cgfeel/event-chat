@@ -27,7 +27,7 @@ const meta: Meta<typeof Toast> = {
   component: Toast,
   title: 'Example/Toast',
   decorators: (Story, { args }) => (
-    <div className="flex justify-center items-center py-20">
+    <div className="flex items-center justify-center py-20">
       <Story {...args} />
     </div>
   ),

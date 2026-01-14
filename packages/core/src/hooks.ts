@@ -46,9 +46,11 @@ export function useEventChat<
   const tokenRc = useMemoFn(token);
 
   const errorHandle = useCallback(
-    (error: unknown, data: unknown) => {
+    (error: unknown, data: unknown, time: Date) => {
       if (error instanceof Error && options.current?.debug)
-        options.current.debug(isResultType(error.cause) ? { ...error.cause, data } : undefined);
+        options.current.debug(
+          isResultType(error.cause) ? { ...error.cause, data, time } : undefined
+        );
     },
     [options]
   );
@@ -64,11 +66,11 @@ export function useEventChat<
       if (opitem.schema !== undefined) {
         validate(upRecord, { ...opitem, schema: opitem.schema }, tokenRc.current)
           .then(opitem.callback)
-          .catch((error) => errorHandle(error, data.detail));
+          .catch((error) => errorHandle(error, data.detail, data.time));
       } else {
         checkLiteral(upRecord, { ...opitem, schema: undefined }, tokenRc.current)
           .then(opitem.callback)
-          .catch((error) => errorHandle(error, data.detail));
+          .catch((error) => errorHandle(error, data.detail, data.time));
       }
     },
     [nameRc, options, tokenRc, errorHandle]
@@ -76,13 +78,14 @@ export function useEventChat<
 
   const emit = useCallback(
     <Detail, CustomName extends NamepathType>(
-      detail: Omit<EventDetailType<Detail, CustomName>, 'group' | 'id' | 'origin' | 'type'>
+      detail: Omit<EventDetailType<Detail, CustomName>, 'group' | 'id' | 'origin' | 'time' | 'type'>
     ) => {
       // 业务提交 name 是空的，那么 origin 就是空，当做匿名处理
       const event = createEvent({
         ...detail,
         group: ops?.group,
         origin: nameRc.current,
+        time: new Date(),
         type: ops?.type,
         id,
       });

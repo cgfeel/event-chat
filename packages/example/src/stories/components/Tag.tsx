@@ -12,7 +12,7 @@ const Tag: FC<PropsWithChildren<TagProps>> = ({ children, type = 'default' }) =>
   const color = colorMap[type];
   return (
     <span
-      className={`sb-anchor inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 ${color}`}
+      className={`sb-anchor inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs font-medium ${color}`}
     >
       {children}
     </span>

@@ -1,4 +1,12 @@
-import { FooterTips, FormEmit, FormList, FormUpdate, FormUpdateFields } from '@/module/form';
+import {
+  FooterTips,
+  FormEmit,
+  FormList,
+  FormRate,
+  FormSchema,
+  FormUpdate,
+  FormUpdateFields,
+} from '@/module/form';
 import { Tag } from 'antd';
 import type { FC } from 'react';
 import Card from '@/components/Card';
@@ -26,7 +34,7 @@ const AntdForm: FC = () => (
         <FooterTips>
           官方文档：<Tag>change</Tag> 事件仅当用户交互才会触发。该设计是为了防止在 <Tag>change</Tag>{' '}
           事件中调用 <Tag>setFieldsValue</Tag> 导致的循环问题。
-          <ul className="list-disc m-4 text-gray-400 text-sm">
+          <ul className="m-4 list-disc text-sm text-gray-400">
             <li>
               官方的建议是：通过 <Tag>useWatch</Tag> 实现字段监听，缺点是 <Tag>Form.List</Tag>{' '}
               动态删减字段时可能会引发报错，这个错误可能不是业务代码能够修复的，只能调整业务逻辑
@@ -37,7 +45,7 @@ const AntdForm: FC = () => (
           </ul>
           <Tag>emit</Tag> 允许被 <Tag>onFieldsChange</Tag> 和 <Tag>onValuesChange</Tag>{' '}
           监听到，但同样会将官方提出的问题暴露给业务方：
-          <ul className="list-disc m-4 text-gray-400 text-sm">
+          <ul className="m-4 list-disc text-sm text-gray-400">
             <li>
               在 <Tag>change</Tag> 内部需要避免循环更新，尤其是循环嵌套触发的更新
             </li>
@@ -73,6 +81,44 @@ const AntdForm: FC = () => (
       title="追踪列表项更新"
     >
       <FormList />
+    </Card>
+    <Card
+      footer={
+        <FooterTips>
+          <div>
+            通过 <Tag>Schema</Tag> 指定受控字段的类型，只有符合条件的消息会触发字段更新。同时提供{' '}
+            <Tag>debug</Tag> 作为调试函数，用于收集未匹配的数据。
+          </div>
+          <div>
+            这样 <Tag>Antd</Tag>{' '}
+            表单字段实现了按照指定类型受控，一个字段可以在不同的业务场景下复用，而最终的交付结果一定是按照最初定义的{' '}
+            <Tag>Schema</Tag> 相匹配。
+          </div>
+        </FooterTips>
+      }
+      title="指定受控类型"
+    >
+      <FormSchema />
+    </Card>
+    <Card
+      footer={
+        <FooterTips>
+          通过上面的示例，使用 <Tag>Schema</Tag> 让字段接受更复杂的数据类型，这里有两种方式：
+          <ol className="m-4 list-decimal text-sm text-gray-400">
+            <li>
+              根据字段值渲染对应的组件，但不会修改值，可以通过 <Tag>Antd</Tag> 原有的属性{' '}
+              <Tag>getValueFromEvent</Tag> 以及 <Tag>getValueProps</Tag> 实现；
+            </li>
+            <li>
+              根据收到的字段值，转换数据类型。可以通过 <Tag>Zod</Tag> 的 <Tag>transform</Tag>{' '}
+              来实现。如上面演示，<Tag>emit</Tag> 提供数值，字段接收后会将其转换成一个对象。
+            </li>
+          </ol>
+        </FooterTips>
+      }
+      title="转换字段数据进行渲染"
+    >
+      <FormRate />
     </Card>
   </div>
 );

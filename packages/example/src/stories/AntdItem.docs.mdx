@@ -3,6 +3,8 @@ import AntdItem from './AntdItem';
 import AntdItemStories, {
   FormEmit,
   FormList,
+  FormRate,
+  FormSchema,
   FormUpdate,
   FormUpdateFields,
 } from './AntdItem.stories';
@@ -55,6 +57,7 @@ pnpm add @event-chat/item
 ## 基础使用示例
 
 <Canvas
+  className="doc-render"
   additionalActions={[
     {
       title: 'Code in GitHub',
@@ -316,6 +319,8 @@ type FormOptions<Name extends NamepathType, Group extends string | undefined = u
   ]}
 />
 
+需要说明的是 `Form.useFormInstance` 扩展的属性全部为可选值，因为是通过上下文获取，如果没有在 `FormEvent` 内部使用，的确可能拿到的是 `undefined`。使用的时候需要通过 `?.` 来调用，例如：`form?.emit`。
+
 ### `FormInstance`
 
 由 `Form.useForm` 或 `Form.useFormInstance` 返回的 `form` 实例，拓展实例的属性如上所述。为了兼容 `Antd v5` 和 `Antd v6`，将实例中的方法 `focusField` 作为可选属性，由业务环境依赖决定。
@@ -425,8 +430,67 @@ const useFormCom = (): FormBaseInstance => {
 
 设置列表项的具体值，并希望追踪更新的值做出相应的反应。`Antd` 原有的能力需要根据业务逻辑挨个赋值，而 `emit` 允许将赋值和受控分离开，当指定表单项更新后受控字段再做出反应。
 
+> 在 `Form.List` 下的 `Form.Item` 会自动收集列表的 `name`，将自动合并列表项自身的 `name`。`emit` 触发更新时，需要完整填写 `namePath`。
+
 在上面的演示案例中，分别展示了：
 
 - 通过 `Form.useForm` 申明一个扩展的表单实例，触发 `emit` 更新
 - 通过 `For.useFormInstance` 从上下文中拿到扩展的表单实例，向表单触发 `emit` 更新字段
 - 在受控字段中通过 `onChange` 回调拿到 `emit` 触发更新
+
+下面会对 `@event-chat/antd-item` 扩展特性进行演示
+
+## 扩展的特性
+
+### 指定受控字段类型
+
+通过 `Schema` 指定受控字段的类型，只有符合条件的消息会触发字段更新。同时提供 `debug` 作为调试函数，用于收集未匹配的数据。
+
+<Canvas
+  additionalActions={[
+    {
+      title: 'Code in GitHub',
+      onClick: () => {
+        window.open(
+          'https://github.com/event-chat/event-chat/blob/main/packages/example/src/module/form/FormSchema.tsx',
+          '_blank'
+        );
+      },
+    },
+  ]}
+  of={FormSchema}
+  sourceState="none"
+/>
+
+这样 `Antd` 表单字段实现了按照指定类型受控，一个字段可以在不同的业务场景下复用，而最终的交付结果一定是按照最初定义的 `Schema` 相匹配。
+
+> 比如有个字段叫 `userLevel`，类型为：`{ type: string; power: number; }`，那么这个字段在用户录入的表单里是这个类型，在新增管理员的表单里也一定是这个类型。
+
+### 转换字段数据进行渲染
+
+根据上方 `schema` 演示，可以将字段让字段赋值变得更加简单，而渲染更加复杂。
+
+<Canvas
+  additionalActions={[
+    {
+      title: 'Code in GitHub',
+      onClick: () => {
+        window.open(
+          'https://github.com/event-chat/event-chat/blob/main/packages/example/src/module/form/FormRate.tsx',
+          '_blank'
+        );
+      },
+    },
+  ]}
+  of={FormRate}
+  sourceState="none"
+/>
+
+使用 `Schema` 让字段接受更复杂的数据类型，这里有两种方式：
+
+- 根据字段值渲染对应的组件，但不会修改值，可以通过 `Antd` 原有的属性 `getValueFromEvent` 以及 `getValueProps` 实现；
+- 根据收到的字段值，转换数据类型。可以通过 `Zod` 的 `transform` 来实现。如上面演示，`emit` 提供数值，字段接收后会将其转换成一个对象。
+
+以上两个字段都只接收数值类型，`rateInput` 不会过滤数据，而 `transform` 会做转换。通过这样的方式，相同的字段，相同的组件，可以根据业务灵活配置需要的数据。而发起更新的 `emit` 仍旧保持数值类型不变，不会随着业务或者处理逻辑不同而改变。
+
+> 遗留问题：`Form.Item` 的属性 `shouldUpdate` 请通过 `Antd` 原本的 `Form.Item`，目前扩展的表单项使用之后不会刷新表单项。

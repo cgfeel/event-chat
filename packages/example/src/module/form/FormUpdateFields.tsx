@@ -12,7 +12,7 @@ const FormUpdateFields: FC = () => {
       <FormWrapper
         footer={
           <Form.Item colon={false} label={` `}>
-            <pre className="bg-gray-800 max-h-80 overflow-auto p-4 rounded-xl text-sm">
+            <pre className="max-h-80 overflow-auto rounded-xl bg-gray-800 p-4 text-sm">
               {JSON.stringify(alldata, null, 2)}
             </pre>
           </Form.Item>
@@ -34,7 +34,7 @@ const FormUpdateFields: FC = () => {
         footer={
           <Form.Item colon={false} label={` `} shouldUpdate>
             {() => (
-              <pre className="bg-gray-800 max-h-80 overflow-auto p-4 rounded-xl text-sm">
+              <pre className="max-h-80 overflow-auto rounded-xl bg-gray-800 p-4 text-sm">
                 {JSON.stringify(formRaw.getFieldsValue(), null, 2)}
               </pre>
             )}

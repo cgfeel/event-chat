@@ -29,8 +29,8 @@ const meta: Meta<typeof Tabs> = {
     (_, context) => {
       const { args } = context;
       return (
-        <div className="flex flex-col gap-8 max-w-200 mx-auto py-4">
-          <div className="flex justify-center items-center py-4 w-full">
+        <div className="mx-auto flex max-w-200 flex-col gap-8 py-4">
+          <div className="flex w-full items-center justify-center py-4">
             <Tabs {...args}>
               <TabItem name="EventChat">eventChat</TabItem>
               <TabItem name="AntdForm">antdForm</TabItem>

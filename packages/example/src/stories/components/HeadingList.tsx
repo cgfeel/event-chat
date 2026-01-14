@@ -8,14 +8,10 @@ export const HeadingList: FC<CategoryListProps> = ({ list, scrollTo }) => {
         const { indent, fontSize, color } = getCatalogItemStyle(tag);
         return (
           <li
-            className={`
-                  ${indent} ${fontSize} ${color}
-                  sb-anchor rounded-md
-                  hover:bg-gray-50 transition-colors cursor-pointer
-                `}
+            className={` ${indent} ${fontSize} ${color} sb-anchor cursor-pointer rounded-md transition-colors hover:bg-gray-50`}
             key={name}
           >
-            <a className="text-blue-500 flex items-center" onClick={() => scrollTo?.(name)}>
+            <a className="flex items-center text-blue-500" onClick={() => scrollTo?.(name)}>
               {title}
             </a>
           </li>

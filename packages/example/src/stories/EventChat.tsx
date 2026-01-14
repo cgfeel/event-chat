@@ -23,11 +23,11 @@ const GroupChat: FC = () => (
       <ChatLayout
         extra={
           <ExtraGuid>
-            <div className="pb-1 pt-4">
+            <div className="pt-4 pb-1">
               群组成员发送的信息只能在群组内接收，非群组成员无法接收。
             </div>
-            <div className="pb-1 pt-4">群组成员可以通过 global 向公屏发送消息</div>
-            <div className="pb-1 pt-4">
+            <div className="pt-4 pb-1">群组成员可以通过 global 向公屏发送消息</div>
+            <div className="pt-4 pb-1">
               非群组内的成员只能通过 group 设为组内成员才能在群组内发送消息。
             </div>
           </ExtraGuid>

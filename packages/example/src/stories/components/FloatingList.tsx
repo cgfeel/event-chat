@@ -36,16 +36,11 @@ const FloatingList: FC<CategoryListProps> = ({ list, scrollTo }) => {
     <div className="floating-list fixed right-6 bottom-6 z-50">
       <div className="relative flex flex-col items-end">
         <button
-          className={`
-            control-btn w-10 h-10 rounded-full bg-gray-800 text-white border-2 border-white 
-            flex items-center justify-center shadow-md 
-            hover:bg-gray-700 active:bg-gray-900 transition-all duration-300
-            ${isExpanded ? 'opacity-0 pointer-events-none inset-0 translate-y-10' : 'opacity-100 pointer-events-auto'}
-          `}
+          className={`control-btn flex h-10 w-10 items-center justify-center rounded-full border-2 border-white bg-gray-800 text-white shadow-md transition-all duration-300 hover:bg-gray-700 active:bg-gray-900 ${isExpanded ? 'pointer-events-none inset-0 translate-y-10 opacity-0' : 'pointer-events-auto opacity-100'} `}
           aria-label={isExpanded ? '收起清单' : '展开清单'}
         >
           <svg
-            className="w-5 h-5 pointer-events-none"
+            className="pointer-events-none h-5 w-5"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -60,16 +55,12 @@ const FloatingList: FC<CategoryListProps> = ({ list, scrollTo }) => {
           </svg>
         </button>
         <div
-          className={`
-            overflow-hidden transition-all duration-300 ease-in-out
-            ${isExpanded ? 'max-h-96 opacity-100 scale-100' : 'max-h-0 opacity-0 scale-95'}
-            bg-white rounded-lg shadow-xl border border-gray-100 w-64
-          `}
+          className={`overflow-hidden transition-all duration-300 ease-in-out ${isExpanded ? 'max-h-96 scale-100 opacity-100' : 'max-h-0 scale-95 opacity-0'} w-64 rounded-lg border border-gray-100 bg-white shadow-xl`}
         >
-          <button className="control-btn cursor-pointer w-full flex items-center justify-between px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
+          <button className="control-btn flex w-full cursor-pointer items-center justify-between px-4 py-3 text-gray-700 transition-colors hover:bg-gray-50">
             <span className="font-medium">文档目录</span>
             <svg
-              className="w-4 h-4 text-gray-500 rotate-180 transition-transform duration-300 pointer-events-none"
+              className="pointer-events-none h-4 w-4 rotate-180 text-gray-500 transition-transform duration-300"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -84,14 +75,12 @@ const FloatingList: FC<CategoryListProps> = ({ list, scrollTo }) => {
             </svg>
           </button>
           <div className="max-h-84 overflow-y-auto">
-            <ul className="px-2 py-2 m-0 border-t border-gray-100">
+            <ul className="m-0 border-t border-gray-100 px-2 py-2">
               {list.map(({ name, tag, title }) => {
                 const { indent, color } = getCatalogItemStyle(tag);
                 return (
                   <li
-                    className={`
-                  ${indent} ${color}
-                  sb-anchor py-2 text-sm hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors cursor-pointer`}
+                    className={` ${indent} ${color} sb-anchor cursor-pointer rounded-md py-2 text-sm transition-colors hover:bg-gray-50 hover:text-gray-900`}
                     key={name}
                     onClick={() => scrollTo?.(name)}
                   >

@@ -69,7 +69,7 @@ const SubPrivate: FC = () => {
 
   return (
     <>
-      <div className="border border-dashed break-all h-13 mb-2 text-xs wrap-break-word p-2">
+      <div className="mb-2 h-13 border border-dashed p-2 text-xs wrap-break-word break-all">
         Sync: {token || '--'}{' '}
         {token && (
           <FontAwesomeIcon

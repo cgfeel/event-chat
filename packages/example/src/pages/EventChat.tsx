@@ -28,7 +28,7 @@ const EventChat: FC = () => (
       ]}
       title="Event-chat-nolimit"
     />
-    <hr className="mb-4 mt-4" />
+    <hr className="mt-4 mb-4" />
     <Layout
       list={[
         <ChatLayout extra={<PubSchemaExtra />} key="pub" title="pub-zod-schema">
@@ -40,17 +40,17 @@ const EventChat: FC = () => (
       ]}
       title="Event-chat-by-zod-schema"
     />
-    <hr className="mb-4 mt-4" />
+    <hr className="mt-4 mb-4" />
     <Layout
       list={[
         <ChatLayout
           extra={
             <ExtraGuid>
-              <div className="pb-1 pt-4">
+              <div className="pt-4 pb-1">
                 群组成员发送的信息只能在群组内接收，非群组成员无法接收。
               </div>
-              <div className="pb-1 pt-4">群组成员可以通过 global 向公屏发送消息</div>
-              <div className="pb-1 pt-4">
+              <div className="pt-4 pb-1">群组成员可以通过 global 向公屏发送消息</div>
+              <div className="pt-4 pb-1">
                 非群组内的成员只能通过 group 设为组内成员才能在群组内发送消息。
               </div>
             </ExtraGuid>
@@ -66,7 +66,7 @@ const EventChat: FC = () => (
       ]}
       title="Event-chat-group"
     />
-    <hr className="mb-4 mt-4" />
+    <hr className="mt-4 mb-4" />
     <Layout
       list={[
         <ChatLayout extra={<ExtraGuid>无限制收发型消息</ExtraGuid>} key="pub" title="pub-private">
@@ -82,7 +82,7 @@ const EventChat: FC = () => (
       ]}
       title="Event-chat-private"
     />
-    <hr className="mb-4 mt-4" />
+    <hr className="mt-4 mb-4" />
   </>
 );
 

@@ -35,16 +35,16 @@ const RenderCard: FC<RenderCardProps> = ({ item: { description, id, ingredients,
   const bgcolor = getColor(bgColorMap, id);
   const textcolor = getColor(textColorMap, id);
   return (
-    <div className="bg-white rounded-xl card-shadow overflow-hidden transition-transform hover:scale-[1.02] duration-300">
-      <div className={`${bgcolor} text-white p-6`}>
-        <h2 className="text-2xl font-bold mb-1">{title}</h2>
-        <p className="text-amber-200 text-sm">食谱 ID：{id}</p>
+    <div className="card-shadow overflow-hidden rounded-xl bg-white transition-transform duration-300 hover:scale-[1.02]">
+      <div className={`${bgcolor} p-6 text-white`}>
+        <h2 className="mb-1 text-2xl font-bold">{title}</h2>
+        <p className="text-sm text-amber-200">食谱 ID：{id}</p>
       </div>
       <div className="p-6">
         <div className="mb-5">
-          <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+          <h3 className="mb-3 flex items-center text-lg font-semibold text-gray-800">
             <svg
-              className={`w-5 h-5 mr-2 ${textcolor}`}
+              className={`mr-2 h-5 w-5 ${textcolor}`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -64,7 +64,7 @@ const RenderCard: FC<RenderCardProps> = ({ item: { description, id, ingredients,
               const keyname = `${ingredient}:${idx}`;
               return (
                 <li className="flex items-center" key={keyname}>
-                  <span className={`w-2 h-2 rounded-full ${bgcolor} mr-2`} />
+                  <span className={`h-2 w-2 rounded-full ${bgcolor} mr-2`} />
                   {ingredient}
                 </li>
               );
@@ -72,8 +72,8 @@ const RenderCard: FC<RenderCardProps> = ({ item: { description, id, ingredients,
           </ul>
         </div>
         {description && (
-          <div className="text-gray-600 bg-gray-100 p-4 rounded-lg">
-            <h3 className="text-lg font-semibold mb-2 text-gray-800">食谱描述</h3>
+          <div className="rounded-lg bg-gray-100 p-4 text-gray-600">
+            <h3 className="mb-2 text-lg font-semibold text-gray-800">食谱描述</h3>
             <p>{description}</p>
           </div>
         )}

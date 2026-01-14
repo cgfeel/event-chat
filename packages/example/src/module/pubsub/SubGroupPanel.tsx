@@ -19,11 +19,11 @@ const GroupItem: FC<PropsWithChildren<GroupItemProps>> = ({
   rollRef,
 }) => (
   <div
-    className={['gap-2 grid grid-rows-[60px_1fr] h-78 p-2 rounded-md shadow-md', className]
+    className={['grid h-78 grid-rows-[60px_1fr] gap-2 rounded-md p-2 shadow-md', className]
       .filter(Boolean)
       .join(' ')}
   >
-    <div className="bg-slate-700 flex gap-2 items-center p-4 rounded-md">{header}</div>
+    <div className="flex items-center gap-2 rounded-md bg-slate-700 p-4">{header}</div>
     <div className="h-full overflow-y-auto p-2" ref={rollRef}>
       {children}
     </div>
@@ -60,23 +60,23 @@ const SubPanel: FC<SubPanelProps> = ({ group, name, ...props }) => {
 };
 
 const SubGroup: FC = () => (
-  <div className="gap-4 grid grid-cols-1">
+  <div className="grid grid-cols-1 gap-4">
     <SubPanel
-      className="bg-slate-800 group"
+      className="group bg-slate-800"
       group={groupName}
       header={[
         <span key="name">sub-group-items</span>,
-        <span className="bg-slate-400 flex h-full items-center px-1 rounded-md text-sm" key="desc">
+        <span className="flex h-full items-center rounded-md bg-slate-400 px-1 text-sm" key="desc">
           group
         </span>,
       ]}
       name={subGroupItems}
     />
     <SubPanel
-      className="bg-green-600 group"
+      className="group bg-green-600"
       header={[
         <span key="name">sub-group-items</span>,
-        <span className="bg-green-600 flex h-full items-center px-1 rounded-md text-sm" key="desc">
+        <span className="flex h-full items-center rounded-md bg-green-600 px-1 text-sm" key="desc">
           global
         </span>,
       ]}

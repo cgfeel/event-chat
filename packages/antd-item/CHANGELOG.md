@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.7](https://github.com/event-chat/event-chat/compare/antd-item@v0.2.6...antd-item@v0.2.7) (2026-01-14)
+
+
+### Bug Fixes
+
+* update core add arg time ([7dfe54f](https://github.com/event-chat/event-chat/commit/7dfe54fa01a39f23449ec82bfe5ac12710a5f04b))
+* update core add arg time ([0418ba0](https://github.com/event-chat/event-chat/commit/0418ba03ad090d0aca0f14324d4dc4f8c0d6bf60))
+
 ## [0.2.6](https://github.com/event-chat/event-chat/compare/antd-item@v0.2.5...antd-item@v0.2.6) (2026-01-13)
 
 

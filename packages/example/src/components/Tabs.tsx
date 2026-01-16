@@ -33,7 +33,7 @@ const TabItem: FC<PropsWithChildren<TabItemProps>> = ({ children, name }) => {
   return (
     <li className={active ? 'active' : undefined}>
       <button
-        className="rounded-sm px-2 py-1 text-sm font-medium text-slate-900 transition duration-200 hover:text-slate-600 focus:outline-none focus-visible:ring-2"
+        className="cursor-pointer rounded-sm px-2 py-1 text-sm font-medium text-slate-900 transition duration-200 hover:text-slate-600 focus:outline-none focus-visible:ring-2"
         type="button"
         onClick={() => {
           if (!active) emit({ detail: takeKey, name: tabsContainer });

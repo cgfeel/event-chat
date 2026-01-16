@@ -1,47 +1,56 @@
-import { checkDetail } from '@event-chat/core';
+import { NamepathType, checkDetail } from '@event-chat/core';
 import { FormItemProps as FormItemRawProps } from 'antd';
 import { ReactNode } from 'react';
 import { ZodType } from 'zod';
 import FormInput, { FormInputProps } from './FormInput';
-import { FormInsType, convertName, useFormCom, useFormInstance } from './utils';
+import { FormEventInstance, useFormCom, useFormInstance } from './utils';
 
 const FormItem = <
+  Name extends NamepathType,
   Schema extends ZodType | undefined = undefined,
   Type extends string | undefined = undefined,
 >({
   async,
   children,
+  initialValue,
+  name,
   rules,
   schema,
   type,
   callback,
   debug,
   onChange,
+  transform,
   ...props
-}: FormItemProps<Schema, Type>) => {
-  const formInstance = useFormInstance();
+}: FormItemProps<Name, Schema, Type>) => {
+  const { group, emit } = useFormInstance();
   const Form = useFormCom();
   return (
     <>
       <Form.Item
         {...props}
+        initialValue={initialValue}
+        name={name}
         rules={
           !schema
             ? rules
             : (rules ?? []).concat([
                 {
                   validator: (_, value) => checkDetail(value, { async, schema }),
+                  transform,
                 },
               ])
         }
       >
-        {typeof children === 'function' ? children(formInstance) : children}
+        {typeof children === 'function'
+          ? (form) => children({ ...form, group, name, emit })
+          : children}
       </Form.Item>
-      {props.name !== undefined && (
-        <Form.Item name={convertName(props.name)} hidden>
+      {name !== undefined && (
+        <Form.Item {...props} name={name} hidden>
           <FormInput
             async={async}
-            name={props.name}
+            name={name}
             schema={schema}
             type={type}
             callback={callback}
@@ -57,9 +66,14 @@ const FormItem = <
 export default FormItem;
 
 interface FormItemProps<
+  Name extends NamepathType,
   Schema extends ZodType | undefined = undefined,
   Type extends string | undefined = undefined,
 >
-  extends Omit<FormItemRawProps, 'children' | 'name'>, FormInputProps<Schema, Type> {
-  children?: ReactNode | ((form: FormInsType) => ReactNode);
+  extends
+    Omit<FormItemRawProps, 'children' | 'initialValue' | 'name'>,
+    FormInputProps<Name, Schema, Type> {
+  children?: ReactNode | ((form: FormEventInstance<Name, string | undefined>) => ReactNode);
+  initialValue?: unknown;
+  transform?: (value: unknown) => unknown;
 }

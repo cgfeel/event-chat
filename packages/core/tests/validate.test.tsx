@@ -26,6 +26,7 @@ const baseTestData: EventDetailType<{ message: string }> = {
   detail: { message },
   id: 'test-id-123',
   origin: 'test-origin',
+  time: new Date(),
   type: 'test-type',
   name,
 };
@@ -160,7 +161,7 @@ describe('验证方法单元测试', () => {
     const checked = validate({ ...baseTestData, detail: invalidDetail }, options, config.token);
     const { rejects } = await expect(checked);
 
-    await rejects.toThrow('validate faild');
+    await rejects.toThrow('消息长度不能少于3个字符');
     await rejects.toHaveProperty('cause');
     checked.catch((error) => {
       expect(getPath(error, 'cause.success')).toBe(false);

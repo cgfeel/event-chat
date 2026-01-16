@@ -28,7 +28,7 @@ describe('index 出口文件导出验证', () => {
 
   test('导出成员完整，无多余或缺失', () => {
     const indexExportNames = Object.keys(IndexExports);
-    const expectedValueExports = ['useEventChat', 'createToken'];
+    const expectedValueExports = ['useEventChat', 'createToken', 'checkDetail'];
 
     expect(indexExportNames).toEqual(expect.arrayContaining(expectedValueExports));
     expect(indexExportNames).toHaveLength(expectedValueExports.length);
@@ -66,6 +66,7 @@ describe('index 出口文件导出验证', () => {
       id: '123456',
       name: 'chat.message',
       origin: 'web-client',
+      time: new Date(),
       type: 'message',
       token: 'abc-123',
     };

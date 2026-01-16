@@ -25,7 +25,9 @@ export const checkDetail = <
       : Promise.resolve(schema.safeParse(detail));
 
     return result.then((cause) =>
-      cause.success ? cause : Promise.reject(new Error('validate faild', { cause }))
+      cause.success
+        ? cause
+        : Promise.reject(new Error(cause.error.issues[0].message ?? 'validate faild', { cause }))
     );
   }
   return Promise.reject(new Error('validate faild'));

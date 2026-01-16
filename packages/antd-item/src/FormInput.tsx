@@ -8,10 +8,11 @@ const convertPath = (path?: NamepathType) =>
   (typeof path === 'object' ? [...path] : [path]).filter(isDefined);
 
 const InputInner = <
+  Name extends NamepathType,
   Schema extends ZodType | undefined = undefined,
   Type extends string | undefined = undefined,
 >(
-  { name, callback, onChange, ...props }: FormInputProps<Schema, Type>,
+  { name, callback, onChange, ...props }: FormInputProps<Name, Schema, Type>,
   ref?: ForwardedRef<HTMLInputElement>
 ) => {
   const { group, parent } = useFormEvent();
@@ -37,10 +38,11 @@ const InputInner = <
 };
 
 const FormInput = forwardRef(InputInner) as (<
+  Name extends NamepathType,
   Schema extends ZodType | undefined = undefined,
   Type extends string | undefined = undefined,
 >(
-  props: FormInputProps<Schema, Type> & { ref?: ForwardedRef<HTMLInputElement> }
+  props: FormInputProps<Name, Schema, Type> & { ref?: ForwardedRef<HTMLInputElement> }
 ) => ReturnType<typeof InputInner>) & { displayName?: string };
 
 if (process.env.NODE_ENV !== 'production') {
@@ -50,10 +52,11 @@ if (process.env.NODE_ENV !== 'production') {
 export default FormInput;
 
 export interface FormInputProps<
+  Name extends NamepathType,
   Schema extends ZodType | undefined = undefined,
   Type extends string | undefined = undefined,
 > extends Omit<EventChatOptions<NamepathType, Schema, string, Type, undefined>, 'group' | 'token'> {
-  name?: NamepathType;
+  name?: Name;
   onChange?: (
     value: Parameters<
       NonNullable<EventChatOptions<NamepathType, Schema, string, Type, undefined>['callback']>

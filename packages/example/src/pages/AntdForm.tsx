@@ -1,5 +1,6 @@
 import {
   FooterTips,
+  FormAsync,
   FormEmit,
   FormList,
   FormRate,
@@ -119,6 +120,9 @@ const AntdForm: FC = () => (
       title="转换字段数据进行渲染"
     >
       <FormRate />
+    </Card>
+    <Card title="分段 + 异步验证自身字段">
+      <FormAsync />
     </Card>
   </div>
 );

@@ -11,7 +11,6 @@ export const FormEventContext = createContext<FormEventContextInstance>({});
 export const getStringValue = <T extends NamepathType | undefined>(values: T[]) =>
   values.find((item) => item !== undefined && (!Array.isArray(item) || item.length > 0));
 
-export const convertName = (path?: NamepathType) => (typeof path === 'object' ? [...path] : path);
 export const useForm = <Name extends string, Group extends string | undefined = undefined>(
   options?: FormOptions<Name, Group>,
   formInit?: FormEventInstance<Name, Group>
@@ -89,11 +88,11 @@ export interface FormBaseInstance extends FC<
   Pick<ComponentProps<typeof Form>, 'children' | 'form' | 'name'>
 > {
   Item: FC<
-    Pick<FormItemProps, 'hidden' | 'name' | 'rules'> & {
+    Pick<FormItemProps, 'hidden' | 'initialValue' | 'name' | 'rules'> & {
       children?: ReactNode | ((form: FormInsType) => ReactNode);
     }
   >;
-  List: FC<Pick<ComponentProps<typeof Form.List>, 'children' | 'name' | 'rules'>>;
+  List: FC<Pick<ComponentProps<typeof Form.List>, 'children' | 'initialValue' | 'name' | 'rules'>>;
   useFormInstance: <Value>() => FormInsType<Value>;
 }
 

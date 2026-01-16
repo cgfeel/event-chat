@@ -1,5 +1,5 @@
 import FormEvent from '@event-chat/antd-item';
-import { ConfigProvider, Divider, Form, Rate, Space } from 'antd';
+import { ConfigProvider, Divider, Rate, Space } from 'antd';
 import { type FC, type ReactNode, useCallback, useState } from 'react';
 import z from 'zod';
 import Button from '@/components/Button';
@@ -127,7 +127,7 @@ const FormRate: FC = () => {
             extra="拿到数值后，只渲染不过滤"
             label="rateInput"
             name="rateInput"
-            schema={baseSchema}
+            schema={baseSchema.transform(convertData)}
             getValueFromEvent={convertCode}
             getValueProps={(value) => ({ value: value ? convertData(value) : undefined })}
             debug={(log) => debugHandle('rateInput', log)}
@@ -142,6 +142,7 @@ const FormRate: FC = () => {
             name="transform"
             schema={baseSchema.transform(convertData)}
             debug={(log) => debugHandle('transform', log)}
+            transform={(value: unknown) => convertCode(value)}
           >
             <RateInput />
           </FormEvent.Item>
@@ -150,13 +151,13 @@ const FormRate: FC = () => {
               <ErrorResultList errors={debug} />
             </div>
           </FormEvent.Item>
-          <Form.Item colon={false} label={` `} shouldUpdate>
+          <FormEvent.Item colon={false} label={` `} shouldUpdate>
             {() => (
               <pre className="max-h-80 overflow-auto rounded-xl bg-gray-800 p-4 text-sm">
                 {JSON.stringify(form.getFieldsValue(), null, 2)}
               </pre>
             )}
-          </Form.Item>
+          </FormEvent.Item>
         </FormEvent>
       </div>
     </ConfigProvider>

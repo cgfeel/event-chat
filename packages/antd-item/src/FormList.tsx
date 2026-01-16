@@ -1,9 +1,12 @@
 import { NamepathType, checkDetail } from '@event-chat/core';
 import { Form as FormRaw } from 'antd';
-import { ComponentProps, FC, PropsWithChildren, memo } from 'react';
+import { ComponentProps, FC, PropsWithChildren, memo, useMemo } from 'react';
 import { ZodType } from 'zod';
 import FormInput, { FormInputProps } from './FormInput';
-import { FormEventContext, convertName, useFormCom, useFormEvent } from './utils';
+import { FormEventContext, useFormCom, useFormEvent } from './utils';
+
+const isNamepath = (value: unknown): value is number | string =>
+  typeof value === 'string' || Number.isInteger(value);
 
 const FormListInner: FC<PropsWithChildren<FormListInnerProps>> = ({ children, name: parent }) => {
   const record = useFormEvent();
@@ -14,10 +17,12 @@ const FormListInner: FC<PropsWithChildren<FormListInnerProps>> = ({ children, na
 
 const ListItem = memo(FormListInner);
 const FormList = <
+  Name extends NamepathType,
   Schema extends ZodType | undefined = undefined,
   Type extends string | undefined = undefined,
 >({
   async,
+  initialValue,
   name,
   rules,
   schema,
@@ -27,13 +32,21 @@ const FormList = <
   debug,
   onChange,
   ...props
-}: FormListProps<Schema, Type>) => {
+}: FormListProps<Name, Schema, Type>) => {
   const Form = useFormCom();
-  return (
+  const fieldName = useMemo(
+    () =>
+      (Array.isArray(name) ? name.filter(isNamepath) : undefined) ??
+      (isNamepath(name) ? name : undefined),
+    [name]
+  );
+
+  return !fieldName ? null : (
     <>
       <Form.List
         {...props}
-        name={typeof name === 'object' ? [...name] : name}
+        initialValue={initialValue}
+        name={fieldName}
         rules={
           !schema
             ? rules
@@ -48,10 +61,10 @@ const FormList = <
           <ListItem name={name}>{children(fields, options, metas)}</ListItem>
         )}
       </Form.List>
-      <Form.Item name={convertName(name)} hidden>
+      <Form.Item {...props} name={fieldName} hidden>
         <FormInput
           async={async}
-          name={convertName(name)}
+          name={fieldName}
           schema={schema}
           type={type}
           callback={callback}
@@ -65,14 +78,15 @@ const FormList = <
 
 export default FormList;
 
-interface FormListInnerProps extends Pick<FormListProps, 'name'> {}
+interface FormListInnerProps extends Pick<FormListProps<NamepathType>, 'name'> {}
 
 interface FormListProps<
+  Name extends NamepathType,
   Schema extends ZodType | undefined = undefined,
   Type extends string | undefined = undefined,
 >
   extends
     Omit<ComponentProps<typeof FormRaw.List>, 'name'>,
-    Omit<FormInputProps<Schema, Type>, 'name'> {
-  name: NamepathType;
+    Omit<FormInputProps<Name, Schema, Type>, 'name'> {
+  name: Name;
 }

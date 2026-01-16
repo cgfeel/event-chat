@@ -43,7 +43,7 @@ const FormAsync: FC = () => {
         >
           <Input
             disabled={loading}
-            placeholder="请输入邮箱地址，必须以 event.chat 结尾"
+            placeholder="请输入邮箱地址，邮箱地址仅支持 @event.chat"
             suffix={
               loading ? <FontAwesomeIcon className="animate-spin" icon={faSpinner} /> : <span />
             }

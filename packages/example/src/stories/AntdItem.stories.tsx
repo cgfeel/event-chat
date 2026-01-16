@@ -69,3 +69,9 @@ export const FormRate: Story = {
     name: 'FormRate',
   },
 };
+
+export const FormAsync: Story = {
+  args: {
+    name: 'FormAsync',
+  },
+};

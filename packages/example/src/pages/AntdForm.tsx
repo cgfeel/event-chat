@@ -104,24 +104,68 @@ const AntdForm: FC = () => (
     <Card
       footer={
         <FooterTips>
-          通过上面的示例，使用 <Tag>Schema</Tag> 让字段接受更复杂的数据类型，这里有两种方式：
+          <div>提供了 5 种方法用于数据类型转换，按照生命周期划分分别如下：</div>
           <ol className="m-4 list-decimal text-sm text-gray-400">
             <li>
-              根据字段值渲染对应的组件，但不会修改值，可以通过 <Tag>Antd</Tag> 原有的属性{' '}
-              <Tag>getValueFromEvent</Tag> 以及 <Tag>getValueProps</Tag> 实现；
+              <Tag>ZodType.transform</Tag>：校验数据成功后转换数据，将结果通过 <Tag>onChange</Tag>{' '}
+              发起更新
             </li>
             <li>
-              根据收到的字段值，转换数据类型。可以通过 <Tag>Zod</Tag> 的 <Tag>transform</Tag>{' '}
-              来实现。如上面演示，<Tag>emit</Tag> 提供数值，字段接收后会将其转换成一个对象。
+              <Tag>getValueFromEvent</Tag>：<Tag>Antd</Tag> 现有的属性，用于接收 <Tag>onChange</Tag>{' '}
+              的值更新字段
+            </li>
+            <li>
+              <Tag>normalize</Tag>：同 <Tag>getValueFromEvent</Tag>
+            </li>
+            <li>
+              <Tag>FormItem.transform</Tag>：补充方法，仅用于通过 <Tag>schema</Tag>{' '}
+              校验表单数据前转换用，不会改变字段值
+            </li>
+            <li>
+              <Tag>getValueProps</Tag>：<Tag>Antd</Tag>{' '}
+              现有的属性，用于将更新的数据转换成符合回显要求的数据
             </li>
           </ol>
+          <div>根据自己的业务选择适合的方式，这里提供了 2 个演示：</div>
+          <ul className="m-4 list-disc text-sm text-gray-400">
+            <li>
+              前提：不同的业务场景下，同类型字段组件，<Tag>emit</Tag>{' '}
+              触发更新都是数字，不改组件，不改配置规则；
+            </li>
+            <li>第 1 个演示：怎么收集数据，怎么提交，但会把收集的数据重新转换成渲染匹配的数据；</li>
+            <li>第 2 个演示：拿到数值，转换成渲染一致的格式提交；</li>
+          </ul>
+          <div>
+            需要注意的是：<Tag>Form.List</Tag> 除了 <Tag>ZodType.transform</Tag>{' '}
+            以外都不支持，为了减少业务的复杂度，不建议对 <Tag>Array</Tag>{' '}
+            这样的字段类型做数据转换，可以对 <Tag>List</Tag> 下的 <Tag>Item</Tag> 做数据转换
+          </div>
         </FooterTips>
       }
       title="转换字段数据进行渲染"
     >
       <FormRate />
     </Card>
-    <Card title="分段 + 异步验证自身字段">
+    <Card
+      footer={
+        <FooterTips>
+          <div>
+            当提供 <Tag>schema</Tag> 后，会自动将其作为一项字段校验的 <Tag>Rule</Tag>{' '}
+            添加到字段中。当前示例分别演示了：
+          </div>
+          <ul className="m-4 list-disc text-sm text-gray-400">
+            <li>
+              <Tag>pipe</Tag>：通过管道分段校验，中途错误将不再继续
+            </li>
+            <li>
+              <Tag>async</Tag>：异步校验，当需要做异步校验时，字段的状态可以在 <Tag>refine</Tag>{' '}
+              中定义
+            </li>
+          </ul>
+        </FooterTips>
+      }
+      title="分段 + 异步验证自身字段"
+    >
       <FormAsync />
     </Card>
   </div>

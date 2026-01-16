@@ -1,4 +1,5 @@
 import {
+  FormAsync,
   FormEmit,
   FormList,
   FormRate,
@@ -10,6 +11,7 @@ import type { FC } from 'react';
 import { isKey } from '@/utils/fields';
 
 const formMap = Object.freeze({
+  FormAsync,
   FormEmit,
   FormList,
   FormRate,

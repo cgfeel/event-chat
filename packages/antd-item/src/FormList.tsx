@@ -16,11 +16,7 @@ const FormListInner: FC<PropsWithChildren<FormListInnerProps>> = ({ children, na
 };
 
 const ListItem = memo(FormListInner);
-const FormList = <
-  Name extends NamepathType,
-  Schema extends ZodType | undefined = undefined,
-  Type extends string | undefined = undefined,
->({
+const FormList = <Name extends NamepathType, Schema extends ZodType | undefined = undefined>({
   async,
   initialValue,
   name,
@@ -32,7 +28,7 @@ const FormList = <
   debug,
   onChange,
   ...props
-}: FormListProps<Name, Schema, Type>) => {
+}: FormListProps<Name, Schema>) => {
   const Form = useFormCom();
   const fieldName = useMemo(
     () =>
@@ -80,13 +76,9 @@ export default FormList;
 
 interface FormListInnerProps extends Pick<FormListProps<NamepathType>, 'name'> {}
 
-interface FormListProps<
-  Name extends NamepathType,
-  Schema extends ZodType | undefined = undefined,
-  Type extends string | undefined = undefined,
->
+interface FormListProps<Name extends NamepathType, Schema extends ZodType | undefined = undefined>
   extends
     Omit<ComponentProps<typeof FormRaw.List>, 'name'>,
-    Omit<FormInputProps<Name, Schema, Type>, 'name'> {
+    Omit<FormInputProps<Name, Schema>, 'name'> {
   name: Name;
 }

@@ -8,7 +8,7 @@ import { FormEventInstance, useFormCom, useFormInstance } from './utils';
 const FormItem = <
   Name extends NamepathType,
   Schema extends ZodType | undefined = undefined,
-  Type extends string | undefined = undefined,
+  ValueType = unknown,
 >({
   async,
   children,
@@ -22,9 +22,9 @@ const FormItem = <
   onChange,
   transform,
   ...props
-}: FormItemProps<Name, Schema, Type>) => {
-  const { group, emit } = useFormInstance();
-  const Form = useFormCom();
+}: FormItemProps<Name, Schema, ValueType>) => {
+  const { group, emit } = useFormInstance<ValueType>();
+  const Form = useFormCom<ValueType>();
   return (
     <>
       <Form.Item
@@ -68,12 +68,14 @@ export default FormItem;
 interface FormItemProps<
   Name extends NamepathType,
   Schema extends ZodType | undefined = undefined,
-  Type extends string | undefined = undefined,
+  ValueType = unknown,
 >
   extends
     Omit<FormItemRawProps, 'children' | 'initialValue' | 'name'>,
-    FormInputProps<Name, Schema, Type> {
-  children?: ReactNode | ((form: FormEventInstance<Name, string | undefined>) => ReactNode);
+    FormInputProps<Name, Schema> {
+  children?:
+    | ReactNode
+    | ((form: FormEventInstance<Name, string | undefined, ValueType>) => ReactNode);
   initialValue?: unknown;
   transform?: (value: unknown) => unknown;
 }

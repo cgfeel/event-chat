@@ -1,4 +1,5 @@
 import { Canvas, Controls, Meta } from '@storybook/addon-docs/blocks';
+import Table, { TBody, Td, Th, Thead, Tr } from '@/components/Table';
 import AntdItem from './AntdItem';
 import AntdItemStories, {
   FormAsync,
@@ -220,7 +221,65 @@ onChange?: (
   ) => void;
 ```
 
-原来的 `Form.Item` 的子集如果是一个函数时，会将 `FormInstance` 作为回调函数。由于拓展了实例 `FormInstance`，回调函数中 `form` 实例类型为 `FormInsType` [[查看](tag2)]。
+> 原来的 `Form.Item` 的子组件如果是一个函数时，会将 `FormInstance` 作为回调函数。由于扩展了实例 `FormInstance`，回调函数中 `form` 实例将包含：`name`、`group`、`emit` [[查看](tag2)]。
+
+扩展的 `Form.Item` 包含 2 个 `onChange`，一个是 `Antd` 表单组件本身自带的 `onChange`，一个是通过 `@event-chat/core` 扩展 `Form.Item` 后补充的 `onChange`，两者差异：
+
+<Table className={{ wrap: 'sb-unstyled' }}>
+  <Thead>
+    <Tr>
+      <Th className="w-50 bg-gray-100" sticky>
+        对比 <Tag type="info">onChange</Tag>
+      </Th>
+      <Th>
+        <Tag type="info">Form.Item</Tag> 扩展
+      </Th>
+      <Th>表单组件现有的</Th>
+    </Tr>
+  </Thead>
+  <TBody>
+    <Tr>
+      <Td>所属组件</Td>
+      <Td>
+        <Tag>Form.Item</Tag>
+      </Td>
+      <Td>
+        表单组件，例如：<Tag>Input</Tag>
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>场景</Td>
+      <Td>
+        通过 <Tag>emit</Tag> 触发
+      </Td>
+      <Td>
+        收集自然输入更新的值，在表单组件内部通过 <Tag>onChange</Tag> 触发
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>数据校验</Td>
+      <Td>
+        更新数据前校验，若配置了 <Tag>schema</Tag> 则拿到的数据一定符合预期，更新后的字段不会触发{' '}
+        <Tag>Rule</Tag> 校验
+      </Td>
+      <Td>
+        更新数据后通过 <Tag>Rule</Tag> 校验，更新的值不一定符合预期
+      </Td>
+    </Tr>
+  </TBody>
+</Table>
+
+`Form.Item` 扩展的 `onChange` 和表单组件的 `onChange` 一样的地方：
+
+- 通过 `setFieldValue` 手动设置的值都不响应
+- 都会响应后更新字段数据，并触发相应操作，如：`getValueFromEvent`
+- 提交表单时，更新的数据都会再次校验，不符合要求的情况会被拦截操作
+
+> 由于触发的场景不一样，因此自然输入的时候会交由表单组件更新并触发 `onChange`，`emit` 则是手动触发，会在 `Form.Item` 更新值并回调 `onChange`，为了避免混淆，并没有合并回调方法，这两个方法也不存在同时触发的场景。
+
+由于以上特性，因此建议：
+
+- 多个字段间存在主控和受控关系时，使用 `emit` 代替 `setFieldValue` 等默认的手动设置方法
 
 ### `Form.List`
 
@@ -336,7 +395,7 @@ type FormOptions<Name extends NamepathType, Group extends string | undefined = u
 
 ### `FormInstance`
 
-由 `Form.useForm` 或 `Form.useFormInstance` 返回的 `form` 实例，拓展实例的属性如上所述。为了兼容 `Antd v5` 和 `Antd v6`，将实例中的方法 `focusField` 作为可选属性，由业务环境依赖决定。
+由 `Form.useForm` 或 `Form.useFormInstance` 返回的 `form` 实例，扩展实例的属性如上所述。为了兼容 `Antd v5` 和 `Antd v6`，将实例中的方法 `focusField` 作为可选属性，由业务环境依赖决定。
 
 ### `observer`
 
@@ -539,3 +598,85 @@ const useFormCom = (): FormBaseInstance => {
 
 - `pipe`：通过管道分段校验，中途错误将不再继续
 - `async`：异步校验，当需要做异步校验时，字段的状态可以在 `refine` 中定义
+
+## 类型对齐
+
+`@event-chat/core` 作为 `Antd Form` 的 `@event-chat/core` 的扩展，自然要对齐这二者的类型。
+
+### 摒弃部分泛型
+
+在 `@event-chat/core` 中将不必要的参数做了简化：
+
+- 摒弃了部分配置：表单字段由 `Form` 分配 `group`，不能够自定义配置
+- 泛型推导只保留了：`schema` 和 `name`，表单 `Form` 组件保留了 `Group`，其他全部给到默认值
+
+### 对内简化 `Form` 类型
+
+为了扩展并且跨版本支持 `Antd Form`，在内部按照扩展必要用到的属性做了一个通用的简化的 `Form` 类型
+
+```typescript
+type FormType<ValueType = unknown> = (
+  props: Pick<ComponentProps<typeof Form<ValueType>>, 'children' | 'form' | 'name'> &
+    React.RefAttributes<FormInsType<ValueType>>
+) => React.ReactElement;
+
+type FormBaseInstance<ValueType = unknown> = FormType<ValueType> & {
+  Item: FC<
+    Pick<FormItemProps, 'hidden' | 'initialValue' | 'name' | 'rules'> & {
+      children?: ReactNode | ((form: FormInsType<ValueType>) => ReactNode);
+    }
+  >;
+  List: FC<Pick<ComponentProps<typeof Form.List>, 'children' | 'initialValue' | 'name' | 'rules'>>;
+  useFormInstance: <Value>() => FormInsType<Value>;
+};
+
+type FormInsType<ValueType = unknown> = Omit<
+  NonNullable<ComponentProps<typeof Form<ValueType>>['form']>,
+  'focusField'
+> & {
+  focusField?: NonNullable<ComponentProps<typeof Form>['form']>['focusField'];
+};
+```
+
+只能符合基本要求的类型，都视为有效的 `Form` 组件。同时为了跨版本支持， 去除了 `Antd v6` 实例 `FormInstance` 中的 `focusField` 改为可选属性，由业务决定属性是否存在。
+
+### 扩展 `Antd` 的泛型
+
+在 `Antd Form` 泛型中需要补齐 `Name` 和 `Schema`，这里存在一个问题：
+
+- `Typescript` 泛型中要么全部隐式推导，要么全部手动显示提供，若前面的手动提供，后面带有默认类型的泛型将不再隐式推导，而全部采用默认类型。
+
+于是在每个组件泛型中，将 `ValueType` 放到最后，避免因未提供其他类型造成错误
+
+```typescript
+// Form 扩展后的类型
+const FormEvent: (<Name extends string, Group extends string | undefined = undefined, ValuesType = unknown>({ children, form, group, name, ...props }: PropsWithChildren<FormProps<Name, Group, ValuesType>>) => JSX.Element) & FormExtraInstance
+
+// Form.Item 扩展后的类型
+const Item: <Name extends NamepathType, Schema extends ZodType | undefined = undefined, ValueType = unknown>({ async, children, initialValue, name, rules, schema, type, callback, debug, onChange, transform, ...props }: FormItemProps<Name, Schema, ValueType>) => JSX.Element
+
+// useForm 扩展后的类型
+const useForm = <
+  Name extends string,
+  Group extends string | undefined = undefined,
+  ValueType = unknown,
+>() => {
+  // 略...
+}
+```
+
+`useFormInstance` 提供的泛型保持不变，`Form.List` 无需提供泛型
+
+### 对外合并扩展
+
+为了保持一致，导出的出口文件 `index.tsx` 做了和 `Antd` 一致的事，将所有扩展方法全部合并到 `Form`
+
+```typescript
+const FormEvent: typeof FormEventInner & FormExtraInstance = Object.assign(FormEventInner, {
+  Item: FormItem,
+  List: FormList,
+  observer,
+  useForm,
+  useFormInstance,
+});
+```

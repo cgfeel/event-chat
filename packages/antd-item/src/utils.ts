@@ -11,12 +11,16 @@ export const FormEventContext = createContext<FormEventContextInstance>({});
 export const getStringValue = <T extends NamepathType | undefined>(values: T[]) =>
   values.find((item) => item !== undefined && (!Array.isArray(item) || item.length > 0));
 
-export const useForm = <Name extends string, Group extends string | undefined = undefined>(
+export const useForm = <
+  Name extends string,
+  Group extends string | undefined = undefined,
+  ValueType = unknown,
+>(
   options?: FormOptions<Name, Group>,
-  formInit?: FormEventInstance<Name, Group>
+  formInit?: FormEventInstance<Name, Group, ValueType>
 ) => {
   const { group, name, focusField } = formInit ?? {};
-  const [form] = Form.useForm(
+  const [form] = Form.useForm<ValueType>(
     formInit ? { ...formInit, focusField: focusField ?? (() => {}) } : undefined
   );
 
@@ -45,14 +49,16 @@ export const useForm = <Name extends string, Group extends string | undefined = 
 };
 
 export const useFormInstance = <ValueType>() => {
-  const FormCom = useFormCom();
+  const FormCom = useFormCom<ValueType>();
   const form = FormCom.useFormInstance<ValueType>();
   const { group, name, emit } = useFormEvent();
   return Object.assign(form, { group, name, emit });
 };
 
-export const useFormCom = (): FormBaseInstance => {
-  return AntdCom.form ?? Form;
+export const useFormCom = <ValueType = unknown>(): FormBaseInstance<ValueType> => {
+  // eslint 不让 AntdCom.form 定义为 any 所以断言，泛型在组件实例化后传入
+  const CustomForm = AntdCom.form as FormBaseInstance<ValueType> | undefined;
+  return CustomForm ?? Form;
 };
 
 export const useFormEvent = () => {
@@ -72,29 +78,23 @@ export interface FormEventContextInstance {
 export interface FormEventInstance<
   Name extends NamepathType,
   Group extends string | undefined = undefined,
+  ValueType = unknown,
 >
-  extends FormInsType, FormOptions<Name, Group> {
+  extends FormInsType<ValueType>, FormOptions<Name, Group> {
   emit?: <Detail, CustomName extends NamepathType>(
     record: Omit<EventDetailType<Detail, CustomName>, 'group' | 'id' | 'origin' | 'time' | 'type'>
   ) => void;
 }
 
-type FormOptions<Name extends NamepathType, Group extends string | undefined = undefined> = {
-  group?: Group;
-  name?: Name;
-};
-
-export interface FormBaseInstance extends FC<
-  Pick<ComponentProps<typeof Form>, 'children' | 'form' | 'name'>
-> {
+export type FormBaseInstance<ValueType = unknown> = FormType<ValueType> & {
   Item: FC<
     Pick<FormItemProps, 'hidden' | 'initialValue' | 'name' | 'rules'> & {
-      children?: ReactNode | ((form: FormInsType) => ReactNode);
+      children?: ReactNode | ((form: FormInsType<ValueType>) => ReactNode);
     }
   >;
   List: FC<Pick<ComponentProps<typeof Form.List>, 'children' | 'initialValue' | 'name' | 'rules'>>;
   useFormInstance: <Value>() => FormInsType<Value>;
-}
+};
 
 // 内部剔除掉 6 的新特新改为可选项，保留公共属性
 export type FormInsType<ValueType = unknown> = Omit<
@@ -103,3 +103,13 @@ export type FormInsType<ValueType = unknown> = Omit<
 > & {
   focusField?: NonNullable<ComponentProps<typeof Form>['form']>['focusField'];
 };
+
+type FormOptions<Name extends NamepathType, Group extends string | undefined = undefined> = {
+  group?: Group;
+  name?: Name;
+};
+
+type FormType<ValueType = unknown> = (
+  props: Pick<ComponentProps<typeof Form<ValueType>>, 'children' | 'form' | 'name'> &
+    React.RefAttributes<FormInsType<ValueType>>
+) => React.ReactElement;

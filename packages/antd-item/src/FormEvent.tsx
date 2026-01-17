@@ -21,17 +21,17 @@ const FormProviderInner: FC<PropsWithChildren<FormEventContextInstance>> = ({
 const FormProvider = memo(FormProviderInner);
 
 const FormInitialization = <
-  ValuesType,
   Name extends string,
   Group extends string | undefined = undefined,
+  ValuesType = unknown,
 >({
   children,
   form,
   group,
   name,
   ...props
-}: PropsWithChildren<FormProps<ValuesType, Name, Group>>) => {
-  const Form = useFormCom();
+}: PropsWithChildren<FormProps<Name, Group, ValuesType>>) => {
+  const Form = useFormCom<ValuesType>();
   const [formInstance] = useForm({ group, name }, form);
   return (
     <Form {...props} form={formInstance} name={formInstance.name}>
@@ -42,18 +42,22 @@ const FormInitialization = <
   );
 };
 
-const FormEvent = <ValuesType, Name extends string, Group extends string | undefined = undefined>({
+const FormEvent = <
+  Name extends string,
+  Group extends string | undefined = undefined,
+  ValuesType = unknown,
+>({
   children,
   form,
   group,
   name,
   ...props
-}: PropsWithChildren<FormProps<ValuesType, Name, Group>>) => {
+}: PropsWithChildren<FormProps<Name, Group, ValuesType>>) => {
   // 组件 Form 的 name 优先于 useForm 外部配置的 form.name，因为这是 antd form 的默认配置
   // 而 group 外部配置 useForm 优先于当前组件配置，减少不必要的 rerender，如果配置不一样可以在 FormItem 通过 callback 进行排查
   const formName = useMemo(() => getStringValue([name, form?.name]), [form?.name, name]);
   const formGroup = useMemo(() => getStringValue([form?.group, group]), [form?.group, group]);
-  const Form = useFormCom();
+  const Form = useFormCom<ValuesType>();
 
   if (form?.emit && form.name === formName) {
     const { focusField, ...formIns } = form;
@@ -78,11 +82,11 @@ export default FormEvent;
 
 // 这里的 Name 要适配 Form 组件，所以取 string
 interface FormProps<
-  ValuesType,
-  Name extends string,
+  Name extends string = string,
   Group extends string | undefined = undefined,
+  ValuesType = unknown,
 > extends Omit<FormRawProps<ValuesType>, 'form'> {
-  form?: FormEventInstance<Name, Group>;
+  form?: FormEventInstance<Name, Group, ValuesType>;
   group?: Group;
   name?: Name;
 }

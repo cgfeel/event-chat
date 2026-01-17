@@ -8,6 +8,7 @@ import {
   FormUpdate,
   FormUpdateFields,
 } from '@/module/form';
+import FormAppend from '@/module/form/FormAppend';
 import { Tag } from 'antd';
 import type { FC } from 'react';
 import Card from '@/components/Card';
@@ -167,6 +168,9 @@ const AntdForm: FC = () => (
       title="分段 + 异步验证自身字段"
     >
       <FormAsync />
+    </Card>
+    <Card>
+      <FormAppend />
     </Card>
   </div>
 );

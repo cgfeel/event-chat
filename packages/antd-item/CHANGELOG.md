@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.1](https://github.com/event-chat/event-chat/compare/antd-item@v0.3.0...antd-item@v0.3.1) (2026-01-17)
+
+
+### Bug Fixes
+
+* update antd-item type add ValueType ([fcfc455](https://github.com/event-chat/event-chat/commit/fcfc4550a750ca06be3447513e4ac99085fb8f44))
+* update antd-item type add ValueType ([9223e5b](https://github.com/event-chat/event-chat/commit/9223e5b2f9886d197ab971439519e0ca0e75a604))
+
 ## [0.3.0](https://github.com/event-chat/event-chat/compare/antd-item@v0.2.8...antd-item@v0.3.0) (2026-01-16)
 
 

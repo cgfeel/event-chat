@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.6](https://github.com/event-chat/event-chat/compare/core@v0.2.5...core@v0.2.6) (2026-01-23)
+
+
+### Bug Fixes
+
+* add @formily/path ([3051f37](https://github.com/event-chat/event-chat/commit/3051f370e7c0bd72e7ce5abed3f72bca969880c0))
+* add @formily/path ([7e00292](https://github.com/event-chat/event-chat/commit/7e00292eada079ba5074a0b93054e27bb340d39a))
+
 ## [0.2.5](https://github.com/event-chat/event-chat/compare/core@v0.2.4...core@v0.2.5) (2026-01-16)
 
 

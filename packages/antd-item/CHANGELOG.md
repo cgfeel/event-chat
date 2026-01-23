@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.2](https://github.com/event-chat/event-chat/compare/antd-item@v0.3.1...antd-item@v0.3.2) (2026-01-23)
+
+
+### Bug Fixes
+
+* add @formily/path ([3051f37](https://github.com/event-chat/event-chat/commit/3051f370e7c0bd72e7ce5abed3f72bca969880c0))
+* add @formily/path ([7e00292](https://github.com/event-chat/event-chat/commit/7e00292eada079ba5074a0b93054e27bb340d39a))
+
 ## [0.3.1](https://github.com/event-chat/event-chat/compare/antd-item@v0.3.0...antd-item@v0.3.1) (2026-01-17)
 
 

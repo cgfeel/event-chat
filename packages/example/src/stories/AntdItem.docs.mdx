@@ -225,10 +225,10 @@ onChange?: (
 
 扩展的 `Form.Item` 包含 2 个 `onChange`，一个是 `Antd` 表单组件本身自带的 `onChange`，一个是通过 `@event-chat/core` 扩展 `Form.Item` 后补充的 `onChange`，两者差异：
 
-<Table className={{ wrap: 'sb-unstyled' }}>
+<Table className={{ wrap: 'sb-unstyled' }} maxHeight={200} stickyHeader>
   <Thead>
     <Tr>
-      <Th className="w-50 bg-gray-100" sticky>
+      <Th className="bg-gray-100" sticky>
         更新场景
       </Th>
       <Th>
@@ -239,7 +239,7 @@ onChange?: (
   </Thead>
   <TBody>
     <Tr>
-      <Td>所属组件</Td>
+      <Td sticky>所属组件</Td>
       <Td>
         <Tag>Form.Item</Tag>
       </Td>
@@ -248,7 +248,7 @@ onChange?: (
       </Td>
     </Tr>
     <Tr>
-      <Td>①自然输入</Td>
+      <Td sticky>①自然输入</Td>
       <Td>
         不会触发扩展的 <Tag>onChange</Tag> 回调，但会将 <Tag>schema</Tag> 转换成一条 <Tag>Rule</Tag>
         ，用于自然输入后校验，更新的数据不一定符合预期
@@ -259,7 +259,7 @@ onChange?: (
       </Td>
     </Tr>
     <Tr>
-      <Td>
+      <Td sticky>
         ②通过 <Tag>emit</Tag> 手动更新
       </Td>
       <Td>

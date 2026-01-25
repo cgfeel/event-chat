@@ -1,6 +1,7 @@
 import {
   type FC,
   type PropsWithChildren,
+  type RefObject,
   createContext,
   memo,
   useContext,
@@ -15,9 +16,14 @@ const borderStyle = 'border-r border-b border-gray-200 last:border-r-0';
 const stickyStyle = 'sticky left-0 z-10';
 const stickyHeaderStyle = 'sticky top-0 z-20 bg-gray-100';
 
+const bodyWrap = 'body-wrap';
+const headerWrap = 'header-wrap';
+const tableName = 'custom-table';
+
 const tableStyles = tv({
   slots: {
     bodyWrap: '',
+    col: '',
     headerWrap: '',
     table: 'w-full border-separate border-spacing-0 text-sm',
     tbody: '',
@@ -25,7 +31,7 @@ const tableStyles = tv({
     th: 'font-semibold text-gray-700',
     thead: 'bg-gray-100',
     tr: '',
-    wrap: 'w-full overflow-hidden rounded-tl-sm rounded-tr-sm border-t border-r border-l border-gray-200',
+    wrap: `${tableName} w-full rounded-tl-sm rounded-tr-sm border-t border-r border-l border-gray-200`,
   },
   variants: {
     align: {
@@ -44,22 +50,22 @@ const tableStyles = tv({
   },
   compoundSlots: [
     {
-      slots: ['headerWrap'],
-      stickyHeader: true,
-      class: stickyHeaderStyle,
-    },
-    {
       slots: ['bodyWrap'],
       stickyHeader: true,
       class: 'overflow-auto',
     },
     {
-      slots: ['table'],
+      slots: ['headerWrap'],
       stickyHeader: true,
-      class: 'table-fixed',
+      class: stickyHeaderStyle,
     },
     {
-      slots: ['td', 'th'],
+      slots: ['table'],
+      stickyHeader: true,
+      class: 'w-max min-w-full table-auto',
+    },
+    {
+      slots: ['col', 'td', 'th'],
       className: 'px-4 py-3',
     },
     {
@@ -92,38 +98,86 @@ const tableStyles = tv({
       sticky: true,
       class: 'bg-gray-100',
     },
+    {
+      slots: ['wrap'],
+      stickyHeader: false,
+      class: 'overflow-x-auto',
+    },
+    {
+      slots: ['wrap'],
+      stickyHeader: undefined,
+      class: 'overflow-x-auto',
+    },
+    {
+      slots: ['wrap'],
+      stickyHeader: true,
+      class: 'overflow-hidden',
+    },
   ],
 });
 
-const TableContext = createContext<TableContextInstance>({
+const ColgroupContext = createContext<ColgroupContextInstance>({
   columnWidths: [],
+});
+
+const TableContext = createContext<TableContextInstance>({
   style: tableStyles(),
-  setColumnWidths: (val) => val,
 });
 
 const Colgroup: FC = () => {
-  const { columnWidths } = useContext(TableContext);
+  const style = tableStyles();
+  const { columnWidths, minWidth } = useContext(ColgroupContext);
+  const width = parseInt(String(minWidth ?? 800), 10);
+
   return (
     <colgroup>
       {columnWidths.map((item, idx) => {
         const keyname = `${idx}:${Math.random()}`;
-        return <col key={keyname} style={{ width: `${item}px` }} />;
+        return (
+          <col
+            className={cn([item, style.col()])}
+            key={keyname}
+            style={
+              item
+                ? undefined
+                : { width: Number.isNaN(width) ? '200px' : `${width / columnWidths.length}px` }
+            }
+          />
+        );
       })}
     </colgroup>
   );
 };
 
-// const ColumnWidthCalculator: FC<{ children: ReactNode }> = ({ children }) => {
-//   const { style } = useContext(TableContext);
-//   return (
-//     <div className="invisible absolute">
-//       <table className={style.table()}>
-//         <Colgroup />
-//         {children}
-//       </table>
-//     </div>
-//   );
-// };
+const ColgroupProvider: FC<PropsWithChildren<ColgroupProviderProps>> = ({
+  children,
+  minWidth,
+  wrap,
+}) => {
+  const [columnWidths, setColumnWidths] = useState<ColgroupContextInstance['columnWidths']>([]);
+  useEffect(() => {
+    const tableWrap = wrap.current;
+    const firstRow =
+      tableWrap?.querySelector(`.${bodyWrap} tbody tr`) ??
+      tableWrap?.querySelector(`.${headerWrap} thead th`);
+
+    if (!firstRow) return;
+
+    const cells = Array.from(firstRow.children);
+    const widths = cells.map((cell) => {
+      const className = cell.getAttribute('class');
+      return className ? /(w-[^\s]+)/.exec(className)?.[0] : undefined;
+    });
+
+    setColumnWidths(widths);
+  }, [wrap, setColumnWidths]);
+
+  return (
+    <ColgroupContext.Provider value={{ columnWidths, minWidth }}>
+      {children}
+    </ColgroupContext.Provider>
+  );
+};
 
 const Table: FC<PropsWithChildren<TableProps>> = ({
   children,
@@ -134,76 +188,27 @@ const Table: FC<PropsWithChildren<TableProps>> = ({
   minWidth = '800px',
   stickyHeader = false,
 }) => {
-  const [columnWidths, setColumnWidths] = useState<number[]>([]);
   const style = tableStyles({ align, border, stickyHeader });
   const { table, wrap } = className ?? {};
-
-  // const headerRef = useRef<HTMLDivElement>(null);
-  // const bodyRef = useRef<HTMLDivElement>(null);
-
-  // let theadContent: ReactNode = null;
-  // let tbodyContent: ReactNode = null;
-  // let theadOriginal = null as
-  //   | ReactPortal
-  //   | ReactElement<unknown, string | JSXElementConstructor<unknown>>
-  //   | null;
-
-  // const bodyStyle = stickyHeader
-  //   ? {
-  //       maxHeight: typeof maxHeight === 'number' ? `${maxHeight}px` : maxHeight,
-  //     }
-  //   : undefined;
-
-  // Children.forEach(children, (child) => {
-  //   if (isValidElement(child)) {
-  //     if (child.type === Thead) {
-  //       theadOriginal = child;
-  //     } else if (child.type === TBody) {
-  //       tbodyContent = child;
-  //     }
-  //   }
-  // });
-
-  // if (stickyHeader && theadOriginal) {
-  //   const headProps = theadOriginal.props as unknown as { className: string | undefined };
-  //   theadContent = cloneElement(theadOriginal, {
-  //     ref: headerRef,
-  //     className: cn([style.headerWrap({ class: headerWrap }), headProps.className]),
-  //   });
-  // }
-
-  // useEffect(() => {
-  //   if (!stickyHeader || !headerRef.current || !bodyRef.current) return;
-
-  //   const body = bodyRef.current;
-  //   const header = headerRef.current;
-
-  //   const handleScroll = () => {
-  //     header.scrollLeft = body.scrollLeft;
-  //   };
-
-  //   body.addEventListener('scroll', handleScroll);
-  //   return () => body.removeEventListener('scroll', handleScroll);
-  // }, [stickyHeader]);
+  const wrapRef = useRef<HTMLDivElement>(null);
 
   return (
-    <TableContext.Provider
-      value={{ columnWidths, maxHeight, minWidth, stickyHeader, style, table, setColumnWidths }}
-    >
-      <div className={cn([style.wrap({ class: wrap }), className])}>
-        {stickyHeader ? (
-          children
-        ) : (
-          <table className={style.table({ class: table })}>{children}</table>
-        )}
-      </div>
+    <TableContext.Provider value={{ maxHeight, stickyHeader, style, table }}>
+      <ColgroupProvider minWidth={minWidth} wrap={wrapRef}>
+        <div className={cn([style.wrap({ class: wrap }), className])} ref={wrapRef}>
+          {stickyHeader ? (
+            children
+          ) : (
+            <table className={style.table({ class: table })}>{children}</table>
+          )}
+        </div>
+      </ColgroupProvider>
     </TableContext.Provider>
   );
 };
 
 const TBody: FC<PropsWithChildren<TableBaseProps>> = ({ children, className }) => {
-  const { maxHeight, minWidth, stickyHeader, style, table, setColumnWidths } =
-    useContext(TableContext);
+  const { maxHeight, stickyHeader, style, table } = useContext(TableContext);
 
   const bodyRef = useRef<HTMLDivElement>(null);
   const bodyStyle = useMemo(
@@ -216,37 +221,33 @@ const TBody: FC<PropsWithChildren<TableBaseProps>> = ({ children, className }) =
     [maxHeight, stickyHeader]
   );
 
-  const tableWidth = useMemo(
-    () =>
-      (stickyHeader && typeof minWidth === 'number' ? `${minWidth}px` : undefined) ??
-      (stickyHeader ? minWidth : undefined),
-    [minWidth, stickyHeader]
-  );
-
   useEffect(() => {
-    if (!stickyHeader || !bodyRef.current) return;
+    const currentBody = bodyRef.current;
+    const tableWrap = currentBody?.closest(`.${tableName}`);
+    const thead = tableWrap?.querySelector(`.${headerWrap}`);
 
-    const tableElem = bodyRef.current.querySelector('table');
-    if (!tableElem) return;
+    function scrollHandle() {
+      if (thead) thead.scrollLeft = currentBody?.scrollLeft ?? 0;
+    }
 
-    const firstRow = tableElem.querySelector('tbody tr');
-    if (!firstRow) return;
-
-    const cells = Array.from(firstRow.children);
-    const widths = cells.map((cell) => cell.getBoundingClientRect().width);
-    setColumnWidths(widths);
-  }, [bodyRef, stickyHeader, setColumnWidths]);
+    currentBody?.addEventListener('scroll', scrollHandle);
+    return () => {
+      currentBody?.removeEventListener('scroll', scrollHandle);
+    };
+  }, []);
 
   return !stickyHeader ? (
     <tbody className={cn([style.tbody(), className])}>{children}</tbody>
   ) : (
-    <div className={style.bodyWrap({ class: className })} ref={bodyRef} style={bodyStyle}>
-      <div style={{ minWidth: tableWidth }}>
-        <table className={style.table({ class: table })}>
-          <Colgroup />
-          <tbody className={cn([style.tbody(), className])}>{children}</tbody>
-        </table>
-      </div>
+    <div
+      className={cn([style.bodyWrap({ class: className }), bodyWrap])}
+      ref={bodyRef}
+      style={bodyStyle}
+    >
+      <table className={style.table({ class: table })}>
+        <Colgroup />
+        <tbody className={cn([style.tbody(), className])}>{children}</tbody>
+      </table>
     </div>
   );
 };
@@ -263,29 +264,36 @@ const Th: FC<PropsWithChildren<TableCellProps>> = ({ children, className, sticky
 
 const Thead: FC<PropsWithChildren<TableBaseProps>> = ({ children, className }) => {
   const headerRef = useRef<HTMLDivElement>(null);
-  const { minWidth, stickyHeader, style, table } = useContext(TableContext);
+  const { stickyHeader, style, table } = useContext(TableContext);
 
-  const tableWidth = useMemo(
-    () =>
-      (stickyHeader && typeof minWidth === 'number' ? `${minWidth}px` : undefined) ??
-      (stickyHeader ? minWidth : undefined),
-    [minWidth, stickyHeader]
-  );
+  useEffect(() => {
+    const currentHeader = headerRef.current;
+    const tableWrap = currentHeader?.closest(`.${tableName}`);
+    const tbody = tableWrap?.querySelector(`.${bodyWrap}`);
 
-  useEffect(() => {}, [headerRef]);
+    function scrollHandle() {
+      if (tbody) tbody.scrollLeft = currentHeader?.scrollLeft ?? 0;
+    }
+
+    currentHeader?.addEventListener('scroll', scrollHandle);
+    return () => {
+      currentHeader?.removeEventListener('scroll', scrollHandle);
+    };
+  }, [headerRef, stickyHeader]);
 
   return !stickyHeader ? (
     <thead className={cn([style.thead(), className])}>{children}</thead>
   ) : (
-    <div className={cn([style.bodyWrap({ class: className }), 'no-scrollbar'])}>
-      <div style={{ minWidth: tableWidth }}>
-        <table className={style.table({ class: table })}>
-          <Colgroup />
-          <thead className={cn([style.headerWrap({ class: className }), style.thead()])}>
-            {children}
-          </thead>
-        </table>
-      </div>
+    <div
+      className={cn([style.bodyWrap({ class: className }), `${headerWrap} no-scrollbar`])}
+      ref={headerRef}
+    >
+      <table className={style.table({ class: table })}>
+        <Colgroup />
+        <thead className={cn([style.headerWrap({ class: className }), style.thead()])}>
+          {children}
+        </thead>
+      </table>
     </div>
   );
 };
@@ -299,14 +307,20 @@ export { TBody, Td, Th, Thead, Tr };
 
 export default memo(Table);
 
+interface ColgroupContextInstance extends Pick<TableProps, 'minWidth'> {
+  columnWidths: Array<string | undefined>;
+}
+
+interface ColgroupProviderProps extends Pick<TableProps, 'minWidth'> {
+  wrap: RefObject<HTMLDivElement>;
+}
+
 interface TableBaseProps {
   className?: string;
 }
 
-interface TableContextInstance extends Pick<TableProps, 'maxHeight' | 'minWidth' | 'stickyHeader'> {
-  columnWidths: number[];
+interface TableContextInstance extends Pick<TableProps, 'maxHeight' | 'stickyHeader'> {
   style: ReturnType<typeof tableStyles>;
-  setColumnWidths: (vals: number[]) => unknown;
   table?: string;
 }
 

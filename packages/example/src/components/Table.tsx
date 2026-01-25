@@ -99,6 +99,11 @@ const tableStyles = tv({
       class: 'bg-gray-100',
     },
     {
+      slots: ['td'],
+      stickyHeader: true,
+      class: 'bg-last:td:border-b-none',
+    },
+    {
       slots: ['wrap'],
       stickyHeader: false,
       class: 'overflow-x-auto',
@@ -111,7 +116,7 @@ const tableStyles = tv({
     {
       slots: ['wrap'],
       stickyHeader: true,
-      class: 'overflow-hidden',
+      class: 'overflow-hidden border-b',
     },
   ],
 });

@@ -11,20 +11,20 @@ import {
   useState,
 } from 'react';
 import { cn, tv } from 'tailwind-variants';
+import ScrollVirtual from './ScrollVirtual';
 
 const borderStyle = 'border-r border-b border-gray-200 last:border-r-0';
 const stickyStyle = 'sticky left-0 z-10';
 const stickyHeaderStyle = 'sticky top-0 z-20 bg-gray-100';
 
-const bodyWrap = 'body-wrap';
-const headerWrap = 'header-wrap';
+const scrollName = 'scrollbar';
 const tableName = 'custom-table';
 
 const tableStyles = tv({
   slots: {
-    bodyWrap: '',
+    base: 'relative',
     col: '',
-    headerWrap: '',
+    scrollbar: `${scrollName} pointer-events-none z-30`,
     table: 'w-full border-separate border-spacing-0 text-sm',
     tbody: '',
     td: 'text-gray-800',
@@ -50,12 +50,7 @@ const tableStyles = tv({
   },
   compoundSlots: [
     {
-      slots: ['bodyWrap'],
-      stickyHeader: true,
-      class: 'overflow-auto',
-    },
-    {
-      slots: ['headerWrap'],
+      slots: ['thead'],
       stickyHeader: true,
       class: stickyHeaderStyle,
     },
@@ -116,7 +111,7 @@ const tableStyles = tv({
     {
       slots: ['wrap'],
       stickyHeader: true,
-      class: 'overflow-hidden border-b',
+      class: 'no-scrollbar overflow-auto border-b',
     },
   ],
 });
@@ -163,8 +158,8 @@ const ColgroupProvider: FC<PropsWithChildren<ColgroupProviderProps>> = ({
   useEffect(() => {
     const tableWrap = wrap.current;
     const firstRow =
-      tableWrap?.querySelector(`.${bodyWrap} tbody tr`) ??
-      tableWrap?.querySelector(`.${headerWrap} thead th`);
+      tableWrap?.querySelector(`.${tableName} tbody tr`) ??
+      tableWrap?.querySelector(`.${tableName} thead th`);
 
     if (!firstRow) return;
 
@@ -184,6 +179,33 @@ const ColgroupProvider: FC<PropsWithChildren<ColgroupProviderProps>> = ({
   );
 };
 
+const ScrollBar: FC<PropsWithChildren<Pick<ColgroupProviderProps, 'wrap'>>> = ({
+  children,
+  wrap,
+}) => {
+  const { base, scrollbar } = tableStyles();
+  const barRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const barWrap = barRef.current;
+    const height = barWrap?.querySelector('thead')?.clientHeight;
+    const scroll = barWrap?.querySelector(`.${scrollName}`);
+
+    if (scroll instanceof HTMLElement) scroll.style.top = height ? `${height}px` : '0';
+  }, [barRef]);
+
+  return (
+    <div className={base()} ref={barRef}>
+      {children}
+      <div className={scrollbar()} ref={scrollRef}>
+        <ScrollVirtual scroll={scrollRef} wrap={wrap} />
+        <ScrollVirtual direction="horizontal" scroll={scrollRef} wrap={wrap} />
+      </div>
+    </div>
+  );
+};
+
 const Table: FC<PropsWithChildren<TableProps>> = ({
   children,
   className,
@@ -195,27 +217,8 @@ const Table: FC<PropsWithChildren<TableProps>> = ({
 }) => {
   const style = tableStyles({ align, border, stickyHeader });
   const { table, wrap } = className ?? {};
+
   const wrapRef = useRef<HTMLDivElement>(null);
-
-  return (
-    <TableContext.Provider value={{ maxHeight, stickyHeader, style, table }}>
-      <ColgroupProvider minWidth={minWidth} wrap={wrapRef}>
-        <div className={cn([style.wrap({ class: wrap }), className])} ref={wrapRef}>
-          {stickyHeader ? (
-            children
-          ) : (
-            <table className={style.table({ class: table })}>{children}</table>
-          )}
-        </div>
-      </ColgroupProvider>
-    </TableContext.Provider>
-  );
-};
-
-const TBody: FC<PropsWithChildren<TableBaseProps>> = ({ children, className }) => {
-  const { maxHeight, stickyHeader, style, table } = useContext(TableContext);
-
-  const bodyRef = useRef<HTMLDivElement>(null);
   const bodyStyle = useMemo(
     () =>
       stickyHeader
@@ -226,35 +229,29 @@ const TBody: FC<PropsWithChildren<TableBaseProps>> = ({ children, className }) =
     [maxHeight, stickyHeader]
   );
 
-  useEffect(() => {
-    const currentBody = bodyRef.current;
-    const tableWrap = currentBody?.closest(`.${tableName}`);
-    const thead = tableWrap?.querySelector(`.${headerWrap}`);
-
-    function scrollHandle() {
-      if (thead) thead.scrollLeft = currentBody?.scrollLeft ?? 0;
-    }
-
-    currentBody?.addEventListener('scroll', scrollHandle);
-    return () => {
-      currentBody?.removeEventListener('scroll', scrollHandle);
-    };
-  }, []);
-
-  return !stickyHeader ? (
-    <tbody className={cn([style.tbody(), className])}>{children}</tbody>
-  ) : (
-    <div
-      className={cn([style.bodyWrap({ class: className }), bodyWrap])}
-      ref={bodyRef}
-      style={bodyStyle}
-    >
-      <table className={style.table({ class: table })}>
-        <Colgroup />
-        <tbody className={cn([style.tbody(), className])}>{children}</tbody>
-      </table>
-    </div>
+  return (
+    <TableContext.Provider value={{ maxHeight, stickyHeader, style, table }}>
+      <ColgroupProvider minWidth={minWidth} wrap={wrapRef}>
+        <ScrollBar wrap={wrapRef}>
+          <div
+            className={cn([style.wrap({ class: wrap }), className])}
+            ref={wrapRef}
+            style={bodyStyle}
+          >
+            <table className={style.table({ class: table })}>
+              <Colgroup />
+              {children}
+            </table>
+          </div>
+        </ScrollBar>
+      </ColgroupProvider>
+    </TableContext.Provider>
   );
+};
+
+const TBody: FC<PropsWithChildren<TableBaseProps>> = ({ children, className }) => {
+  const { style } = useContext(TableContext);
+  return <tbody className={cn([style.tbody(), className])}>{children}</tbody>;
 };
 
 const Td: FC<PropsWithChildren<TableCellProps>> = ({ children, className, sticky }) => {
@@ -268,39 +265,8 @@ const Th: FC<PropsWithChildren<TableCellProps>> = ({ children, className, sticky
 };
 
 const Thead: FC<PropsWithChildren<TableBaseProps>> = ({ children, className }) => {
-  const headerRef = useRef<HTMLDivElement>(null);
-  const { stickyHeader, style, table } = useContext(TableContext);
-
-  useEffect(() => {
-    const currentHeader = headerRef.current;
-    const tableWrap = currentHeader?.closest(`.${tableName}`);
-    const tbody = tableWrap?.querySelector(`.${bodyWrap}`);
-
-    function scrollHandle() {
-      if (tbody) tbody.scrollLeft = currentHeader?.scrollLeft ?? 0;
-    }
-
-    currentHeader?.addEventListener('scroll', scrollHandle);
-    return () => {
-      currentHeader?.removeEventListener('scroll', scrollHandle);
-    };
-  }, [headerRef, stickyHeader]);
-
-  return !stickyHeader ? (
-    <thead className={cn([style.thead(), className])}>{children}</thead>
-  ) : (
-    <div
-      className={cn([style.bodyWrap({ class: className }), `${headerWrap} no-scrollbar`])}
-      ref={headerRef}
-    >
-      <table className={style.table({ class: table })}>
-        <Colgroup />
-        <thead className={cn([style.headerWrap({ class: className }), style.thead()])}>
-          {children}
-        </thead>
-      </table>
-    </div>
-  );
+  const { style } = useContext(TableContext);
+  return <thead className={cn([style.thead(), className])}>{children}</thead>;
 };
 
 const Tr: FC<PropsWithChildren<TableBaseProps>> = ({ children, className }) => {

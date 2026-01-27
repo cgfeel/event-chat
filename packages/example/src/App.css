@@ -10,7 +10,7 @@
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
-    overscroll-behavior-x: none;
+    overscroll-behavior: none;
   }
 
   .tabs-container {
@@ -127,6 +127,19 @@
 
 @utility chat-wrapper {
   @apply mb-4 flex;
+}
+
+/* 滚动条 */
+@utility scrollbar {
+  @apply absolute right-0 bottom-0 left-0;
+}
+
+@utility scrollbar-thumb {
+  @apply absolute rounded-full bg-black/20;
+}
+
+@utility scrollbar-track {
+  @apply invisible absolute right-0 bottom-0 cursor-pointer transition-[background_0.2s];
 }
 
 /* 消息框 */

@@ -7,10 +7,11 @@ import Toast from './components/toast';
 import { isKey } from './utils/fields';
 
 const AntdForm = lazy(() => import('./pages/AntdForm'));
+const Components = lazy(() => import('./pages/Components'));
 const EventChat = lazy(() => import('./pages/EventChat'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
-const Router = Object.freeze({ AntdForm, EventChat });
+const Router = Object.freeze({ AntdForm, Components, EventChat });
 FormEvent.observer(Form);
 
 const App: FC = () => {
@@ -24,7 +25,7 @@ const App: FC = () => {
         <Tabs defaultActive="EventChat" onChange={(detail) => setCurrent(String(detail))}>
           <TabItem name="EventChat">eventChat</TabItem>
           <TabItem name="AntdForm">antdForm</TabItem>
-          <TabItem name="antd-form1">antdForm1</TabItem>
+          <TabItem name="Components">others</TabItem>
         </Tabs>
       </div>
       <ConfigProvider

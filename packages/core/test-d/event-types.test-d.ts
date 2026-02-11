@@ -1,6 +1,6 @@
 import { expectAssignable, expectType } from 'tsd';
 import { z } from 'zod';
-import type { EventChatOptions, EventDetailType, ResultType } from '../dist/utils';
+import type { EventChatOptions, EventDetailType, NamepathType, ResultType } from '../dist/utils';
 
 // -------------------------- EventChatOptions 测试用例 --------------------------
 // 1. 测试带 Schema 的 EventChatOptions 合规性
@@ -63,13 +63,16 @@ const eventDetail: EventDetailType<CustomDetail, 'chat.message'> = {
   id: '123456',
   name: 'chat.message',
   origin: 'web-client',
+  originName: 'web-client',
+  rule: 'chat.message',
+  time: new Date(),
   type: 'message',
   global: true,
   token: 'abc-123',
 };
 
 // 验证各个字段类型
-expectType<string>(eventDetail.origin);
+expectType<NamepathType>(eventDetail.origin);
 expectType<'chat.message'>(eventDetail.name);
 expectType<string>(eventDetail.id);
 expectType<CustomDetail | undefined>(eventDetail.detail);
@@ -84,11 +87,14 @@ const defaultDetail: EventDetailType<unknown, 'system.notice'> = {
   id: '654321',
   name: 'system.notice',
   origin: 'mobile-client',
+  originName: 'mobile-client',
+  rule: 'system.notice',
+  time: new Date(),
   token: undefined,
 };
 
 // 验证各个字段类型
-expectType<string>(defaultDetail.origin);
+expectType<NamepathType>(defaultDetail.origin);
 expectType<'system.notice'>(defaultDetail.name);
 expectType<string>(defaultDetail.id);
 expectType<unknown | undefined>(defaultDetail.detail);

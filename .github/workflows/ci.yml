@@ -16,38 +16,10 @@ permissions:
 
 # 作业配置
 jobs:
-  # 更新 release
-  release-please:
-    runs-on: ubuntu-latest
-    outputs:
-      # 输出每个子包的独立发布状态和Tag
-      antd-item--release_created: ${{ steps.release.outputs['packages/antd-item--release_created'] }}
-      antd-item--tag_name: ${{ steps.release.outputs['packages/antd-item--tag_name'] }}
-      antd-item--version: ${{ steps.release.outputs['packages/antd-item--version'] }} # 新增：输出版本号
-      core--release_created: ${{ steps.release.outputs['packages/core--release_created'] }}
-      core--tag_name: ${{ steps.release.outputs['packages/core--tag_name'] }}
-      core--version: ${{ steps.release.outputs['packages/core--version'] }}
-      releases_created: ${{ steps.release.outputs.releases_created }}
-    steps:
-      - uses: googleapis/release-please-action@v4
-        id: release
-        with:
-          token: ${{ secrets.GH_PACKAGES_TOKEN }}
-          include-component-in-tag: true
-          config-file: release-please-config.json
-          manifest-file: .release-please-manifest.json
-      - name: Print release outputs for debugging
-        continue-on-error: true
-        run: |
-          echo "Release outputs (write to file first):"
-          # 方案1：将JSON输出到文件，再cat查看（推荐，避免特殊字符解析）
-          echo '${{ toJson(steps.release.outputs) }}' > release-outputs.json
-          cat release-outputs.json
-
   # 代码校验 & 构建作业（覆盖所有子包）
   validate-and-build:
     # 依赖：仅当release-please作业成功完成后，才执行该作业
-    needs: [release-please]
+    # needs: [release-please]
     runs-on: ubuntu-latest
     # 可选：指定Node版本矩阵，多版本测试（按需开启）
     # strategy:
@@ -116,6 +88,35 @@ jobs:
           name: core-build-output
           path: packages/core/dist/ # 关键：改为子包的dist路径
           retention-days: 7
+
+  # 更新 release
+  release-please:
+    needs: [validate-and-build]
+    runs-on: ubuntu-latest
+    outputs:
+      # 输出每个子包的独立发布状态和Tag
+      antd-item--release_created: ${{ steps.release.outputs['packages/antd-item--release_created'] }}
+      antd-item--tag_name: ${{ steps.release.outputs['packages/antd-item--tag_name'] }}
+      antd-item--version: ${{ steps.release.outputs['packages/antd-item--version'] }} # 新增：输出版本号
+      core--release_created: ${{ steps.release.outputs['packages/core--release_created'] }}
+      core--tag_name: ${{ steps.release.outputs['packages/core--tag_name'] }}
+      core--version: ${{ steps.release.outputs['packages/core--version'] }}
+      releases_created: ${{ steps.release.outputs.releases_created }}
+    steps:
+      - uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          token: ${{ secrets.GH_PACKAGES_TOKEN }}
+          include-component-in-tag: true
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+      - name: Print release outputs for debugging
+        continue-on-error: true
+        run: |
+          echo "Release outputs (write to file first):"
+          # 方案1：将JSON输出到文件，再cat查看（推荐，避免特殊字符解析）
+          echo '${{ toJson(steps.release.outputs) }}' > release-outputs.json
+          cat release-outputs.json
 
   # 调整：发布到 npm（仅发布有更新的子包）
   publish-to-npm:

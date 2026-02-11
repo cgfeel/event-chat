@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.8](https://github.com/event-chat/event-chat/compare/core@v0.2.7...core@v0.2.8) (2026-02-11)
+
+
+### Bug Fixes
+
+* reduce semi ([a193f41](https://github.com/event-chat/event-chat/commit/a193f4158627b6d87ca1746d083e11a8c381c919))
+* reduce semi ([e3ba48f](https://github.com/event-chat/event-chat/commit/e3ba48feaa248554d3366f6759e659ac5dbf1b3b))
+
 ## [0.2.7](https://github.com/event-chat/event-chat/compare/core@v0.2.6...core@v0.2.7) (2026-02-11)
 
 

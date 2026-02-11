@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.3](https://github.com/event-chat/event-chat/compare/antd-item@v0.3.2...antd-item@v0.3.3) (2026-02-11)
+
+
+### Bug Fixes
+
+* reduce semi ([a193f41](https://github.com/event-chat/event-chat/commit/a193f4158627b6d87ca1746d083e11a8c381c919))
+* reduce semi ([e3ba48f](https://github.com/event-chat/event-chat/commit/e3ba48feaa248554d3366f6759e659ac5dbf1b3b))
+
 ## [0.3.2](https://github.com/event-chat/event-chat/compare/antd-item@v0.3.1...antd-item@v0.3.2) (2026-01-23)
 
 

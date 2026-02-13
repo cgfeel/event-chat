@@ -169,7 +169,7 @@ const AntdForm: FC = () => (
     >
       <FormAsync />
     </Card>
-    <Card title="表单项主控字段">
+    <Card title="表单项触发更新">
       <FormAppend />
     </Card>
   </div>

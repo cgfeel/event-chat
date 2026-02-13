@@ -18,12 +18,11 @@ const FormProviderInner: FC<PropsWithChildren<FormEventContextInstance>> = ({
 
 const FormItemProviderInner: FC<PropsWithChildren<FormItemProviderProps>> = ({
   children,
-  parent,
-  emit,
+  ...props
 }) => {
   const record = useFormEvent()
   return (
-    <FormEventContext.Provider value={{ ...record, parent, emit }}>
+    <FormEventContext.Provider value={{ ...record, ...props }}>
       {children}
     </FormEventContext.Provider>
   )

@@ -1,2 +1,2 @@
+export { default as MatchPath } from './MatchPath'
 export { default as PointPath } from './PointPath'
-export { default as SubscriptPath } from './SubscriptPath'

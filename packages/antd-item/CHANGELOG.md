@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.5](https://github.com/event-chat/event-chat/compare/antd-item@v0.3.4...antd-item@v0.3.5) (2026-02-14)
+
+
+### Bug Fixes
+
+* update group rule ([a483874](https://github.com/event-chat/event-chat/commit/a483874455e8e0cdd60ebba1a03c7b44671438f1))
+* update group rule ([7785443](https://github.com/event-chat/event-chat/commit/7785443d53456e0673c752dc001bdb46fd574b65))
+
 ## [0.3.4](https://github.com/event-chat/event-chat/compare/antd-item@v0.3.3...antd-item@v0.3.4) (2026-02-13)
 
 

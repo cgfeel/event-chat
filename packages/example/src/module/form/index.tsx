@@ -1,4 +1,5 @@
 export { default as FooterTips } from './FooterTips'
+export { default as FormAppend } from './FormAppend'
 export { default as FormAsync } from './FormAsync'
 export { default as FormEmit } from './FormEmit'
 export { default as FormList } from './FormList'

@@ -1,5 +1,6 @@
 import {
   FooterTips,
+  FormAppend,
   FormAsync,
   FormEmit,
   FormList,
@@ -8,7 +9,6 @@ import {
   FormUpdate,
   FormUpdateFields,
 } from '@/module/form'
-import FormAppend from '@/module/form/FormAppend'
 import { Tag } from 'antd'
 import type { FC } from 'react'
 import Card from '@/components/Card'
@@ -169,7 +169,22 @@ const AntdForm: FC = () => (
     >
       <FormAsync />
     </Card>
-    <Card title="表单项触发更新">
+    <Card
+      footer={
+        <FooterTips>
+          <p>
+            可以通过 <Tag>ref</Tag> 或在表单组件组件内通过上下文发起更新。这种方式和 <Tag>form</Tag>{' '}
+            实例发起的更新不同点，在于触发更新时 <Tag>emit</Tag> 绑定了当前字段的{' '}
+            <Tag>namepath</Tag>
+            ，允许通过相对路径查找并发起字段更新。
+          </p>
+          <p>
+            <Tag>namepath</Tag> 可以切换顶部 <Tag>Tab</Tag> 查看用例。
+          </p>
+        </FooterTips>
+      }
+      title="表单项触发更新"
+    >
       <FormAppend />
     </Card>
   </div>

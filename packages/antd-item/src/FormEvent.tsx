@@ -42,7 +42,11 @@ const FormEvent = <
   const formGroup = useMemo(() => getStringValue([form?.group, group]), [form?.group, group])
   const Form = useFormCom<ValuesType>()
 
-  if (form?.emit && form.name === formName) {
+  if (
+    form?.emit &&
+    form.name === formName &&
+    (form.group !== undefined || form.group === formGroup)
+  ) {
     const { focusField, ...formIns } = form
     formIns.group = formGroup
     return (

@@ -30,7 +30,7 @@ const ListForm: FC = () => {
   return (
     <FormEvent group="list-form" labelCol={{ span: 8 }} wrapperCol={{ span: 16 }}>
       <FormEvent.Item colon={false} label={` `}>
-        <Title level={5}>通过表单组件向相邻的表单项发起更新</Title>
+        <Title level={5}>在表单组件中通过上下文发起更新</Title>
       </FormEvent.Item>
       <FormEvent.List initialValue={[{ 'target-input': 'levi' }]} name="target-list">
         {(fields, { add, remove }) => (

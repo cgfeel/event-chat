@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.6](https://github.com/event-chat/event-chat/compare/antd-item@v0.3.5...antd-item@v0.3.6) (2026-02-15)
+
+
+### Bug Fixes
+
+* update useForm add memo ([73dde90](https://github.com/event-chat/event-chat/commit/73dde90aae221b1356e62a359bdc04d0ad754ebd))
+* update useForm add memo ([a02eb35](https://github.com/event-chat/event-chat/commit/a02eb35e5fb2728074d35cdbd136d68aa430db74))
+
 ## [0.3.5](https://github.com/event-chat/event-chat/compare/antd-item@v0.3.4...antd-item@v0.3.5) (2026-02-14)
 
 

@@ -60,11 +60,16 @@ export const useForm = <
     group: groupName,
   })
 
-  const formInstance = Object.assign(formInit ?? {}, form, {
-    group: groupName,
-    name: formName,
-    emit,
-  })
+  const formInstance = useMemo(
+    () =>
+      Object.assign(formInit ?? {}, form, {
+        group: groupName,
+        name: formName,
+        emit,
+      }),
+    [form, formInit, groupName, formName, emit]
+  )
+
   return [formInstance] as const
 }
 

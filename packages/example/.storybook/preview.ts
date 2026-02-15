@@ -1,8 +1,8 @@
-import { withThemeByClassName } from '@storybook/addon-themes';
-import type { Preview } from '@storybook/react';
-import { sb } from 'storybook/test';
-import '../src/App.css';
-import AppDecorator from './AppDecorator';
+import { withThemeByClassName } from '@storybook/addon-themes'
+import type { Preview } from '@storybook/react'
+import { sb } from 'storybook/test'
+import '../src/App.css'
+import AppDecorator from './AppDecorator'
 
 const preview: Preview = {
   decorators: [AppDecorator],
@@ -11,8 +11,13 @@ const preview: Preview = {
     interactivePlayground: {
       collapsed: true,
     },
+    options: {
+      storySort: {
+        order: ['Document', ['EventChat', 'AntdItem'], 'Example', ['Toast', 'Tabs']],
+      },
+    },
   },
-};
+}
 
 export const decorators = [
   withThemeByClassName({
@@ -22,10 +27,10 @@ export const decorators = [
     },
     defaultTheme: 'dark',
   }),
-];
+]
 
 // Provide a simple module mock to validate the new mocking pipeline.
 // This swaps src/stories/utils/greeting.ts with its __mocks__ implementation.
-sb.mock('../src/stories/utils/greeting.ts');
+sb.mock('../src/stories/utils/greeting.ts')
 
-export default preview;
+export default preview

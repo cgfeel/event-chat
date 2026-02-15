@@ -1,5 +1,11 @@
 import { FooterTips, ListForm } from '@/module/form'
-import { PointPath } from '@/module/namepath'
+import {
+  EscapePath,
+  ExtendedAndRangePath,
+  GroupAndReversePath,
+  MatchPath,
+  PointPath,
+} from '@/module/namepath'
 import { Tag } from 'antd'
 import type { FC } from 'react'
 import Card from '@/components/Card'
@@ -27,6 +33,33 @@ const Namepath: FC = () => (
       <div className="max-w-150">
         <ListForm />
       </div>
+    </Card>
+    <Card
+      footer={
+        <FooterTips>
+          通过通配符 <Tag>*</Tag> 实现全局或局部匹配
+        </FooterTips>
+      }
+      title="全局和局部匹配"
+    >
+      <MatchPath />
+    </Card>
+    <Card title="广播和反向匹配">
+      <GroupAndReversePath />
+    </Card>
+    <Card title="扩展和范围路径">
+      <ExtendedAndRangePath />
+    </Card>
+    <Card
+      footer={
+        <FooterTips>
+          <Tag>formily</Tag>中转义符由<Tag>\\</Tag>组成，由于<Tag>\</Tag>
+          本身是转义字符，示例中使用 <Tag>\\\\</Tag> 表示 <Tag>\\</Tag>
+        </FooterTips>
+      }
+      title="转义路径"
+    >
+      <EscapePath />
     </Card>
   </div>
 )

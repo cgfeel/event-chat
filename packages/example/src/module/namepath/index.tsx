@@ -1,2 +1,5 @@
+export { default as EscapePath } from './EscapePath'
+export { default as ExtendedAndRangePath } from './ExtendedAndRangePath'
+export { default as GroupAndReversePath } from './GroupAndReversePath'
 export { default as MatchPath } from './MatchPath'
 export { default as PointPath } from './PointPath'

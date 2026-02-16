@@ -1,6 +1,6 @@
-import { Canvas, Controls, Meta } from '@storybook/addon-docs/blocks';
-import Table, { TBody, Td, Th, Thead, Tr } from '@/components/TableVirtual';
-import AntdItem from './AntdItem';
+import { Canvas, Controls, Meta } from '@storybook/addon-docs/blocks'
+import Table, { TBody, Td, Th, Thead, Tr } from '@/components/TableVirtual'
+import AntdItem from './AntdItem'
 import AntdItemStories, {
   FormAsync,
   FormEmit,
@@ -9,11 +9,11 @@ import AntdItemStories, {
   FormSchema,
   FormUpdate,
   FormUpdateFields,
-} from './AntdItem.stories';
-import './assets/story-styles.css';
-import ListObserver from './components/ListObserver';
-import TableList from './components/TableList';
-import Tag from './components/Tag';
+} from './AntdItem.stories'
+import './assets/story-styles.css'
+import ListObserver from './components/ListObserver'
+import TableList from './components/TableList'
+import Tag from './components/Tag'
 
 <Meta component={AntdItem} of={AntdItemStories} />
 
@@ -67,7 +67,7 @@ pnpm add @event-chat/item
         window.open(
           'https://github.com/event-chat/event-chat/blob/main/packages/example/src/module/form/FormEmit.tsx',
           '_blank'
-        );
+        )
       },
     },
   ]}
@@ -207,7 +207,7 @@ pnpm add @event-chat/item
 `NamepathType` 类型：
 
 ```typescript
-type NamepathType = number | string | Array<string | number> | Readonly<Array<string | number>>;
+type NamepathType = number | string | Array<string | number> | Readonly<Array<string | number>>
 ```
 
 `onChange` 类型：
@@ -225,7 +225,7 @@ onChange?: (
 
 扩展的 `Form.Item` 包含 2 个 `onChange`，一个是 `Antd` 表单组件本身自带的 `onChange`，一个是通过 `@event-chat/core` 扩展 `Form.Item` 后补充的 `onChange`，两者差异：
 
-<Table className={{ wrap: 'sb-unstyled' }} maxHeight={200} stickyHeader>
+<Table className={{ wrap: 'sb-unstyled' }}>
   <Thead>
     <Tr>
       <Th className="w-30" sticky>
@@ -356,9 +356,9 @@ onChange?: (
 
 ```typescript
 type FormOptions<Name extends NamepathType, Group extends string | undefined = undefined> = {
-  group?: Group;
-  name?: Name;
-};
+  group?: Group
+  name?: Name
+}
 ```
 
 `formInit` 允许提供一个 `FormInstance` 实例，可以是扩展前的实例，也是扩展后的实例：
@@ -411,28 +411,28 @@ type FormOptions<Name extends NamepathType, Group extends string | undefined = u
 
 ```typescript
 // root component
-import FormEvent from '@event-chat/antd-item';
-import { Form } from 'antd';
+import FormEvent from '@event-chat/antd-item'
+import { Form } from 'antd'
 
-FormEvent.observer(Form);
+FormEvent.observer(Form)
 ```
 
 这样所有子组件引入的 `Form` 全部来自业务提供的 `Form`。原本作为组件库要打通组件上下文，通常是将 `antd` 从库内部引入再统一提供给外部，但这次扩展只针对 `Form` 组件，于是做了一个中间层
 
 ```typescript
-import { Form } from 'antd';
+import { Form } from 'antd'
 
 export const AntdCom: {
-  form?: FormBaseInstance;
-} = {};
+  form?: FormBaseInstance
+} = {}
 
 const observer = (FormCom: FormBaseInstance): void => {
-  AntdCom.form = FormCom;
-};
+  AntdCom.form = FormCom
+}
 
 const useFormCom = (): FormBaseInstance => {
-  return AntdCom.form ?? Form;
-};
+  return AntdCom.form ?? Form
+}
 ```
 
 所有扩展的组件内部通过 `useFormCom` 根据配置，获取最终的组件。
@@ -449,7 +449,7 @@ const useFormCom = (): FormBaseInstance => {
         window.open(
           'https://github.com/event-chat/event-chat/blob/main/packages/example/src/module/form/FormUpdate.tsx',
           '_blank'
-        );
+        )
       },
     },
   ]}
@@ -480,7 +480,7 @@ const useFormCom = (): FormBaseInstance => {
         window.open(
           'https://github.com/event-chat/event-chat/blob/main/packages/example/src/module/form/FormUpdateFields.tsx',
           '_blank'
-        );
+        )
       },
     },
   ]}
@@ -500,7 +500,7 @@ const useFormCom = (): FormBaseInstance => {
         window.open(
           'https://github.com/event-chat/event-chat/blob/main/packages/example/src/module/form/FormList.tsx',
           '_blank'
-        );
+        )
       },
     },
   ]}
@@ -534,7 +534,7 @@ const useFormCom = (): FormBaseInstance => {
         window.open(
           'https://github.com/event-chat/event-chat/blob/main/packages/example/src/module/form/FormSchema.tsx',
           '_blank'
-        );
+        )
       },
     },
   ]}
@@ -558,7 +558,7 @@ const useFormCom = (): FormBaseInstance => {
         window.open(
           'https://github.com/event-chat/event-chat/blob/main/packages/example/src/module/form/FormRate.tsx',
           '_blank'
-        );
+        )
       },
     },
   ]}
@@ -594,7 +594,7 @@ const useFormCom = (): FormBaseInstance => {
         window.open(
           'https://github.com/event-chat/event-chat/blob/main/packages/example/src/module/form/FormAsync.tsx',
           '_blank'
-        );
+        )
       },
     },
   ]}
@@ -626,24 +626,24 @@ const useFormCom = (): FormBaseInstance => {
 type FormType<ValueType = unknown> = (
   props: Pick<ComponentProps<typeof Form<ValueType>>, 'children' | 'form' | 'name'> &
     React.RefAttributes<FormInsType<ValueType>>
-) => React.ReactElement;
+) => React.ReactElement
 
 type FormBaseInstance<ValueType = unknown> = FormType<ValueType> & {
   Item: FC<
     Pick<FormItemProps, 'hidden' | 'initialValue' | 'name' | 'rules'> & {
-      children?: ReactNode | ((form: FormInsType<ValueType>) => ReactNode);
+      children?: ReactNode | ((form: FormInsType<ValueType>) => ReactNode)
     }
-  >;
-  List: FC<Pick<ComponentProps<typeof Form.List>, 'children' | 'initialValue' | 'name' | 'rules'>>;
-  useFormInstance: <Value>() => FormInsType<Value>;
-};
+  >
+  List: FC<Pick<ComponentProps<typeof Form.List>, 'children' | 'initialValue' | 'name' | 'rules'>>
+  useFormInstance: <Value>() => FormInsType<Value>
+}
 
 type FormInsType<ValueType = unknown> = Omit<
   NonNullable<ComponentProps<typeof Form<ValueType>>['form']>,
   'focusField'
 > & {
-  focusField?: NonNullable<ComponentProps<typeof Form>['form']>['focusField'];
-};
+  focusField?: NonNullable<ComponentProps<typeof Form>['form']>['focusField']
+}
 ```
 
 只能符合基本要求的类型，都视为有效的 `Form` 组件。同时为了跨版本支持， 去除了 `Antd v6` 实例 `FormInstance` 中的 `focusField` 改为可选属性，由业务决定属性是否存在。
@@ -686,5 +686,5 @@ const FormEvent: typeof FormEventInner & FormExtraInstance = Object.assign(FormE
   observer,
   useForm,
   useFormInstance,
-});
+})
 ```

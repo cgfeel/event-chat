@@ -27,6 +27,8 @@
     "test:coverage": "rstest --coverage",
     "test:type": "tsd"
   },
+  "keywords": [],
+  "license": "MIT",
   "devDependencies": {
     "@formily/path": "^2.3.7",
     "@rslib/core": "^0.18.4",

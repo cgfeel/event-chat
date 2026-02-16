@@ -1,0 +1,173 @@
+import { Canvas, Meta } from '@storybook/addon-docs/blocks'
+import Table, { TBody, Td, Th, Thead, Tr } from '@/components/TableVirtual'
+import NamePath from './NamePath'
+import NamePathStories, { PointPath } from './NamePath.stories'
+import './assets/story-styles.css'
+import Header from './components/Header'
+import ListObserver from './components/ListObserver'
+import Tag from './components/Tag'
+
+<Meta component={NamePath} of={NamePathStories} />
+
+<Header />
+
+# `NamePath` 路径路径系统
+
+## 介绍
+
+`NamePath` 采用了 `@formily/path` 作为路径系统，集成在 `@event-chat/core` 中，用于作为触发事件时匹配接受方的事件名。因此，所有集成了 `@event-chat/core` 的扩展库、组件都支持这套路径系统，比如：`@event-chat/ante-item`；所以目前不需要额外安装依赖便可开箱即用。
+
+**用途**：
+
+- 通过路径系统可以触发相对路径更新，或同时向多个事件名发起更新；
+- 和 `formily` 不同的是，路径系统在 `eventChat` 中只用于触发事件时匹配接收方的事件名，路径本身是不存在赋值和获取字段值的概念。
+
+**2 套路径系统**：
+
+- `@event-chat/core` 集成了 `@formily/path`，因此默认支持 `formily` 的路径系统；
+- 而 `Antd` 采用数组路径系统，为了兼容数组路径，会将其转换为 `formily` 点路径系统进行匹配。
+
+**3 层路径缓存**：
+
+按照操作顺序如下，目的为了减少路径计算的性能消耗。
+
+<Table className={{ wrap: 'sb-unstyled' }}>
+  <Thead>
+    <Tr>
+      <Th className="w-30" sticky>
+        分类
+      </Th>
+      <Th>缓存内容</Th>
+      <Th>用途</Th>
+    </Tr>
+  </Thead>
+  <TBody>
+    <Tr>
+      <Td className="w-30" sticky>
+        <Tag>eventMap</Tag>
+      </Td>
+      <Td>
+        <Tag>@event-chat/core</Tag> 事件名
+      </Td>
+      <Td>第一层补充缓存，用于记 2 套路径系统处理后的事件名</Td>
+    </Tr>
+    <Tr>
+      <Td className="w-30" sticky>
+        <Tag>pathCache</Tag>
+      </Td>
+      <Td>
+        <Tag>@formily/path</Tag> 的路径缓存，触发 <Tag>emit</Tag> 后，由 <Tag>Path.parse</Tag>{' '}
+        发起记录
+      </Td>
+      <Td>首次成功生成事件名，或首次触发事件时记录</Td>
+    </Tr>
+    <Tr>
+      <Td className="w-30" sticky>
+        <Tag>matchCache</Tag>
+      </Td>
+      <Td>
+        <Tag>@formily/path</Tag> 的匹配缓存，由 <Tag>Path.match</Tag> 发起记录
+      </Td>
+      <Td>首次匹配后将匹配的结果记录到缓存中</Td>
+    </Tr>
+  </TBody>
+</Table>
+
+> 为了便于演示下面将通过 `@event-chat/antd-item` 来展示用例，这篇文档将按照 `formily` 的 `FormPath` 的顺序描述用例说明。
+>
+> 要了解 `@formily/path` 相关用法建议查阅官方文档 [[查看](https://core.formilyjs.org/zh-CN/api/entry/form-path)]，这里主要演示用例以及在 `EventChat` 使用需要注意的地方。
+
+## 目录
+
+<ListObserver />
+
+## 写在前面
+
+**路径不支持解构表达式**
+
+在 `formily` 中解构表达式用于赋值和取值用的，例如官方文档示例：
+
+```typescript
+import { FormPath } from '@formily/core'
+
+const target = {}
+
+FormPath.setIn(target, 'parent.[aa,bb]', [11, 22])
+console.log(target) //{parent:{aa:11,bb:22}}
+console.log(FormPath.getIn(target, 'parent.[aa,bb]')) //[11,22]
+console.log(FormPath.parse('parent.[aa,bb]').toString()) //parent.[aa,bb]
+```
+
+而 `EventChat` 使用路径用于触发事件，不需要赋值和取值。而解构表达式只能匹配解构表达式，还是引用官方文档示例：
+
+```typescript
+import { FormPath } from '@formily/core'
+
+console.log(FormPath.parse('target.[aa,bb]').match('target.[aa,bb]')) //true
+console.log(FormPath.parse('target.[aa,bb]').match('target.aa')) //false
+console.log(FormPath.parse('target.[aa,bb]').match('target.bb')) //false
+```
+
+解构表达式不能匹配解构对象中的子集，那么存在的意义也就用处不大。
+
+**只用到了路径解析和匹配**
+
+- `Path.parse`：解析路径，包含计算相对路径
+- `Path.match`：用于路径表达式匹配 `eventBus` 中记录的事件，用于触发对应的回调事件
+
+> 包含以上所有 `formily` 路径相关的 `API` 均不对外提供，如需用到清在业务中自行安装 `formily`，或单独安装 `@formily/path`
+
+## 点路径
+
+<Canvas
+  className="doc-render"
+  additionalActions={[
+    {
+      title: 'Code in GitHub',
+      onClick: () => {
+        window.open(
+          'https://github.com/event-chat/event-chat/blob/main/packages/example/src/module/namepath/PointPath.tsx',
+          '_blank'
+        )
+      },
+    },
+  ]}
+  of={PointPath}
+  sourceState="none"
+/>
+
+1 维路径：
+
+- 这类路径无论是 `formily` 还是 `antd` 都是以字符表示，例如：`aa`、`bb`、`cc`
+
+多维路径，支持 2 个类型：
+
+- `formily` 使用的 `.` 路径：路径仍旧为字符类型，用 `.` 间隔路径，如：`aa.bb.cc`
+- `antd` 使用的数组路径：路径为数组类型，如：`['aa', 'bb', 'cc']`
+
+对于数组类型的路径，最终会转换成 `formily` 一致的字符类型，例如：
+
+- `['aa', 'bb', 'cc']` 等于 `aa.bb.cc`
+
+## 下标路径
+
+<Canvas
+  className="doc-render"
+  additionalActions={[
+    {
+      title: 'Code in GitHub',
+      onClick: () => {
+        window.open(
+          'https://github.com/event-chat/event-chat/blob/main/packages/example/src/module/namepath/PointPath.tsx',
+          '_blank'
+        )
+      },
+    },
+  ]}
+  of={PointPath}
+  sourceState="none"
+/>
+
+如果数组路径中存在特殊字符：`*~[],:.`，将会转换成在特殊字符前加两个斜杠 `\\${1}`，例如：
+
+- `['aa', 'bb', 'cc']` 等于 `aa.bb.cc`

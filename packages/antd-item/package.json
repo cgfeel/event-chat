@@ -27,6 +27,8 @@
     "test:coverage": "rstest --coverage",
     "test:type": "tsd"
   },
+  "keywords": [],
+  "license": "MIT",
   "devDependencies": {
     "@event-chat/core": "workspace:*",
     "@rslib/core": "^0.18.4",

@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.10](https://github.com/event-chat/event-chat/compare/core@v0.2.9...core@v0.2.10) (2026-02-16)
+
+
+### Bug Fixes
+
+* update package.json add license ([4bbebe6](https://github.com/event-chat/event-chat/commit/4bbebe64b160b8453197a24e726fb52c69a1e1d4))
+* update package.json add license ([76ced40](https://github.com/event-chat/event-chat/commit/76ced404ed4b50b92cc60d751d5d69167c77b131))
+
 ## [0.2.9](https://github.com/event-chat/event-chat/compare/core@v0.2.8...core@v0.2.9) (2026-02-14)
 
 

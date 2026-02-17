@@ -34,3 +34,27 @@ export const ListForm: Story = {
     name: 'ListForm',
   },
 }
+
+export const MatchPath: Story = {
+  args: {
+    name: 'MatchPath',
+  },
+}
+
+export const GroupAndReversePath: Story = {
+  args: {
+    name: 'GroupAndReversePath',
+  },
+}
+
+export const ExtendedAndRangePath: Story = {
+  args: {
+    name: 'ExtendedAndRangePath',
+  },
+}
+
+export const EscapePath: Story = {
+  args: {
+    name: 'EscapePath',
+  },
+}

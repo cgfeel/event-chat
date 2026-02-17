@@ -1,7 +1,14 @@
 import { Canvas, Meta } from '@storybook/addon-docs/blocks'
 import Table, { TBody, Td, Th, Thead, Tr } from '@/components/TableVirtual'
 import NamePath from './NamePath'
-import NamePathStories, { PointPath } from './NamePath.stories'
+import NamePathStories, {
+  EscapePath,
+  ExtendedAndRangePath,
+  GroupAndReversePath,
+  ListForm,
+  MatchPath,
+  PointPath,
+} from './NamePath.stories'
 import './assets/story-styles.css'
 import Header from './components/Header'
 import ListObserver from './components/ListObserver'
@@ -140,7 +147,7 @@ console.log(FormPath.parse('target.[aa,bb]').match('target.bb')) //false
 
 - 这类路径无论是 `formily` 还是 `antd` 都是以字符表示，例如：`aa`、`bb`、`cc`
 
-多维路径，支持 2 个类型：
+多维路径支持 2 个类型：
 
 - `formily` 使用的 `.` 路径：路径仍旧为字符类型，用 `.` 间隔路径，如：`aa.bb.cc`
 - `antd` 使用的数组路径：路径为数组类型，如：`['aa', 'bb', 'cc']`
@@ -158,16 +165,141 @@ console.log(FormPath.parse('target.[aa,bb]').match('target.bb')) //false
       title: 'Code in GitHub',
       onClick: () => {
         window.open(
-          'https://github.com/event-chat/event-chat/blob/main/packages/example/src/module/namepath/PointPath.tsx',
+          'https://github.com/event-chat/event-chat/blob/main/packages/example/src/module/form/FormAppend.tsx',
           '_blank'
         )
       },
     },
   ]}
-  of={PointPath}
+  of={ListForm}
   sourceState="none"
 />
 
-如果数组路径中存在特殊字符：`*~[],:.`，将会转换成在特殊字符前加两个斜杠 `\\${1}`，例如：
+下标路径同样也支持 2 个类型：
 
-- `['aa', 'bb', 'cc']` 等于 `aa.bb.cc`
+- `formily` 字符下标路径：`aa.0.bb` 或 `aa[0].bb` 都符合下标路径，且这两条路径在 `formily` 中是相互匹配的
+- `antd` 数组下标路径：`['aa', '0', 'bb']` 或 `['aa', 0, 'bb']` 都符合下标路径，但这两条路径不能相互匹配
+
+> 于是路径在这里存在逻辑冲突
+
+解决办法：
+
+- 采用 `formily` 一致的逻辑，只要是下标路径即相等
+- `@event-chat/antd-item` 的 `name` 下标设置为数值类型，如：`['aa', 0, 'bb']` 转换为 `aa[0].bb`
+- `@event-chat/antd-item` 的 `name` 下标设置为数字类型的字符，如：`['aa', '0', 'bb']` 转换为 `aa.0.bb`
+
+通常来说是不需要区分下标类型，但如果有需要区分可以在注册事件时，提供的属性 `callback` 通过回调参数自行判断：
+
+- `origin`：当前的接收事件名，提供什么得到什么，不解析不转义
+- `originName`：触发事件名，触发什么得到什么，不解析不转义
+
+相对路径：
+
+通常用于 `emit` 触发路径时使用，例如：
+
+```typescript
+useEventChat('aa.bb.cc').emit('.dd')
+// i.e. `FormPath.parse('.dd', 'aa.bb.cc')` equal: aa.bb.dd
+
+useEventChat('aa.1.cc').emit('..[].dd')
+// i.e. `FormPath.parse('..[].dd', 'aa.1.cc')` equal: aa.1.dd
+
+useEventChat('aa.1.cc').emit('..[+].dd')
+// i.e. `FormPath.parse('..[+].dd', 'aa.1.cc')` equal: aa.2.dd
+
+useEventChat('aa.1.cc').emit('..[+10].dd')
+// i.e. `FormPath.parse('..[+10].dd', 'aa.1.cc')` equal: aa.11.dd
+```
+
+> 注册事件时可以提供相对路径作为事件名，但不建议，因为违背了 `@formily/path` 路径规则，无法匹配。
+
+## 全局匹配和局部匹配
+
+<Canvas
+  className="doc-render"
+  additionalActions={[
+    {
+      title: 'Code in GitHub',
+      onClick: () => {
+        window.open(
+          'https://github.com/event-chat/event-chat/blob/main/packages/example/src/module/namepath/MatchPath.tsx',
+          '_blank'
+        )
+      },
+    },
+  ]}
+  of={MatchPath}
+  sourceState="none"
+/>
+
+`emit` 触发事件时，使用通配符 `*` 全局匹配或局部匹配
+
+## 广播和反向匹配
+
+<Canvas
+  className="doc-render"
+  additionalActions={[
+    {
+      title: 'Code in GitHub',
+      onClick: () => {
+        window.open(
+          'https://github.com/event-chat/event-chat/blob/main/packages/example/src/module/namepath/GroupAndReversePath.tsx',
+          '_blank'
+        )
+      },
+    },
+  ]}
+  of={GroupAndReversePath}
+  sourceState="none"
+/>
+
+## 扩展和范围路径
+
+<Canvas
+  className="doc-render"
+  additionalActions={[
+    {
+      title: 'Code in GitHub',
+      onClick: () => {
+        window.open(
+          'https://github.com/event-chat/event-chat/blob/main/packages/example/src/module/namepath/ExtendedAndRangePath.tsx',
+          '_blank'
+        )
+      },
+    },
+  ]}
+  of={ExtendedAndRangePath}
+  sourceState="none"
+/>
+
+## 转义路径
+
+<Canvas
+  className="doc-render"
+  additionalActions={[
+    {
+      title: 'Code in GitHub',
+      onClick: () => {
+        window.open(
+          'https://github.com/event-chat/event-chat/blob/main/packages/example/src/module/namepath/EscapePath.tsx',
+          '_blank'
+        )
+      },
+    },
+  ]}
+  of={EscapePath}
+  sourceState="none"
+/>
+
+根据不同的路径类型，分别做如下处理：
+
+- `formily` 字符路径：需要手动转义，例如 `aa.\\\\,.bb`
+- `antd` 数组路径：自动转义，例如 `['aa', ',', 'bb']` 等同 `aa.\\\\,.bb`
+
+转义的字符包含：`*~[],:.`
+
+> 在 `formily` 中转义符由 2 条斜杆组成 `\\`，由于 `\` 在 `javascript` 中本身就是转义符号，因此这里用了 4 条斜杠 `\\\\`
+
+注意：
+
+- 当手动转义时，请勿在事件名中填写：相对路径、通配符等特殊符号作为事件名，会因违背了 `@formily/path` 路径规则，无法匹配。

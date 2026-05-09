@@ -1,4 +1,4 @@
-import { FactoryOptions } from '../fields'
+import { FactoryOptions, ListenerType } from '../fields'
 import BaseTransport from './BaseTransport'
 
 function isSafeBufferSource(data: unknown): data is ArrayBuffer | ArrayBufferView<ArrayBuffer> {
@@ -27,14 +27,14 @@ class WebSocketTransport extends BaseTransport<WebSocket> {
     })
   }
 
-  destory() {
+  destroy() {
     this._target.onclose = null
     this._target.onopen = null
 
     if (this._target.readyState === WebSocket.OPEN) this._target.close()
   }
 
-  onmessage(listener: (ev: MessageEvent) => unknown): void {
+  onmessage(listener: ListenerType): void {
     this._target.onmessage = listener
   }
 

@@ -34,7 +34,7 @@ const WorkerPanel: FC<PropsWithChildren<WorkerPanelProps>> = ({
       </div>
       <div className={scroll()}>{children}</div>
       <div className={bar()}>
-        <div className={selectUser()}>{title}:</div>
+        {title && <div className={selectUser()}>{title}:</div>}
         <div className={inputBox()}>
           <Input
             {...props}
@@ -52,6 +52,7 @@ const WorkerPanel: FC<PropsWithChildren<WorkerPanelProps>> = ({
 export default WorkerPanel
 
 interface WorkerPanelProps
-  extends Pick<SendMessage, 'name'>, Omit<InputProps, 'name' | 'style' | 'variant'> {
+  extends Pick<SendMessage, 'name'>, Omit<InputProps, 'name' | 'style' | 'title' | 'variant'> {
   card?: ReactNode
+  title?: ReactNode
 }

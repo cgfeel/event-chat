@@ -1,18 +1,18 @@
-import { IframeSerializeOptions } from '../fields'
+import { IframeSerializeOptions, ListenerType } from '../fields'
 import BaseTransport from './BaseTransport'
 
 // 主线程 → 共享 Worker，多页面共享一个 Worker 线程：SharedWorker
 class SharedWorkerTransport extends BaseTransport<SharedWorker> {
-  destory() {
+  destroy() {
     this._target.port.close()
   }
 
-  onmessage(listener: (ev: MessageEvent) => unknown): void {
+  onmessage(listener: ListenerType): void {
     this._target.port.addEventListener('message', listener, this._options.message)
     this._target.port.start()
   }
 
-  onremove(listener: (ev: MessageEvent) => unknown): void {
+  onremove(listener: ListenerType): void {
     this._target.port.removeEventListener('message', listener, this._options.message)
   }
 

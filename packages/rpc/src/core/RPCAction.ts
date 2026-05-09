@@ -142,7 +142,9 @@ class RPCAction {
   }
 
   // 这里收到的消息还要再考虑下，如果不是对象，比如 ArrayBuff
-  private _messageHandler(event: MessageEvent<MessageItem | undefined>) {
+  private _messageHandler(
+    event: Pick<MessageEvent<MessageItem | undefined>, 'data' | 'origin' | 'source'>
+  ) {
     const { data, origin, source } = event
     const { __RPC__, broadcast, channel, error, heartbeat, kind, payload, requestId, type } =
       data ?? {}

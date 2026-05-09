@@ -2,7 +2,7 @@ import { Transport } from '../fields'
 import RPCAction, { ActionFunType, BrodcastItem, RPCOptionsType, RequestOptions } from './RPCAction'
 
 const factoryKey = ['getType', 'upset'] as const
-const disabledKey = ['on', 'onBrodcast'] as const
+const disabledKey = ['destroy', 'on', 'onBrodcast'] as const
 
 function isAction(action: RPCAction, key: string): key is keyof RPCAction {
   return !disabledKey.map(String).includes(key) && key in action
@@ -28,20 +28,20 @@ function RPCDecorator<EVENT extends ActionRecord, CONSUME extends ActionRecord>(
     return action?.request(keyname, reqops) as Promise<ReturnType<CONSUME[K]>>
   }
 
+  const destroy = () => {
+    action?.destroy()
+    factory?.destroy()
+  }
+
   Object.entries(event ?? {}).forEach(([keyname, handle]) => action?.on(keyname, handle))
   Object.values(brodcast ?? {}).forEach((handle) => action?.onBrodcast(handle))
 
-  return new Proxy(
+  const rpcInsc = new Proxy(
     {},
     {
       get(_, key) {
         const keyname = key.toString()
         switch (key) {
-          case 'destroy':
-            return () => {
-              action?.destroy()
-              factory?.destory()
-            }
           case 'request':
             return request
           default:
@@ -69,6 +69,8 @@ function RPCDecorator<EVENT extends ActionRecord, CONSUME extends ActionRecord>(
         request: typeof request
       }
   >
+
+  return [rpcInsc, destroy] as const
 }
 
 export default RPCDecorator

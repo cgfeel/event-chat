@@ -1,5 +1,6 @@
 import Iframe from '@/module/rpc/Iframe'
 import RecipientsProvider from '@/module/rpc/RecipientsProvider'
+import ServiceWorkerDemo from '@/module/rpc/ServiceWorkerDemo'
 import WorkerDemo from '@/module/rpc/WorkerDemo'
 import { Tag } from 'antd'
 import type { FC } from 'react'
@@ -23,11 +24,22 @@ const RPCDemo: FC = () => {
         <Card
           title={
             <>
-              <Tag>Worker</Tag> 通信演示
+              <Tag>Web Worker</Tag> 通信演示
             </>
           }
         >
           <WorkerDemo />
+        </Card>
+      </RecipientsProvider>
+      <RecipientsProvider>
+        <Card
+          title={
+            <>
+              <Tag>Server Worker</Tag> 通信演示
+            </>
+          }
+        >
+          <ServiceWorkerDemo />
         </Card>
       </RecipientsProvider>
     </div>

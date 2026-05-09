@@ -1,9 +1,9 @@
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import RPCDecorator, { ActionRecord, DecoratorContext } from '../core/RPCDecorator'
 import { EntryOptions, FactoryOptions } from '../transports/fields'
+import { isKey } from '../utils'
 import { RPCInstanceContext } from './fields'
 
-const disableKey = ['destroy'] as const
 const defaultBrod = () => {}
 
 const useRPC = <EVENT extends ActionRecord, CONSUME extends ActionRecord, TARGET>(
@@ -12,49 +12,29 @@ const useRPC = <EVENT extends ActionRecord, CONSUME extends ActionRecord, TARGET
   const { brodcastScope, mount } = useContext(RPCInstanceContext)
   const [connected, setConnected] = useState(false)
 
-  const decoratorRef = useRef<RPCResult<EVENT, CONSUME> | null>(null)
+  const decoratorRef = useRef<RPCResult<EVENT, CONSUME>[0] | null>(null)
   const processRef = useRef(Promise.resolve<RPCResult<EVENT, CONSUME> | null>(null))
   const opsRef = useRef(ops)
-
-  const isRPCResult = useCallback(
-    (data: RPCResult<EVENT, CONSUME>, key: string): key is keyof RPCResult<EVENT, CONSUME> => {
-      return data !== null && key in data
-    },
-    []
-  )
 
   const rpcIns = useMemo(
     () =>
       new Proxy(
         {},
         {
-          get(_, key) {
-            const decorator = decoratorRef.current
-            const keyname = key.toString()
-            if (
-              decorator &&
-              !disableKey.map(String).includes(keyname) &&
-              isRPCResult(decorator, keyname)
-            ) {
-              return decorator[keyname]
-            }
+          get(_, key, ref) {
+            if (decoratorRef.current && isKey(key, decoratorRef.current))
+              return Reflect.get(decoratorRef.current, key, ref)
             throw new Error(`outof decorator: ${key.toString()}`)
           },
           has(_, key) {
-            const decorator = decoratorRef.current
-            const keyname = key.toString()
-            return (
-              decorator !== null &&
-              !disableKey.map(String).includes(keyname) &&
-              isRPCResult(decorator, keyname)
-            )
+            return decoratorRef.current !== null && key in decoratorRef.current
           },
           set() {
             throw new Error('decorator is readonly')
           },
         }
-      ) as Readonly<Omit<RPCResult<EVENT, CONSUME>, (typeof disableKey)[number]>>,
-    [decoratorRef, isRPCResult]
+      ) as RPCResult<EVENT, CONSUME>[0],
+    []
   )
 
   const mounHandle = useCallback(
@@ -65,7 +45,7 @@ const useRPC = <EVENT extends ActionRecord, CONSUME extends ActionRecord, TARGET
   )
 
   useEffect(() => {
-    const { config, options, drive, init, name = '', ...opConfig } = opsRef.current
+    const { config, options, drive, faild, init, name = '', ...opConfig } = opsRef.current
 
     // 如果是 iframe 不用等待 onload，RPC 会有心跳检测
     // 这里采用外层限制，内部宽松，因为除了 TARGET，createRPC 接受 unknown
@@ -94,18 +74,25 @@ const useRPC = <EVENT extends ActionRecord, CONSUME extends ActionRecord, TARGET
             })
           : RPCDecorator(null, context)
       })
-      .then((result) => {
+      .then((target) => {
+        const [result] = target
         decoratorRef.current = result
+
         mount?.(result, name)
-        return result
+        return target
+      })
+      .catch((error) => {
+        faild?.(error)
+        return null
       })
 
     return () => {
-      processRef.current = processRef.current.then((result) => {
+      processRef.current = processRef.current.then((target) => {
         setConnected(false)
-        if (result) {
+        if (target) {
+          const [result, destroy] = target
           mount?.(result)
-          result.destroy()
+          destroy()
         }
 
         decoratorRef.current = null
@@ -127,6 +114,7 @@ export default useRPC
 interface RPCBaseOptions {
   name?: string
   options?: FactoryOptions
+  faild?: (error: unknown) => void
 }
 
 interface RPCDriveOptions<EVENT extends ActionRecord, CONSUME extends ActionRecord, TARGET>

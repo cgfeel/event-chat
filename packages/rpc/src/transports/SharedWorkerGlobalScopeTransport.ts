@@ -1,4 +1,4 @@
-import { IframeSerializeOptions } from '../fields'
+import { IframeSerializeOptions, ListenerType } from '../fields'
 import BaseTransport from './BaseTransport'
 
 // 共享 Worker 内部，共享 Worker 收发所有页面消息：SharedWorkerGlobalScope
@@ -6,14 +6,14 @@ class SharedWorkerGlobalScopeTransport extends BaseTransport<SharedWorkerGlobalS
   private _onconnect = Promise.resolve<MessagePort | null>(null)
   private _message: ((event: MessageEvent) => void) | undefined
 
-  destory() {
+  destroy() {
     this._onconnect.then((messagePort) => messagePort?.close()).catch(() => {})
     if (this._message) {
       this._target.removeEventListener('connect', this._message)
     }
   }
 
-  onmessage(listener: (ev: MessageEvent) => unknown): void {
+  onmessage(listener: ListenerType): void {
     const SharedWorker = this._target
     this._onconnect = new Promise((resolve) => {
       this._message = (event: MessageEvent) => {
@@ -28,7 +28,7 @@ class SharedWorkerGlobalScopeTransport extends BaseTransport<SharedWorkerGlobalS
     })
   }
 
-  onremove(listener: (ev: MessageEvent) => unknown): void {
+  onremove(listener: ListenerType): void {
     this._onconnect
       .then((messagePort) => {
         messagePort?.removeEventListener('message', listener, this._options.message)

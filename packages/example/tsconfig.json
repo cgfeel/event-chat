@@ -2,7 +2,7 @@
   "extends": "../../tsconfig.json", // 继承根目录的基础配置（可选但推荐）
   "compilerOptions": {
     "composite": true, // 必须：子包启用复合项目，支持根目录关联
-    "lib": ["DOM", "ES2020"],
+    "lib": ["DOM", "ES2020", "WebWorker"],
     "jsx": "react-jsx",
     "target": "ES2020",
     "noEmit": true,

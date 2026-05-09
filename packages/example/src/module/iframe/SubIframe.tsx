@@ -7,8 +7,8 @@ import { ChatLine, ChatScroll } from '@/components/chatLine'
 import CardSelect from '@/components/chatLine/CardSelect'
 import { receiptStore } from '@/components/chatLine/receiptStore'
 import { isKey } from '@/utils/fields'
-import { useRecipients } from './createRecipientsStore'
-import { chatItem, iframeName } from './uitls'
+import { useRecipients } from '../rpc/createRecipientsStore'
+import { chatItem, iframeName } from '../rpc/uitls'
 
 const SubIframe: FC<SubIframeProps> = ({ group = iframeName }) => {
   const [store, recipients] = useRecipients()

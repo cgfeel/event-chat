@@ -1,16 +1,17 @@
+import { ListenerType } from '../fields'
 import BaseTransport from './BaseTransport'
 
 // 主线程，同源跨标签/窗口：BroadcastChannel
 class BroadcastChannelTransport extends BaseTransport<BroadcastChannel> {
-  destory() {
+  destroy() {
     this._target.close()
   }
 
-  onmessage(listener: (ev: MessageEvent) => unknown): void {
+  onmessage(listener: ListenerType): void {
     this._target.addEventListener('message', listener, this._options.message)
   }
 
-  onremove(listener: (ev: MessageEvent) => unknown): void {
+  onremove(listener: ListenerType): void {
     this._target.removeEventListener('message', listener, this._options.message)
   }
 

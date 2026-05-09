@@ -4,6 +4,22 @@ import { pluginReact } from '@rsbuild/plugin-react';
 
 // Docs: https://rsbuild.rs/config/
 export default defineConfig({
+  dev: {
+    setupMiddlewares: (middlewares) => {
+      middlewares.push((req, res, next) => {
+        if (req.url === '/api/health') {
+        res.setHeader('Content-Type', 'application/json');
+          res.end(JSON.stringify({
+            code: 200,
+            data: { name: '测试用户', id: 1 },
+            message: '成功'
+          }));
+          return;
+        }
+        next();
+      })
+    }
+  },
   plugins: [pluginReact(), 
     pluginEslint({
       // 配置 ESLint 9 扁平配置

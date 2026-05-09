@@ -3,13 +3,15 @@ import { mainCtx, workerChatCtx } from '@/services/workerService'
 import { createDedicatedWorkerGlobalScopeRPC } from '@event-chat/rpc/dedicatedWorkerGlobalScope'
 import { itemSchema } from '@/components/chatLine'
 
-const target = self as DedicatedWorkerGlobalScope
+declare const self: DedicatedWorkerGlobalScope
+
+const target = self
 const recordRef = {
   name: crypto.randomUUID().toString(),
 }
 
 const origin = `worker:${recordRef.name}`
-const rpc = createDedicatedWorkerGlobalScopeRPC(target, {
+const [rpc] = createDedicatedWorkerGlobalScopeRPC(target, {
   context: {
     brodcast: workerChatCtx.brodcasts,
     config: { channel: 'worker' },
@@ -45,3 +47,6 @@ workerChatCtx.provider({
     return `worker:${recordRef.name}`
   },
 })
+
+// 将其当做 module，declare 只在当前有效
+export {}

@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.10](https://github.com/event-chat/event-chat/compare/rpc@v0.1.9...rpc@v0.1.10) (2026-05-09)
+
+
+### Bug Fixes
+
+* update rpc for service worker ([c08d6e6](https://github.com/event-chat/event-chat/commit/c08d6e671c27dbf85960069643b9aa76cbdc6825))
+* update rpc for service worker ([1f16822](https://github.com/event-chat/event-chat/commit/1f16822b8191f25b946777a9f90e9fb38a0f98e2))
+
 ## [0.1.9](https://github.com/event-chat/event-chat/compare/rpc@v0.1.8...rpc@v0.1.9) (2026-05-05)
 
 

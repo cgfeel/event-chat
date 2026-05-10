@@ -4,6 +4,10 @@ export const chatItem = 'chat-item'
 export const chatName = 'chat'
 export const iframeName = 'iframe'
 export const GroupProvider = createContext({ group: iframeName })
+
+export const serviceScopeAction = '/static/js/async/action/'
+export const serviceScopeApi = '/static/js/async/api/'
+export const serviceWorkerGroup = 'service-worker-group'
 export const workerGroup = 'worker-group'
 
 // 避免 formily 对于 worker:item 这样匹配规则的问题

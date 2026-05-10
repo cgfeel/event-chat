@@ -27,7 +27,11 @@ class ServiceWorkerGlobalScopeTransport extends BaseTransport<ServiceWorkerGloba
 
     this._onconnect = (event) => {
       this._source = event.source
-      listener({ ...event, source: null })
+      event.waitUntil(
+        new Promise<void>((resove) => {
+          listener({ ...event, source: null, wait: resove })
+        })
+      )
     }
 
     this._target.addEventListener('message', this._onconnect, this._options.message)

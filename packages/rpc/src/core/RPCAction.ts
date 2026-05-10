@@ -143,9 +143,11 @@ class RPCAction {
 
   // 这里收到的消息还要再考虑下，如果不是对象，比如 ArrayBuff
   private _messageHandler(
-    event: Pick<MessageEvent<MessageItem | undefined>, 'data' | 'origin' | 'source'>
+    event: Pick<MessageEvent<MessageItem | undefined>, 'data' | 'origin' | 'source'> & {
+      wait?: () => void
+    }
   ) {
-    const { data, origin, source } = event
+    const { data, origin, source, wait } = event
     const { __RPC__, broadcast, channel, error, heartbeat, kind, payload, requestId, type } =
       data ?? {}
 
@@ -197,6 +199,7 @@ class RPCAction {
             { __RPC__: RPC_SIGN, kind: 'response', payload: result, channel, requestId, type },
             { targetOrigin: origin }
           )
+          return result
         })
         .catch((err) => {
           const message = err instanceof Error ? err.message : '[RPC] 处理消息时发生错误'
@@ -212,6 +215,7 @@ class RPCAction {
             { targetOrigin: origin }
           )
         })
+        .finally(() => wait?.())
     }
   }
 

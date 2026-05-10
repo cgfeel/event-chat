@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.11](https://github.com/event-chat/event-chat/compare/rpc@v0.1.10...rpc@v0.1.11) (2026-05-10)
+
+
+### Bug Fixes
+
+* update ServiceWorkerGlobalScopeTransport.ts add waitUnit ([2ba2b80](https://github.com/event-chat/event-chat/commit/2ba2b80e39ec9e5b11632cb89113847278e7e38b))
+* update ServiceWorkerGlobalScopeTransport.ts add waitUnit ([24ad831](https://github.com/event-chat/event-chat/commit/24ad831398569e916dd71d14ada28aed8df46107))
+
 ## [0.1.10](https://github.com/event-chat/event-chat/compare/rpc@v0.1.9...rpc@v0.1.10) (2026-05-09)
 
 

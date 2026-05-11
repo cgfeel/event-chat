@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.12](https://github.com/event-chat/event-chat/compare/rpc@v0.1.11...rpc@v0.1.12) (2026-05-11)
+
+
+### Bug Fixes
+
+* update service worker listener event ([472d222](https://github.com/event-chat/event-chat/commit/472d222a95c1450e020ad9a5deeec1aa2d1ba400))
+* update service worker listener event ([8d9f07a](https://github.com/event-chat/event-chat/commit/8d9f07a802ac02f4ff112e7c595f43d84d201e57))
+
 ## [0.1.11](https://github.com/event-chat/event-chat/compare/rpc@v0.1.10...rpc@v0.1.11) (2026-05-10)
 
 

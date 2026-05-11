@@ -21,7 +21,7 @@ const ServiceIframe: FC = () => {
 
   useEventChat(serviceScopeApi, {
     group: serviceWorkerGroup,
-    schema: z.boolean(),
+    schema: z.string(),
     callback: ({ detail }) => {
       rpc.request('broadcast', { payload: detail }).catch(() => {})
     },

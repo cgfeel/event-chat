@@ -1,5 +1,7 @@
 /// <reference lib="webworker" />
+import { workerCtx } from '@/services/serviceWorkerService'
 import { createServiceWorkerGlobalScopeRPC } from '@event-chat/rpc/serviceWorkerGlobalScope'
+import { serviceWorkerGroup } from './uitls'
 
 declare const self: ServiceWorkerGlobalScope
 const target = self
@@ -38,9 +40,9 @@ const target = self
 createServiceWorkerGlobalScopeRPC(target, {
   context: {
     // brodcast: workerChatCtx.brodcasts,
-    config: { channel: 'service-worker' },
+    config: { channel: serviceWorkerGroup },
     // consume: mainCtx.actions,
-    // event: workerChatCtx.actions,
+    event: workerCtx.actions,
   },
 })
 

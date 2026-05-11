@@ -1,5 +1,6 @@
+import { SendOutlined, SyncOutlined } from '@ant-design/icons'
 import { Input, type InputProps } from 'antd'
-import { type FC, type PropsWithChildren, type ReactNode } from 'react'
+import { type FC, type PropsWithChildren, type ReactNode, useState } from 'react'
 import { tv } from 'tailwind-variants'
 import type { SendMessage } from './fields'
 import { baseStyle } from './utils'
@@ -17,16 +18,26 @@ const styles = tv({
   },
 })
 
-const { bar, corner, inputBox, inputLine, scroll, selectUser, wrap } = styles({ variant: 'simple' })
+const { buttons, bar, corner, inputBox, inputLine, scroll, selectUser, sendBtn, wrap } = styles({
+  variant: 'simple',
+})
 
 const WorkerPanel: FC<PropsWithChildren<WorkerPanelProps>> = ({
+  button,
   card,
   children,
+  defaultValue,
+  disabled,
+  loading,
   name: chatName,
   title,
+  value,
+  onChange,
+  onSubmit,
   allowClear = true,
   ...props
 }) => {
+  const [text, setText] = useState(value ?? defaultValue)
   return (
     <div className={wrap({ class: 'bg-gray-800' })}>
       <div className={corner()}>
@@ -40,10 +51,33 @@ const WorkerPanel: FC<PropsWithChildren<WorkerPanelProps>> = ({
             {...props}
             allowClear={allowClear}
             className={inputLine()}
+            disabled={disabled}
+            value={text}
             variant="borderless"
             style={{ padding: 0 }}
+            onChange={(event) => {
+              onChange?.(event)
+              setText(event.target.value)
+            }}
           />
         </div>
+        {button && (
+          <div className={buttons()}>
+            <button
+              className={sendBtn({ disabled: disabled ? true : !text })}
+              disabled={disabled}
+              type="button"
+              onClick={() => {
+                if (text) {
+                  onSubmit?.(text)
+                  setText('')
+                }
+              }}
+            >
+              {loading ? <SyncOutlined spin /> : <SendOutlined rotate={-20} />}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )
@@ -52,7 +86,12 @@ const WorkerPanel: FC<PropsWithChildren<WorkerPanelProps>> = ({
 export default WorkerPanel
 
 interface WorkerPanelProps
-  extends Pick<SendMessage, 'name'>, Omit<InputProps, 'name' | 'style' | 'title' | 'variant'> {
+  extends
+    Pick<SendMessage, 'name'>,
+    Omit<InputProps, 'name' | 'onSubmit' | 'style' | 'title' | 'variant'> {
+  button?: boolean
   card?: ReactNode
+  loading?: boolean
   title?: ReactNode
+  onSubmit?: (text: InputProps['value']) => void
 }

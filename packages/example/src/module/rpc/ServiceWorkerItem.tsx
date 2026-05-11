@@ -7,18 +7,26 @@ import { type FC, useMemo, useState } from 'react'
 import z from 'zod'
 import { ChatScroll } from '@/components/chatLine'
 import { WorkerPanel } from '@/components/chatLine'
-import { serviceWorkerGroup, workerGroup } from './uitls'
+import { serviceWorkerGroup } from './uitls'
+
+const titleRange = Object.freeze({
+  Connect: <Badge status="success" text="Connect" />,
+  Disconnect: <Badge status="default" text="Disconnect" />,
+  Sending: <Badge status="warning" text="Sending" />,
+})
 
 const ServiceWorkerItem: FC<ServiceWorkerItemProps> = ({
   disabled,
   iframe,
   scope,
-  group = workerGroup,
+  group = serviceWorkerGroup,
 }) => {
-  const [broadcast, setBroadcast] = useState(false)
+  const [broadcast, setBroadcast] = useState('nomarl')
+  const [sending, setSending] = useState(false)
+
   const { connected, rpc } = useRPC({
     config: {
-      channel: 'service-worker',
+      channel: serviceWorkerGroup,
     },
     consume: workerCtx.actions,
     event: mainCtx.actions,
@@ -26,30 +34,36 @@ const ServiceWorkerItem: FC<ServiceWorkerItemProps> = ({
     init: () => navigator.serviceWorker.register(new URL('./sw.ts', import.meta.url), { scope }),
   })
 
-  const allow = useMemo(() => !disabled && connected, [connected, disabled])
+  const allow = useMemo(
+    () => (sending ? 'Sending' : undefined) ?? (!disabled && connected ? 'Connect' : 'Disconnect'),
+    [connected, disabled, sending]
+  )
+
   useEventChat(scope, {
-    group: serviceWorkerGroup,
-    schema: z.boolean(),
+    schema: z.string(),
     callback: ({ detail }) => setBroadcast(detail),
+    group,
   })
 
   return (
     <WorkerPanel
-      disabled={!allow}
+      disabled={allow !== 'Connect'}
       name={iframe ? `iframe:${scope}` : scope}
       placeholder="Please input request message"
-      title={
-        allow ? (
-          <Badge status="success" text="Connect" />
-        ) : (
-          <Badge status="default" text="Disconnect" />
-        )
-      }
-      onChange={({ target }) => {
+      title={titleRange[allow]}
+      onSubmit={(value) => {
+        const message = Array.isArray(value) ? value.join('') : String(value ?? '')
+        setSending(true)
+
         rpc
-          .request('sendMessage', { payload: { message: target.value, broadcast } })
+          .request('sendMessage', { payload: { broadcast, message } })
+          .then(() => {
+            // console.log('a---result-1', result)
+          })
           .catch(() => {})
+          .finally(() => setSending(false))
       }}
+      button
     >
       <ChatScroll group={group} name={`chat-${scope}`} />
     </WorkerPanel>

@@ -1,9 +1,8 @@
 import { useEventChat } from '@event-chat/core'
-import { Empty } from 'antd'
-import { type FC, type PropsWithChildren, useState } from 'react'
+import { Empty, Select } from 'antd'
+import { type FC, type PropsWithChildren, useEffect, useState } from 'react'
 import { tv } from 'tailwind-variants'
 import Button from '@/components/Button'
-import Checkbox from '@/components/checkbox'
 import ServiceIframe from './ServiceIframe'
 import ServiceWorkerItem from './ServiceWorkerItem'
 import { serviceScopeAction, serviceScopeApi, serviceWorkerGroup } from './uitls'
@@ -29,20 +28,36 @@ const { item, itemTitle, panel, worker, wrap } = styles()
 
 const WorkerGrid: FC<PropsWithChildren<WorkerGridProps>> = ({ children, scope }) => {
   const { emit } = useEventChat('', { group: serviceWorkerGroup })
+  const [status, setStatus] = useState('normal')
   const [open, setOpen] = useState(true)
 
+  useEffect(() => {
+    setStatus('normal')
+  }, [open])
+
   return (
-    <div className={item()}>
+    <div className={item()} data-theme="dark">
       <div className={itemTitle()}>
         <Button onClick={() => setOpen(!open)}>{open ? 'closed' : 'open'}</Button>
-        <span>
-          <Checkbox
-            size="xs"
-            onChange={({ target }) => emit({ detail: target.checked, name: scope })}
-          >
-            全局发送
-          </Checkbox>
-        </span>
+        <Select
+          options={[
+            { label: '单独发送', value: 'normal' },
+            {
+              label: '全局广播',
+              value: 'broadcast',
+            },
+            {
+              label: '全局转发',
+              value: 'transmit',
+            },
+          ]}
+          size="small"
+          value={status}
+          onChange={(detail) => {
+            emit({ name: scope, detail })
+            setStatus(detail)
+          }}
+        />
       </div>
       {open ? (
         <div className={worker()}>{children}</div>

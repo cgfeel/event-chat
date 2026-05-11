@@ -8,12 +8,26 @@ export default defineConfig({
     setupMiddlewares: (middlewares) => {
       middlewares.push((req, res, next) => {
         if (req.url === '/api/health') {
-        res.setHeader('Content-Type', 'application/json');
-          res.end(JSON.stringify({
-            code: 200,
-            data: { name: '测试用户', id: 1 },
-            message: '成功'
-          }));
+          let body = ''
+          req.on('data', (chunk) => {
+            body += chunk;
+          })
+
+          req.on('end', () => {
+            try {
+              const requestBody = body ? JSON.parse(body) : {};
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify({
+                code: 200,
+                data: { name: '测试用户', id: 1 },
+                message: '成功',
+                receivedBody: requestBody
+              }));
+            } catch {
+              res.writeHead(400, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify({ code: 400, message: '请求体格式错误' }));
+            }
+          })
           return;
         }
         next();

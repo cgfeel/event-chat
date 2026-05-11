@@ -3,7 +3,7 @@ import { createCtx, createService } from '@event-chat/rpc/react'
 const iframeEvent = createService<IframeCtxType>()
 
 const iframeCtx = iframeEvent((ctx) => ({
-  broadcast: (allow: boolean) => ctx.broadcast?.(allow),
+  broadcast: (status: string) => ctx.broadcast?.(status),
 }))
 
 const mainCtx = createCtx(() => ({
@@ -25,12 +25,12 @@ const workerCtx = createCtx(() => ({
 }))
 
 type IframeCtxType = {
-  broadcast: (allow: boolean) => void
+  broadcast: (status: string) => void
 }
 
 type WorkerMessage = {
   message: string
-  broadcast: boolean
+  broadcast: string
 }
 
 export { iframeCtx, mainCtx, parentCtx, workerCtx }

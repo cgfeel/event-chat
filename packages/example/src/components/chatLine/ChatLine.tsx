@@ -30,7 +30,6 @@ const formatter = new Intl.DateTimeFormat('en-US', {
 const style = tv({
   extend: baseStyle,
   slots: {
-    buttons: 'flex items-center justify-center p-4 pl-0',
     itemInner: 'flex flex-col gap-1 py-4',
     itemUser: 'flex items-center gap-2 text-sm text-gray-500 select-none',
     itemWrap:
@@ -39,7 +38,6 @@ const style = tv({
     msgtext: '',
     name: 'whitespace-nowrap select-none',
     receiptTag: 'ml-2 text-xs text-gray-600 select-none',
-    sendBtn: 'h-9 w-9 cursor-pointer rounded-full bg-gray-900 text-white',
     scrollInner: '',
     tag: 'inline rounded-sm bg-blue-600 px-1 text-white',
   },
@@ -48,12 +46,6 @@ const style = tv({
       true: {
         corner: 'pr-0',
         msgtext: 'rounded bg-gray-900 p-2',
-      },
-    },
-    disabled: {
-      true: {
-        bar: 'bg-gray-800',
-        sendBtn: 'cursor-not-allowed bg-gray-600 text-gray-400',
       },
     },
     empty: {

@@ -21,7 +21,7 @@ const ServiceWorkerItem: FC<ServiceWorkerItemProps> = ({
   scope,
   group = serviceWorkerGroup,
 }) => {
-  const [broadcast, setBroadcast] = useState('nomarl')
+  const [broadcast, setBroadcast] = useState('normal')
   const [sending, setSending] = useState(false)
 
   const { connected, rpc } = useRPC({
@@ -39,7 +39,7 @@ const ServiceWorkerItem: FC<ServiceWorkerItemProps> = ({
     [connected, disabled, sending]
   )
 
-  useEventChat(scope, {
+  const { emit } = useEventChat(scope, {
     schema: z.string(),
     callback: ({ detail }) => setBroadcast(detail),
     group,
@@ -56,16 +56,44 @@ const ServiceWorkerItem: FC<ServiceWorkerItemProps> = ({
         setSending(true)
 
         rpc
-          .request('sendMessage', { payload: { broadcast, message } })
-          .then(() => {
-            // console.log('a---result-1', result)
+          .request('sendMessage', { payload: { broadcast, message, scope } })
+          .then(({ result, message: resmsg }) => {
+            const defaultDetail = {
+              date: new Date(),
+              message: resmsg,
+              own: false,
+              user: scope,
+              receipt: '12',
+            }
+            try {
+              const detail = !result
+                ? defaultDetail
+                : {
+                    broadcast: result.receivedBody?.broadcast !== 'normal',
+                    date: result.data.date,
+                    message: JSON.stringify(result),
+                    own: true,
+                    user: result.receivedBody?.scope ?? scope,
+                    receipt: '12',
+                  }
+
+              emit({
+                name: `chat-${scope}`,
+                detail,
+              })
+            } catch {
+              emit({
+                name: `chat-${scope}`,
+                detail: { ...defaultDetail, message: 'JSON Parse Faild' },
+              })
+            }
           })
           .catch(() => {})
           .finally(() => setSending(false))
       }}
       button
     >
-      <ChatScroll group={group} name={`chat-${scope}`} />
+      <ChatScroll direction="vertical" group={group} name={`chat-${scope}`} />
     </WorkerPanel>
   )
 }

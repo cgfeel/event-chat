@@ -25,7 +25,7 @@ function RPCDecorator<EVENT extends ActionRecord, CONSUME extends ActionRecord>(
       : [keyname: K, reqops: RequestOptionsByAction<CONSUME[K]>]
   ) => {
     const [keyname, reqops] = args
-    return action?.request(keyname, reqops) as Promise<ReturnType<CONSUME[K]>>
+    return action?.request(keyname, reqops) as Promise<UnwrapPromise<ReturnType<CONSUME[K]>>>
   }
 
   const destroy = () => {
@@ -88,3 +88,5 @@ type RequestOptionsByAction<F extends ActionFunType> =
   Parameters<F> extends []
     ? Omit<RequestOptions, 'payload'> & { payload?: never }
     : RequestOptions<Parameters<F>[0]> & { payload: Parameters<F>[0] }
+
+type UnwrapPromise<T> = T extends Promise<infer R> ? R : T

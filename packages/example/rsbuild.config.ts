@@ -19,7 +19,7 @@ export default defineConfig({
               res.setHeader('Content-Type', 'application/json');
               res.end(JSON.stringify({
                 code: 200,
-                data: { name: '测试用户', id: 1 },
+                data: { date: new Date(), id: 1, name: '测试用户' },
                 message: '成功',
                 receivedBody: requestBody
               }));

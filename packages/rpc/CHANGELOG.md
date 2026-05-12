@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.13](https://github.com/event-chat/event-chat/compare/rpc@v0.1.12...rpc@v0.1.13) (2026-05-12)
+
+
+### Bug Fixes
+
+* update RPCDecorator result type ([3efc71a](https://github.com/event-chat/event-chat/commit/3efc71a1f38b5583769eba638f34066e36922510))
+* update RPCDecorator result type ([3583be0](https://github.com/event-chat/event-chat/commit/3583be0d630d5bb6290a040a6796f54a7928b39a))
+
 ## [0.1.12](https://github.com/event-chat/event-chat/compare/rpc@v0.1.11...rpc@v0.1.12) (2026-05-11)
 
 

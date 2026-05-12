@@ -35,7 +35,7 @@ const style = tv({
     itemWrap:
       'after:block after:h-px after:w-full after:bg-gray-700 after:content-[""] last:after:hidden',
     msg: 'flex gap-2 text-gray-400 select-auto',
-    msgtext: '',
+    msgtext: 'overflow-hidden wrap-break-word',
     name: 'whitespace-nowrap select-none',
     receiptTag: 'ml-2 text-xs text-gray-600 select-none',
     scrollInner: '',
@@ -46,6 +46,12 @@ const style = tv({
       true: {
         corner: 'pr-0',
         msgtext: 'rounded bg-gray-900 p-2',
+      },
+    },
+    direction: {
+      horizontal: {},
+      vertical: {
+        msg: 'flex-col',
       },
     },
     empty: {
@@ -90,10 +96,16 @@ const style = tv({
   ],
 })
 
-const { itemInner, itemUser, itemWrap, msg, msgtext, name, receiptTag, scrollInner, tag } = style()
+const { scrollInner } = style()
 
-const ChatItems: FC<ChatItemProps> = ({ item, receipt }) => {
+const ChatItems: FC<ChatItemProps> = ({ item, receipt, direction = 'horizontal' }) => {
   const { broadcast, busy, date, message, own, user, card = 0 } = item
+  const { itemInner, itemUser, itemWrap, msg, msgtext, name, receiptTag, tag } = style({
+    card: card > 0,
+    type: own ? 'own' : undefined,
+    direction,
+  })
+
   return (
     <div className={itemWrap()}>
       <div className={itemInner()}>
@@ -102,9 +114,9 @@ const ChatItems: FC<ChatItemProps> = ({ item, receipt }) => {
           {broadcast && <span className={tag({ type: 'broadcast' })}>broadcast</span>}
           {busy && <span className={tag({ type: 'busy' })}>busy</span>}
         </div>
-        <div className={msg({ type: own ? 'own' : undefined })}>
-          <span className={name({ type: own ? 'own' : undefined })}>{user}: </span>
-          <span className={msgtext({ card: card > 0 })}>
+        <div className={msg()}>
+          <span className={name()}>{user}: </span>
+          <span className={msgtext()}>
             {message}
             {own && (
               <span className={receiptTag()}>
@@ -118,7 +130,12 @@ const ChatItems: FC<ChatItemProps> = ({ item, receipt }) => {
   )
 }
 
-const ChatScroll: FC<ChatScrollProps> = ({ group, debug, name: chatName = ChartName }) => {
+const ChatScroll: FC<ChatScrollProps> = ({
+  direction,
+  group,
+  debug,
+  name: chatName = ChartName,
+}) => {
   const [items, setItems] = useState<Array<ChatItemProps['item']>>([])
   const scrollRef = useRef<HTMLDivElement>(null)
 
@@ -155,7 +172,12 @@ const ChatScroll: FC<ChatScrollProps> = ({ group, debug, name: chatName = ChartN
       {items.map((item, index) => {
         const keyname = `${item.date.getTime()}:${index}`
         return (
-          <ChatItems item={item} key={keyname} receipt={receiptStore.getReceipt(item.receipt)} />
+          <ChatItems
+            direction={direction}
+            item={item}
+            key={keyname}
+            receipt={receiptStore.getReceipt(item.receipt)}
+          />
         )
       })}
     </div>
@@ -177,11 +199,12 @@ const ChatLine: FC<PropsWithChildren<ChatLineProps>> = ({
     group,
   })
 
-  const { bar, buttons, corner, inputBox, inputLine, scroll, selectUser, sendBtn, wrap } = style({
-    card: Boolean(card),
-    unRecipient: (recipients?.length ?? 0) === 0,
-    disabled,
-  })
+  const { bar, buttons, corner, inputBox, inputLine, scroll, selectUser, sendBtn, tag, wrap } =
+    style({
+      card: Boolean(card),
+      unRecipient: (recipients?.length ?? 0) === 0,
+      disabled,
+    })
 
   const [submit] = useSubmit(onSend, () => {
     form.emit({ detail: undefined, name: 'message' })
@@ -297,6 +320,7 @@ export default ChatLine
 interface ChatItemProps {
   item: z.infer<typeof itemSchema>
   receipt: number
+  direction?: 'horizontal' | 'vertical'
 }
 
 interface ChatLineProps extends Pick<SendMessage, 'name'> {
@@ -308,7 +332,8 @@ interface ChatLineProps extends Pick<SendMessage, 'name'> {
   onSend?: (item: SendMessage) => void
 }
 
-interface ChatScrollProps extends Pick<EventChatOptions<NamepathType>, 'debug'> {
+interface ChatScrollProps
+  extends Pick<EventChatOptions<NamepathType>, 'debug'>, Pick<ChatItemProps, 'direction'> {
   group?: string
   name?: string
 }

@@ -1,4 +1,9 @@
-import { mainCtx, workerCtx } from '@/services/serviceWorkerService'
+import {
+  type ParentCtxType,
+  mainCtx,
+  transmitResult,
+  workerCtx,
+} from '@/services/serviceWorkerService'
 import { useEventChat } from '@event-chat/core'
 import { useRPC } from '@event-chat/rpc/react'
 import { createServiceWorkerRegistrationRPC } from '@event-chat/rpc/serviceWorkerRegistration'
@@ -7,6 +12,7 @@ import { type FC, useMemo, useState } from 'react'
 import z from 'zod'
 import { ChatScroll } from '@/components/chatLine'
 import { WorkerPanel } from '@/components/chatLine'
+import { receiptStore } from '@/components/chatLine/receiptStore'
 import { serviceWorkerGroup } from './uitls'
 
 const titleRange = Object.freeze({
@@ -19,6 +25,7 @@ const ServiceWorkerItem: FC<ServiceWorkerItemProps> = ({
   disabled,
   iframe,
   scope,
+  publish,
   group = serviceWorkerGroup,
 }) => {
   const [broadcast, setBroadcast] = useState('normal')
@@ -45,6 +52,8 @@ const ServiceWorkerItem: FC<ServiceWorkerItemProps> = ({
     group,
   })
 
+  mainCtx.provider({ scope: `chat-${scope}`, emit, publish })
+
   return (
     <WorkerPanel
       disabled={allow !== 'Connect'}
@@ -52,44 +61,43 @@ const ServiceWorkerItem: FC<ServiceWorkerItemProps> = ({
       placeholder="Please input request message"
       title={titleRange[allow]}
       onSubmit={(value) => {
-        const message = Array.isArray(value) ? value.join('') : String(value ?? '')
         setSending(true)
-
-        rpc
-          .request('sendMessage', { payload: { broadcast, message, scope } })
-          .then(({ result, message: resmsg }) => {
-            const defaultDetail = {
-              date: new Date(),
-              message: resmsg,
-              own: false,
-              user: scope,
-              receipt: '12',
-            }
-            try {
-              const detail = !result
-                ? defaultDetail
-                : {
-                    broadcast: result.receivedBody?.broadcast !== 'normal',
-                    date: result.data.date,
-                    message: JSON.stringify(result),
-                    own: true,
-                    user: result.receivedBody?.scope ?? scope,
-                    receipt: '12',
-                  }
-
-              emit({
-                name: `chat-${scope}`,
-                detail,
+        switch (broadcast) {
+          case 'normal':
+            rpc
+              .request('sendMessage', {
+                payload: {
+                  receipt: receiptStore.addReceipt(),
+                  message: Array.isArray(value) ? value.join('') : String(value ?? ''),
+                  broadcast,
+                  scope,
+                },
               })
-            } catch {
-              emit({
-                name: `chat-${scope}`,
-                detail: { ...defaultDetail, message: 'JSON Parse Faild' },
+              .then((result) => {
+                const detail = transmitResult({ ...result, scope })
+                emit({ name: `chat-${scope}`, detail })
+                publish?.(detail)
               })
-            }
-          })
-          .catch(() => {})
-          .finally(() => setSending(false))
+              .catch(() => {})
+              .finally(() => setSending(false))
+            break
+          case 'transmit':
+            // 这里也可以做错误处理，演示省略
+            rpc
+              .request('transmit', {
+                payload: {
+                  receipt: receiptStore.addReceipt(),
+                  message: Array.isArray(value) ? value.join('') : String(value ?? ''),
+                  broadcast,
+                  scope,
+                },
+              })
+              .catch(() => {})
+              .finally(() => setSending(false))
+            break
+          default:
+            setSending(false)
+        }
       }}
       button
     >
@@ -100,7 +108,7 @@ const ServiceWorkerItem: FC<ServiceWorkerItemProps> = ({
 
 export default ServiceWorkerItem
 
-interface ServiceWorkerItemProps {
+interface ServiceWorkerItemProps extends Pick<ParentCtxType, 'publish'> {
   scope: string
   disabled?: boolean
   group?: string

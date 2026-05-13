@@ -15,11 +15,12 @@ const ServiceIframe: FC = () => {
     },
     brodcast: parentCtx.brodcasts,
     consume: iframeCtx.actions,
+    event: parentCtx.actions,
     drive: createWindowRPC,
     init: () => iframeRef.current,
   })
 
-  useEventChat(serviceScopeApi, {
+  const { emit } = useEventChat(serviceScopeApi, {
     group: serviceWorkerGroup,
     schema: z.string(),
     callback: ({ detail }) => {
@@ -27,6 +28,7 @@ const ServiceIframe: FC = () => {
     },
   })
 
+  parentCtx.provider({ emit })
   return (
     <iframe className="h-full w-full" ref={iframeRef} src={`/iframe?sub=${serviceWorkerGroup}`} />
   )

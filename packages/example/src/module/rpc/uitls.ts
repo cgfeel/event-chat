@@ -7,6 +7,7 @@ export const GroupProvider = createContext({ group: iframeName })
 
 export const serviceScopeAction = '/static/js/async/action/'
 export const serviceScopeApi = '/static/js/async/api/'
+export const serviceScopeParent = '/static/js/async/'
 export const serviceWorkerGroup = 'service-worker-group'
 export const workerGroup = 'worker-group'
 

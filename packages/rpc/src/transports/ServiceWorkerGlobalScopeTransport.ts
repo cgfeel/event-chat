@@ -49,7 +49,7 @@ class ServiceWorkerGlobalScopeTransport extends BaseTransport<ServiceWorkerGloba
     const { transmit, transfer } = options ?? {}
     // 允许转发请求到指定 窗口或 iframe
     if (transmit) {
-      transmit
+      transmit()
         .then((clients) => clients.forEach((client) => client.postMessage(message, { transfer })))
         .catch(() => {})
     } else {

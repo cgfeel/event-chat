@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.14](https://github.com/event-chat/event-chat/compare/rpc@v0.1.13...rpc@v0.1.14) (2026-05-13)
+
+
+### Bug Fixes
+
+* update request transmit type ([8289baf](https://github.com/event-chat/event-chat/commit/8289baff1072e48de151d6beb3cdd9c88e1e1c17))
+* update request transmit type ([dfbda01](https://github.com/event-chat/event-chat/commit/dfbda01e711f539fac6849272980fc19ed589181))
+
 ## [0.1.13](https://github.com/event-chat/event-chat/compare/rpc@v0.1.12...rpc@v0.1.13) (2026-05-12)
 
 

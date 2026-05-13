@@ -37,7 +37,7 @@ export interface Transport {
 
 export type IframeSerializeOptions = StructuredSerializeOptions & {
   targetOrigin?: string
-  transmit?: Promise<readonly WindowClient[]>
+  transmit?: () => Promise<readonly WindowClient[]>
 }
 
 export type ListenerType = (

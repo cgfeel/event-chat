@@ -1,5 +1,5 @@
 /// <reference lib="webworker" />
-import { workerCtx } from '@/services/serviceWorkerService'
+import { mainCtx, workerCtx } from '@/services/serviceWorkerService'
 import { createServiceWorkerGlobalScopeRPC } from '@event-chat/rpc/serviceWorkerGlobalScope'
 import { serviceWorkerGroup } from './uitls'
 
@@ -37,12 +37,27 @@ const target = self
 //   console.log('a---init')
 // }, 1000)
 
-createServiceWorkerGlobalScopeRPC(target, {
+const [rpc] = createServiceWorkerGlobalScopeRPC(target, {
   context: {
     // brodcast: workerChatCtx.brodcasts,
     config: { channel: serviceWorkerGroup },
-    // consume: mainCtx.actions,
+    consume: mainCtx.actions,
     event: workerCtx.actions,
+  },
+})
+
+workerCtx.provider({
+  transmit: (payload) => {
+    rpc
+      .request('sendMessage', {
+        transmit: () =>
+          self.clients.matchAll({
+            type: 'window',
+            includeUncontrolled: true,
+          }),
+        payload,
+      })
+      .catch(() => {})
   },
 })
 

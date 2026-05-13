@@ -3,15 +3,23 @@ import { Empty, Select } from 'antd'
 import { type FC, type PropsWithChildren, useEffect, useState } from 'react'
 import { tv } from 'tailwind-variants'
 import Button from '@/components/Button'
+import { ChatScroll } from '@/components/chatLine'
+import { receiptStore } from '@/components/chatLine/receiptStore'
 import ServiceIframe from './ServiceIframe'
 import ServiceWorkerItem from './ServiceWorkerItem'
-import { serviceScopeAction, serviceScopeApi, serviceWorkerGroup } from './uitls'
+import {
+  serviceScopeAction,
+  serviceScopeApi,
+  serviceScopeParent,
+  serviceWorkerGroup,
+} from './uitls'
 
 const styles = tv({
   slots: {
     item: 'flex min-h-0 flex-col gap-2',
     itemTitle: 'flex flex-none items-center justify-between gap-2 text-gray-500',
-    panel: 'row-span-2 min-h-0 bg-gray-800',
+    logs: 'flex-1 overflow-auto px-4',
+    panel: 'row-span-2 flex min-h-0 bg-gray-800',
     worker: 'h-full flex-auto overflow-hidden bg-gray-800',
     wrap: 'grid h-108 grid-cols-1 gap-x-4 gap-y-2 md:grid-cols-2',
   },
@@ -24,7 +32,7 @@ const styles = tv({
   },
 })
 
-const { item, itemTitle, panel, worker, wrap } = styles()
+const { item, itemTitle, logs, panel, worker, wrap } = styles()
 
 const WorkerGrid: FC<PropsWithChildren<WorkerGridProps>> = ({ children, scope }) => {
   const { emit } = useEventChat('', { group: serviceWorkerGroup })
@@ -70,19 +78,42 @@ const WorkerGrid: FC<PropsWithChildren<WorkerGridProps>> = ({ children, scope })
   )
 }
 
-const ServiceWorkerDemo: FC = () => (
-  <div className={wrap()}>
-    <div className={panel()}>
-      <div>server</div>
+const WorkerLogs: FC = () => {
+  return (
+    <div className={logs()}>
+      <ChatScroll
+        direction="vertical"
+        group={serviceWorkerGroup}
+        name={`chat-${serviceScopeParent}`}
+      />
     </div>
-    <WorkerGrid scope={serviceScopeAction}>
-      <ServiceWorkerItem group={serviceWorkerGroup} scope={serviceScopeAction} />
-    </WorkerGrid>
-    <WorkerGrid scope={serviceScopeApi}>
-      <ServiceIframe />
-    </WorkerGrid>
-  </div>
-)
+  )
+}
+
+const ServiceWorkerDemo: FC = () => {
+  const { emit } = useEventChat('', { group: serviceWorkerGroup })
+  return (
+    <div className={wrap()}>
+      <div className={panel()}>
+        <WorkerLogs />
+      </div>
+      <WorkerGrid scope={serviceScopeAction}>
+        <ServiceWorkerItem
+          group={serviceWorkerGroup}
+          scope={serviceScopeAction}
+          publish={(detail) => {
+            const { receipt } = detail
+            emit({ detail: { ...detail, own: false }, name: `chat-${serviceScopeParent}` })
+            if (receipt) receiptStore.increasing(receipt)
+          }}
+        />
+      </WorkerGrid>
+      <WorkerGrid scope={serviceScopeApi}>
+        <ServiceIframe />
+      </WorkerGrid>
+    </div>
+  )
+}
 
 export default ServiceWorkerDemo
 

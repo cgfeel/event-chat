@@ -169,8 +169,9 @@ class RPCAction {
     }
 
     // 广播
+    const info = { origin, ports, source }
     if (broadcast) {
-      this._brodcastListeners.forEach((listener) => listener(payload, origin))
+      this._brodcastListeners.forEach((listener) => listener(payload, info))
       return
     }
 
@@ -195,7 +196,7 @@ class RPCAction {
       Promise.resolve()
         .then(() => {
           // 内部的 any 转换成 unknown，不需要知道类型，外部约束
-          const result = handler(payload, { origin, ports, source }) as unknown
+          const result = handler(payload, info) as unknown
           return result
         })
         .then((result) => {
@@ -267,7 +268,7 @@ export type RPCOptionsType = {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ActionFunType = (payload?: any, info?: MessageInfo) => any
 
-export type BrodcastItem = (value: unknown, origin?: string) => void
+export type BrodcastItem = (value: unknown, info?: MessageInfo) => void
 
 export type RequestOptions<T = unknown> = IframeSerializeOptions & {
   payload?: T

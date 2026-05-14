@@ -4,6 +4,11 @@ import { messageSchema } from '@/components/chatLine'
 import { receiptStore } from '@/components/chatLine/receiptStore'
 import { type CtxType, baseChatServer, baseServer } from './baseService'
 
+// 只做存储用，存在的意义只是为了验证上下文方法中第二个参数包含 ports
+const record: { ports: readonly MessagePort[] } = {
+  ports: [],
+}
+
 const receiptSchema = z.object({
   ...messageSchema.shape,
   path: z.array(z.string()),
@@ -58,7 +63,10 @@ const childChatCtx = childIframeEvent(
 const childIframeCtx = childIframeEvent(
   (ctx) => ({
     ...baseServer(ctx),
-    add: ({ a, b }: { a: number; b: number }) => a + b,
+    add: ({ a, b }: { a: number; b: number }, info) => {
+      if (info?.ports) record.ports = info.ports
+      return a + b
+    },
     getChildInfo: () => ({
       name: ctx.name,
       page: 'child',

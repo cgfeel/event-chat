@@ -1,6 +1,7 @@
 import { WINDOW_NAME } from '../core/RPCAction'
 import { registerTransport } from '../core/registry'
 
+// 自动注册时 BroadcastChannel 逆变了，建议明确使用 BroadcastChannelTransport，或断言注册
 registerTransport({
   name: 'broadcastChannel',
   in: () => typeof BroadcastChannel !== 'undefined',

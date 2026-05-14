@@ -1,6 +1,6 @@
 import { createContext } from 'react'
 import RPCAction, { RequestOptions, WINDOW_NAME } from '../core/RPCAction'
-import { Transport } from '../transports/fields'
+import { Transport } from '../fields'
 import { ValueOf } from '../utils'
 
 export const RPCInstanceContext = createContext<RPCInstanceContextIns>({})
@@ -25,7 +25,9 @@ export interface RPCInstanceContextIns {
   mount?: (item: RPCItem, name?: string) => void
 }
 
-export type RPCItem = Pick<RPCAction, 'broadcast'> & Pick<Transport, 'getType'>
+export type RPCItem =
+  | (Pick<RPCAction, 'broadcast'> & Pick<Transport<boolean>, 'getType'>)
+  | Record<never, never>
 
 export type ScopeProps = {
   exclude?: Array<ValueOf<typeof TARGET_TYPE_STRINGS>>

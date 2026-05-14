@@ -4,7 +4,11 @@ import { IframeSerializeOptions, ListenerType, Transport } from '../fields'
 // - worker 每次注销必定关闭线程，而 window 有可能因跨域拿不到实际结果
 // - 注销节省的资源只有定时心跳检测，实例并没有注销，为了统一处理，由组件或 woker 自身决定注销对象
 
-abstract class BaseTransport<T extends TargetType = TargetType> implements Transport {
+abstract class BaseTransport<
+  T extends TargetType = TargetType,
+  ONLYBD extends boolean = false,
+> implements Transport<ONLYBD> {
+  readonly onlyBrod?: ONLYBD
   constructor(
     protected _target: T,
     protected _options: FactoryOptions = {}

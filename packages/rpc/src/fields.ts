@@ -41,7 +41,7 @@ export type IframeSerializeOptions = StructuredSerializeOptions & {
 }
 
 export type ListenerType = (
-  ev: Pick<MessageEvent, 'data' | 'origin' | 'source'> & { wait?: () => void }
+  ev: Pick<MessageEvent, 'data' | 'origin' | 'ports' | 'source'> & { wait?: () => void }
 ) => void
 
 export type RPCItem = Pick<RPCAction, 'broadcast'> & Pick<RPCFactory, 'getType'>

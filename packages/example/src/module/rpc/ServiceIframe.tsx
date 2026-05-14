@@ -1,8 +1,8 @@
-import { iframeCtx, parentCtx } from '@/services/serviceWorkerService'
+import { iframeCtx, parentCtx, resultSchema } from '@/services/serviceWorkerService'
 import { useEventChat } from '@event-chat/core'
 import { useRPC } from '@event-chat/rpc/react'
 import { createWindowRPC } from '@event-chat/rpc/window'
-import { type FC, useRef } from 'react'
+import { type FC, useCallback, useRef } from 'react'
 import z from 'zod'
 import { serviceScopeApi, serviceWorkerGroup } from './uitls'
 
@@ -28,7 +28,15 @@ const ServiceIframe: FC = () => {
     },
   })
 
-  parentCtx.provider({ emit })
+  const transmit = useCallback(
+    (payload: z.infer<typeof resultSchema>) => {
+      rpc.request('sendMessage', { payload }).catch(() => {})
+    },
+    [rpc]
+  )
+
+  parentCtx.provider({ transmit, emit })
+
   return (
     <iframe className="h-full w-full" ref={iframeRef} src={`/iframe?sub=${serviceWorkerGroup}`} />
   )

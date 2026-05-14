@@ -39,25 +39,26 @@ const target = self
 
 const [rpc] = createServiceWorkerGlobalScopeRPC(target, {
   context: {
-    // brodcast: workerChatCtx.brodcasts,
     config: { channel: serviceWorkerGroup },
+    brodcast: workerCtx.brodcasts,
     consume: mainCtx.actions,
     event: workerCtx.actions,
   },
 })
 
 workerCtx.provider({
-  transmit: (payload) => {
-    rpc
-      .request('sendMessage', {
-        transmit: () =>
+  // 可以用 rpc.broadcast，但一个 worker 内部单独线程不共享，广播更适用于主线程
+  // 在 worker.js 中演示了 rpc.broadcast，为了方便这里用统一使用 request
+  transmit: (payload, single) => {
+    const transmit = single
+      ? undefined
+      : () =>
           self.clients.matchAll({
             type: 'window',
             includeUncontrolled: true,
-          }),
-        payload,
-      })
-      .catch(() => {})
+          })
+
+    rpc.request('sendMessage', { payload, transmit }).catch(() => {})
   },
 })
 

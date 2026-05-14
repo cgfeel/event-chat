@@ -31,7 +31,7 @@ class ServiceWorkerGlobalScopeTransport extends BaseTransport<ServiceWorkerGloba
         new Promise<void>((resove) => {
           // eslint 不接受 any，允许 unknown，如果遇到协变了再做具体断言
           const data = event.data as unknown
-          listener({ origin: event.origin, source: null, wait: resove, data })
+          listener({ origin: event.origin, ports: event.ports, source: null, wait: resove, data })
         })
       )
     }
@@ -44,10 +44,9 @@ class ServiceWorkerGlobalScopeTransport extends BaseTransport<ServiceWorkerGloba
       this._target.removeEventListener('message', this._onconnect, this._options.message)
   }
 
-  // 待后续优化: 匹配具体 client
   postMessage(message: unknown, options?: IframeSerializeOptions): void {
     const { transmit, transfer } = options ?? {}
-    // 允许转发请求到指定 窗口或 iframe
+    // 允许转发请求到指定窗口或 iframe
     if (transmit) {
       transmit()
         .then((clients) => clients.forEach((client) => client.postMessage(message, { transfer })))

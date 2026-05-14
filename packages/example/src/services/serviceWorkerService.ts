@@ -27,6 +27,16 @@ const resultSchema = z.object({
   receivedBody: requestSchema.optional(),
 })
 
+const brodcastScope = (ctx: Partial<ParentCtxType>) => ({
+  brodcast: async (data: unknown) => {
+    const { data: body, success } = requestSchema.safeParse(data)
+    if (!success) return
+
+    const { result } = await sendMessage(body)
+    if (result) ctx.transmit?.(result)
+  },
+})
+
 const iframeEvent = createService<ParentCtxType>()
 const sendMessage = (data: WorkerMessage) =>
   fetch(`${URL}api/health`, {
@@ -36,11 +46,11 @@ const sendMessage = (data: WorkerMessage) =>
   })
     .then((res) => res.json())
     .then((res) => {
-      const { data: resData, error, success } = resultSchema.safeParse(res)
+      const { data: result, error, success } = resultSchema.safeParse(res)
       return success
         ? {
-            result: resData,
             message: 'success',
+            result,
           }
         : {
             message: error.issues.slice(-1)[0].message,
@@ -70,7 +80,7 @@ const transmitResult = ({
           date: result.data.date,
           message: JSON.stringify(result),
           own: result.receivedBody?.scope === scope,
-          user: result.receivedBody?.scope ?? scope,
+          user: scope,
           receipt: receipt ?? '',
         }
   } catch {
@@ -83,13 +93,24 @@ const iframeCtx = iframeEvent((ctx) => ({
     const { scope, emit } = ctx
     if (scope) emit?.({ name: scope, detail })
   },
+  sendMessage: (detail: z.infer<typeof resultSchema>) => {
+    const { scope, emit } = ctx
+    if (scope) {
+      emit?.({ name: `chat-${scope}`, detail })
+    }
+  },
 }))
 
 const mainCtx = createCtx((ctx: Partial<ParentCtxType>) => ({
   sendMessage: (result: z.infer<typeof resultSchema>) => {
     const { scope, emit, publish } = ctx
     if (scope) {
-      const detail = transmitResult({ message: 'success', result, scope })
+      const detail = transmitResult({
+        message: 'success',
+        scope: scope.split('-').pop() ?? '',
+        result,
+      })
+
       emit?.({ detail, name: scope })
       publish?.(detail)
     }
@@ -98,40 +119,41 @@ const mainCtx = createCtx((ctx: Partial<ParentCtxType>) => ({
 
 const parentCtx = createCtx(
   (ctx: Partial<ParentCtxType>) => ({
+    // checkin: (receipt: string) => receiptStore.increasing(receipt),
     sendMessage: (detail: z.infer<typeof itemSchema>) => {
-      ctx.emit?.({ name: `chat-${serviceScopeParent}`, detail })
+      ctx.emit?.({ name: `chat-${serviceScopeParent}`, detail: { ...detail, own: false } })
     },
   }),
-  () => ({})
+  brodcastScope
 )
 
-const workerCtx = createCtx((ctx: Partial<WorkerCtx>) => ({
-  transmit: async (data: WorkerMessage) => {
-    try {
-      const { message, result } = await sendMessage(data)
-      if (result) {
-        ctx.transmit?.(result)
-        return [true, message] as const
+const workerCtx = createCtx(
+  (ctx: Partial<ParentCtxType>) => ({
+    transmit: async (data: WorkerMessage) => {
+      try {
+        const { message, result } = await sendMessage(data)
+        if (result) {
+          ctx.transmit?.(result)
+          return [true, message] as const
+        }
+        return [false, message] as const
+      } catch (error) {
+        return [false, error instanceof Error ? error.message : 'unknown error'] as const
       }
-      return [false, message] as const
-    } catch (error) {
-      return [false, error instanceof Error ? error.message : 'unknown error'] as const
-    }
-  },
-  sendMessage,
-}))
+    },
+    sendMessage,
+  }),
+  brodcastScope
+)
 
-export { iframeCtx, mainCtx, parentCtx, workerCtx, transmitResult }
+export { iframeCtx, mainCtx, parentCtx, resultSchema, workerCtx, transmitResult }
 
 export type ParentCtxType = Pick<ReturnType<typeof useEventChat>, 'emit'> & {
   scope: string
-  publish?: (detail: z.infer<typeof itemSchema>) => void
+  publish: (detail: z.infer<typeof itemSchema>) => void
+  transmit: (result: z.infer<typeof resultSchema>, single?: boolean) => void
 }
 
 type TransmitResultProps = Awaited<ReturnType<typeof sendMessage>> & { scope: string }
 
 type WorkerMessage = z.infer<typeof requestSchema>
-
-type WorkerCtx = {
-  transmit: (result: z.infer<typeof resultSchema>) => void
-}

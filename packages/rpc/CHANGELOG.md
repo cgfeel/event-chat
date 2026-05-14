@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.15](https://github.com/event-chat/event-chat/compare/rpc@v0.1.14...rpc@v0.1.15) (2026-05-14)
+
+
+### Bug Fixes
+
+* update ActionFunType add MessageInfo include custom message ports ([2e7af67](https://github.com/event-chat/event-chat/commit/2e7af674224f9ec04b8b6e231bc21dc921d651e9))
+* update brodcastListeners info type ([e014f6d](https://github.com/event-chat/event-chat/commit/e014f6d91e9494adcf272404bb0e7093cd91ddf0))
+
 ## [0.1.14](https://github.com/event-chat/event-chat/compare/rpc@v0.1.13...rpc@v0.1.14) (2026-05-13)
 
 

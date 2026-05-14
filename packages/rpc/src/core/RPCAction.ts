@@ -143,11 +143,11 @@ class RPCAction {
 
   // 这里收到的消息还要再考虑下，如果不是对象，比如 ArrayBuff
   private _messageHandler(
-    event: Pick<MessageEvent<MessageItem | undefined>, 'data' | 'origin' | 'source'> & {
+    event: Pick<MessageEvent<MessageItem | undefined>, 'data' | 'origin' | 'ports' | 'source'> & {
       wait?: () => void
     }
   ) {
-    const { data, origin, source, wait } = event
+    const { data, origin, ports, source, wait } = event
     const { __RPC__, broadcast, channel, error, heartbeat, kind, payload, requestId, type } =
       data ?? {}
 
@@ -169,8 +169,9 @@ class RPCAction {
     }
 
     // 广播
+    const info = { origin, ports, source }
     if (broadcast) {
-      this._brodcastListeners.forEach((listener) => listener(payload, origin))
+      this._brodcastListeners.forEach((listener) => listener(payload, info))
       return
     }
 
@@ -193,7 +194,11 @@ class RPCAction {
     const handler = type && isKey(type, this._handlers) ? this._handlers[type] : undefined
     if (handler) {
       Promise.resolve()
-        .then(() => handler(payload))
+        .then(() => {
+          // 内部的 any 转换成 unknown，不需要知道类型，外部约束
+          const result = handler(payload, info) as unknown
+          return result
+        })
         .then((result) => {
           this._target.postMessage(
             { __RPC__: RPC_SIGN, kind: 'response', payload: result, channel, requestId, type },
@@ -261,16 +266,18 @@ export type RPCOptionsType = {
 
 // 需要限制参数最多只允许存在 1 个，但不能用 unknown，只有 any 才能推导
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type ActionFunType = (payload?: any) => any
+export type ActionFunType = (payload?: any, info?: MessageInfo) => any
 
-export type BrodcastItem = (value: unknown, origin?: string) => void
+export type BrodcastItem = (value: unknown, info?: MessageInfo) => void
 
 export type RequestOptions<T = unknown> = IframeSerializeOptions & {
   payload?: T
   retry?: number
 }
 
-type HandlersRecord = Record<PropertyKey, (...value: unknown[]) => unknown>
+type HandlersRecord = Record<PropertyKey, ActionFunType>
+
+type MessageInfo = Pick<MessageEvent, 'origin' | 'ports' | 'source'>
 
 type MessageItem = Pick<RPCOptionsType, 'channel'> & {
   payload: unknown

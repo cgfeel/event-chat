@@ -31,10 +31,11 @@ const ServiceWorkerItem: FC<ServiceWorkerItemProps> = ({
   const [broadcast, setBroadcast] = useState('normal')
   const [sending, setSending] = useState(false)
 
-  const { connected, rpc } = useRPC({
+  const { connected, rpc, brodcastScope } = useRPC({
     config: {
       channel: serviceWorkerGroup,
     },
+    brodcast: mainCtx.brodcasts,
     consume: workerCtx.actions,
     event: mainCtx.actions,
     drive: createServiceWorkerRegistrationRPC,
@@ -52,6 +53,8 @@ const ServiceWorkerItem: FC<ServiceWorkerItemProps> = ({
     group,
   })
 
+  // 本来应该像 WorkerItem 一样通过 generateMainCtx 区分上下文
+  // 当时当前 service worker 一个放在主页面，一个放在 iframe，本就上下文隔离
   mainCtx.provider({ scope: `chat-${scope}`, emit, publish })
 
   return (
@@ -62,17 +65,17 @@ const ServiceWorkerItem: FC<ServiceWorkerItemProps> = ({
       title={titleRange[allow]}
       onSubmit={(value) => {
         setSending(true)
+        const payload = {
+          receipt: receiptStore.addReceipt(),
+          message: Array.isArray(value) ? value.join('') : String(value ?? ''),
+          broadcast,
+          scope,
+        }
+
         switch (broadcast) {
           case 'normal':
             rpc
-              .request('sendMessage', {
-                payload: {
-                  receipt: receiptStore.addReceipt(),
-                  message: Array.isArray(value) ? value.join('') : String(value ?? ''),
-                  broadcast,
-                  scope,
-                },
-              })
+              .request('sendMessage', { payload })
               .then((result) => {
                 const detail = transmitResult({ ...result, scope })
                 emit({ name: `chat-${scope}`, detail })
@@ -81,17 +84,15 @@ const ServiceWorkerItem: FC<ServiceWorkerItemProps> = ({
               .catch(() => {})
               .finally(() => setSending(false))
             break
+          case 'broadcast':
+            // 广播没有办法等待，如果需要可以通过 transmit
+            brodcastScope({ payload })
+            setSending(false)
+            break
           case 'transmit':
             // 这里也可以做错误处理，演示省略
             rpc
-              .request('transmit', {
-                payload: {
-                  receipt: receiptStore.addReceipt(),
-                  message: Array.isArray(value) ? value.join('') : String(value ?? ''),
-                  broadcast,
-                  scope,
-                },
-              })
+              .request('transmit', { payload })
               .catch(() => {})
               .finally(() => setSending(false))
             break
@@ -108,7 +109,7 @@ const ServiceWorkerItem: FC<ServiceWorkerItemProps> = ({
 
 export default ServiceWorkerItem
 
-interface ServiceWorkerItemProps extends Pick<ParentCtxType, 'publish'> {
+interface ServiceWorkerItemProps extends Partial<Pick<ParentCtxType, 'publish'>> {
   scope: string
   disabled?: boolean
   group?: string

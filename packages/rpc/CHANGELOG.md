@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.1.16](https://github.com/event-chat/event-chat/compare/rpc@v0.1.15...rpc@v0.1.16) (2026-05-14)
+
+
+### Bug Fixes
+
+* update createRecipientsStore type ([e95aa0d](https://github.com/event-chat/event-chat/commit/e95aa0d110918e839ea9c6fe6d9ff207c2142746))
+* update split broadcastChannel ([f20e5fa](https://github.com/event-chat/event-chat/commit/f20e5fa04df3b2561b6ce215e8b0f4a7413a86ee))
+* update split broadcastChannel ([ecc6064](https://github.com/event-chat/event-chat/commit/ecc60647da479b25e486367db310c24be427aeb6))
+
 ## [0.1.15](https://github.com/event-chat/event-chat/compare/rpc@v0.1.14...rpc@v0.1.15) (2026-05-14)
 
 

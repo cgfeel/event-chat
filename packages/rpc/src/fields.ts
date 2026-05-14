@@ -25,7 +25,7 @@ export interface RPCInstanceContextIns {
   mount?: (item: RPCItem, name?: string) => void
 }
 
-export interface Transport {
+export interface Transport<ONLYBD extends boolean = false> {
   destroy: () => void
   getType: () => string
   is: (source: MessageEventSource | null) => boolean
@@ -33,6 +33,7 @@ export interface Transport {
   onremove: (listener: ListenerType) => void
   postMessage: (message: unknown, options?: IframeSerializeOptions) => void
   upset: (options: FactoryOptions) => void
+  onlyBrod?: ONLYBD
 }
 
 export type IframeSerializeOptions = StructuredSerializeOptions & {

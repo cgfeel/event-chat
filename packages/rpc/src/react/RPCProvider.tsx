@@ -21,6 +21,7 @@ const RPCProvider: FC<PropsWithChildren> = ({ children }) => {
 
       list.current.forEach((group, item) => {
         if (
+          'getType' in item &&
           scope.includes(item.getType()) &&
           !typeout?.includes(group) &&
           (!typein || typein.includes(group))

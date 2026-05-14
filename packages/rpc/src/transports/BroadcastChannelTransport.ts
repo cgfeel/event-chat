@@ -2,7 +2,8 @@ import { ListenerType } from '../fields'
 import BaseTransport from './BaseTransport'
 
 // 主线程，同源跨标签/窗口：BroadcastChannel
-class BroadcastChannelTransport extends BaseTransport<BroadcastChannel> {
+class BroadcastChannelTransport extends BaseTransport<BroadcastChannel, true> {
+  override readonly onlyBrod = true
   destroy() {
     this._target.close()
   }

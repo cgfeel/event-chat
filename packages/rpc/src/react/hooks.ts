@@ -1,19 +1,24 @@
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import RPCDecorator, { ActionRecord, DecoratorContext } from '../core/RPCDecorator'
+import { Transport } from '../fields'
 import { EntryOptions, FactoryOptions } from '../transports/fields'
 import { isKey } from '../utils'
 import { RPCInstanceContext } from './fields'
 
 const defaultBrod = () => {}
 
-const useRPC = <EVENT extends ActionRecord, CONSUME extends ActionRecord, TARGET>(
-  ops: RPCHooksOptions<EVENT, CONSUME> | RPCDriveOptions<EVENT, CONSUME, TARGET>
+const useRPC = <
+  TARGET extends TargetInit,
+  EVENT extends ActionRecord,
+  CONSUME extends ActionRecord,
+>(
+  ops: RPCHooksOptions<TARGET, EVENT, CONSUME> | RPCDriveOptions<TARGET, EVENT, CONSUME>
 ) => {
   const { brodcastScope, mount } = useContext(RPCInstanceContext)
   const [connected, setConnected] = useState(false)
 
-  const decoratorRef = useRef<RPCResult<EVENT, CONSUME>[0] | null>(null)
-  const processRef = useRef(Promise.resolve<RPCResult<EVENT, CONSUME> | null>(null))
+  const decoratorRef = useRef<RPCResult<TARGET, EVENT, CONSUME>[0] | null>(null)
+  const processRef = useRef(Promise.resolve<RPCResult<TARGET, EVENT, CONSUME> | null>(null))
   const opsRef = useRef(ops)
 
   const rpcIns = useMemo(
@@ -33,7 +38,7 @@ const useRPC = <EVENT extends ActionRecord, CONSUME extends ActionRecord, TARGET
             throw new Error('decorator is readonly')
           },
         }
-      ) as RPCResult<EVENT, CONSUME>[0],
+      ) as RPCResult<TARGET, EVENT, CONSUME>[0],
     []
   )
 
@@ -67,12 +72,11 @@ const useRPC = <EVENT extends ActionRecord, CONSUME extends ActionRecord, TARGET
             },
           },
         }
-        return tar
-          ? drive(tar as TARGET, {
-              context,
-              options,
-            })
-          : RPCDecorator(null, context)
+
+        return drive(tar as TARGET, {
+          context,
+          options,
+        })
       })
       .then((target) => {
         const [result] = target
@@ -111,33 +115,8 @@ const useRPC = <EVENT extends ActionRecord, CONSUME extends ActionRecord, TARGET
 
 export default useRPC
 
-interface RPCBaseOptions {
-  name?: string
-  options?: FactoryOptions
-  faild?: (error: unknown) => void
-}
-
-interface RPCDriveOptions<EVENT extends ActionRecord, CONSUME extends ActionRecord, TARGET>
-  extends RPCBaseOptions, DecoratorContext<EVENT, CONSUME> {
-  drive: (target: TARGET, config?: EntryOptions<EVENT, CONSUME>) => RPCResult<EVENT, CONSUME>
-  init: () => TARGET | null | Promise<TARGET | null>
-}
-
-interface RPCHooksOptions<EVENT extends ActionRecord, CONSUME extends ActionRecord>
-  extends RPCBaseOptions, DecoratorContext<EVENT, CONSUME> {
-  drive: (
-    target: unknown,
-    context?: EntryOptions<EVENT, CONSUME>
-  ) => Promise<RPCResult<EVENT, CONSUME>>
-  init: () => TargetInit | Promise<TargetInit>
-}
-
-type RPCResult<EVENT extends ActionRecord, CONSUME extends ActionRecord> = ReturnType<
-  typeof RPCDecorator<EVENT, CONSUME>
->
-
 // hooks 只能在主线程下的 React 中使用，排除非主线程的对象
-type TargetInit =
+export type TargetInit =
   | BroadcastChannel
   | ServiceWorkerRegistration
   | SharedWorker
@@ -146,3 +125,50 @@ type TargetInit =
   | Worker
   | HTMLIFrameElement
   | null
+
+interface RPCBaseOptions<TARGET extends TargetInit> {
+  init: () => TARGET | null | Promise<TARGET | null>
+  name?: string
+  options?: FactoryOptions
+  faild?: (error: unknown) => void
+}
+
+interface RPCDriveOptions<
+  TARGET extends TargetInit,
+  EVENT extends ActionRecord,
+  CONSUME extends ActionRecord,
+>
+  extends RPCBaseOptions<TARGET>, DecoratorContext<EVENT, CONSUME> {
+  drive: (
+    target: TARGET,
+    config?: EntryOptions<EVENT, CONSUME>
+  ) => RPCResult<TARGET, EVENT, CONSUME>
+}
+
+interface RPCHooksOptions<
+  TARGET extends TargetInit,
+  EVENT extends ActionRecord,
+  CONSUME extends ActionRecord,
+>
+  extends RPCBaseOptions<TARGET>, DecoratorContext<EVENT, CONSUME> {
+  drive: (
+    target: unknown,
+    context?: EntryOptions<EVENT, CONSUME>
+  ) => Promise<RPCResult<TARGET, EVENT, CONSUME>>
+}
+
+type RPCResult<
+  TARGET extends TargetInit,
+  EVENT extends ActionRecord,
+  CONSUME extends ActionRecord,
+> = ReturnType<
+  typeof RPCDecorator<
+    [TARGET] extends [null]
+      ? null
+      : TARGET extends BroadcastChannel
+        ? Transport<true>
+        : Transport<false>,
+    EVENT,
+    CONSUME
+  >
+>

@@ -42,7 +42,7 @@ export type TransportResolver<T extends TargetType = TargetType> = {
   name: string
   in: () => boolean
   match: (target: unknown) => target is T
-  load: () => Promise<{ default: new (target: T, options?: FactoryOptions) => Transport }>
+  load: () => Promise<{ default: new (target: T, options?: FactoryOptions) => Transport<boolean> }>
 }
 
 // TS 逆变了，采用里面放松约束，对外严格约束

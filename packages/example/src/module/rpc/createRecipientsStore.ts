@@ -1,5 +1,5 @@
 import type { baseServer } from '@/services/iframeService'
-import type { useRPC } from '@event-chat/rpc/react'
+import { type TargetInit, useRPC } from '@event-chat/rpc/react'
 import { createContext, useContext, useSyncExternalStore } from 'react'
 
 export function createRecipientsStore(): RecipientsStore {
@@ -111,7 +111,7 @@ type RecipientsStore = {
   updateRecipientName: (rpc: RPCType, name: string) => void
 }
 
-export type RPCType = ReturnType<typeof useRPC<ActionType, ActionType, unknown>>['rpc']
+export type RPCType = ReturnType<typeof useRPC<TargetInit, ActionType, ActionType>>['rpc']
 
 type ActionType = ReturnType<typeof baseServer>
 type RecipientsRecord = {

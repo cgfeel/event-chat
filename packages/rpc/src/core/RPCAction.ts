@@ -26,7 +26,7 @@ class RPCAction {
   private _boundMessageHandler = this._messageHandler.bind(this)
 
   constructor(
-    private _target: Transport,
+    private _target: Transport<boolean>,
     options?: RPCOptionsType
   ) {
     this._options = {

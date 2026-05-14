@@ -115,6 +115,17 @@ const useRPC = <
 
 export default useRPC
 
+// hooks 只能在主线程下的 React 中使用，排除非主线程的对象
+export type TargetInit =
+  | BroadcastChannel
+  | ServiceWorkerRegistration
+  | SharedWorker
+  | WebSocket
+  | Window
+  | Worker
+  | HTMLIFrameElement
+  | null
+
 interface RPCBaseOptions<TARGET extends TargetInit> {
   init: () => TARGET | null | Promise<TARGET | null>
   name?: string
@@ -161,14 +172,3 @@ type RPCResult<
     CONSUME
   >
 >
-
-// hooks 只能在主线程下的 React 中使用，排除非主线程的对象
-type TargetInit =
-  | BroadcastChannel
-  | ServiceWorkerRegistration
-  | SharedWorker
-  | WebSocket
-  | Window
-  | Worker
-  | HTMLIFrameElement
-  | null

@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.17](https://github.com/event-chat/event-chat/compare/rpc@v0.1.16...rpc@v0.1.17) (2026-05-16)
+
+
+### Bug Fixes
+
+* add observe ([b979719](https://github.com/event-chat/event-chat/commit/b979719ddbe70d1abba43bc82e32a51583562a0b))
+* add observe ([8842112](https://github.com/event-chat/event-chat/commit/88421124b833eff3fc142da4ca5bce52045ba2e8))
+
 ## [0.1.16](https://github.com/event-chat/event-chat/compare/rpc@v0.1.15...rpc@v0.1.16) (2026-05-14)
 
 

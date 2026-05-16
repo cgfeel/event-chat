@@ -34,6 +34,12 @@ class WebSocketTransport extends BaseTransport<WebSocket> {
     if (this._target.readyState === WebSocket.OPEN) this._target.close()
   }
 
+  observe(close?: () => void): void {
+    this._target.onclose = () => {
+      close?.()
+    }
+  }
+
   onmessage(listener: ListenerType): void {
     this._target.onmessage = listener
   }

@@ -10,5 +10,11 @@ export function createWindowRPC<EVENT extends ActionRecord, CONSUME extends Acti
   const { context, options } = config ?? {}
   const instance = target instanceof HTMLIFrameElement ? target.contentWindow : target
 
-  return RPCDecorator(instance ? new WindowTransport(instance, options) : null, context)
+  // 如果提供的 iframe.contentWindow，需要自行提供 Element
+  const ops =
+    target instanceof HTMLIFrameElement
+      ? Object.assign({}, options, { observer: () => target })
+      : options
+
+  return RPCDecorator(instance ? new WindowTransport(instance, ops) : null, context)
 }

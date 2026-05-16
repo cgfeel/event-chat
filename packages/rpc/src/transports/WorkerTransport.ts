@@ -8,6 +8,10 @@ class WorkerTransport extends BaseTransport<Worker> {
     this._target.terminate()
   }
 
+  // 如果加载失败由 hooks 通过 catch 捕获
+  // this._target.onerror 无法区分 worker 状态，抛出异常有可能是因为某项任务就需要抛异常
+  observe(): void {}
+
   onmessage(listener: ListenerType): void {
     this._target.addEventListener('message', listener, this._options.message)
   }

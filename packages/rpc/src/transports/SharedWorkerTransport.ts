@@ -7,6 +7,8 @@ class SharedWorkerTransport extends BaseTransport<SharedWorker> {
     this._target.port.close()
   }
 
+  observe(): void {}
+
   onmessage(listener: ListenerType): void {
     this._target.port.addEventListener('message', listener, this._options.message)
     this._target.port.start()

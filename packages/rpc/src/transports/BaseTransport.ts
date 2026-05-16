@@ -30,6 +30,10 @@ abstract class BaseTransport<
   // 通过 Decorator 调用，注销实例顺序：RPCAction - BaseTransport
   // RPCAction 注销前会先 onremove
   abstract destroy(): void
+
+  // 关闭顺序：hooks - 主线程虚拟 Dom - Dom - 主线程（worker 等） - worker 分支线程
+  // 观察设计：只被动观察接受消息，不主动向对应线程通知，避免混乱；(每个 RPC 有心跳检测)
+  abstract observe(close?: () => void): void
   abstract onmessage(listener: ListenerType): void
 
   // 只提供监听、移除的方法，记录方法的事件需要外部处理
@@ -41,6 +45,8 @@ export default BaseTransport
 
 export interface FactoryOptions {
   message?: boolean | AddEventListenerOptions
+  // 只有 window 和 webSocket 需要观察者用于监控
+  observer?: () => unknown
 }
 
 // WindowClient 和 Client 是 ServerWork 内部事件回调方法中的对象，暂且不用

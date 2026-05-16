@@ -13,6 +13,8 @@ class SharedWorkerGlobalScopeTransport extends BaseTransport<SharedWorkerGlobalS
     }
   }
 
+  observe(): void {}
+
   onmessage(listener: ListenerType): void {
     const SharedWorker = this._target
     this._onconnect = new Promise((resolve) => {

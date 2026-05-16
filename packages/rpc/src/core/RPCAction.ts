@@ -44,7 +44,7 @@ class RPCAction {
   destroy() {
     clearInterval(this._heartbeatTimer ?? undefined)
     this._target.onremove(this._boundMessageHandler)
-    this._abort()
+    this._abort(true)
 
     this._brodcastListeners = []
     this._handlers = {}
@@ -117,9 +117,9 @@ class RPCAction {
     })
   }
 
-  private _abort() {
+  private _abort(destroy?: boolean) {
     this._isConnected = false
-    this._options?.onDisconnect?.()
+    this._options?.onDisconnect?.(destroy)
 
     this._pending.forEach(({ reject, timer }) => {
       clearTimeout(timer)
@@ -261,7 +261,7 @@ export type RPCOptionsType = {
   retryTimeout?: number
   retryTimes?: number
   onConnect?: () => void
-  onDisconnect?: () => void
+  onDisconnect?: (destroy?: boolean) => void
 }
 
 // 需要限制参数最多只允许存在 1 个，但不能用 unknown，只有 any 才能推导
@@ -279,6 +279,7 @@ type HandlersRecord = Record<PropertyKey, ActionFunType>
 
 type MessageInfo = Pick<MessageEvent, 'origin' | 'ports' | 'source'>
 
+// scope?: string 如果还不够区分的话，增加属性（观望）
 type MessageItem = Pick<RPCOptionsType, 'channel'> & {
   payload: unknown
   __RPC__?: string // 过滤外部消息

@@ -1,8 +1,9 @@
 import { ActionRecord, DecoratorContext } from '../core/RPCDecorator'
+import { FactoryOptions } from './BaseTransport'
 
-export interface FactoryOptions {
-  message?: boolean | AddEventListenerOptions
-}
+// export interface FactoryOptions {
+//   message?: boolean | AddEventListenerOptions
+// }
 
 export interface Transport {
   destory: () => void

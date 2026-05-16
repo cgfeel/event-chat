@@ -8,6 +8,9 @@ class DedicatedWorkerGlobalScopeTransport extends BaseTransport<DedicatedWorkerG
     // DedicatedWorkerGlobalScope 内部不用注销，由外部 self.close 处理
   }
 
+  // web worker 内部没有提供监控关闭的方法
+  observe(): void {}
+
   onmessage(listener: ListenerType): void {
     this._target.addEventListener('message', listener, this._options.message)
   }

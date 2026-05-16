@@ -29,6 +29,7 @@ export interface Transport<ONLYBD extends boolean = false> {
   destroy: () => void
   getType: () => string
   is: (source: MessageEventSource | null) => boolean
+  observe: (close?: () => void) => void
   onmessage: (listener: ListenerType) => void
   onremove: (listener: ListenerType) => void
   postMessage: (message: unknown, options?: IframeSerializeOptions) => void

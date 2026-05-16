@@ -36,6 +36,7 @@ function RPCDecorator<
 
   Object.entries(event ?? {}).forEach(([keyname, handle]) => action?.on(keyname, handle))
   Object.values(brodcast ?? {}).forEach((handle) => action?.onBrodcast(handle))
+  factory?.observe(destroy)
 
   const rpcInsc = new Proxy(
     {},

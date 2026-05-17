@@ -21,7 +21,7 @@ const styles = tv({
     logs: 'flex-1 overflow-auto px-4',
     panel: 'row-span-2 flex min-h-0 bg-gray-800',
     worker: 'h-full flex-auto overflow-hidden bg-gray-800',
-    wrap: 'grid h-108 grid-cols-1 gap-x-4 gap-y-2 md:grid-cols-2',
+    wrap: 'grid h-162 grid-cols-1 gap-x-4 gap-y-2 md:grid-cols-2',
   },
   variants: {
     closed: {

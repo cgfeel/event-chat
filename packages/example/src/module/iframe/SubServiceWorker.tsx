@@ -8,7 +8,7 @@ import ServiceWorkerItem from '../rpc/ServiceWorkerItem'
 import { serviceScopeApi } from '../rpc/uitls'
 import type { SubIframeProps } from './SubIframe'
 
-const SubServiceWorker: FC<SubIframeProps> = ({ group }) => {
+const SubServiceWorker: FC<SubServiceWorkerProps> = ({ group, scope = serviceScopeApi }) => {
   const { connected, rpc } = useRPC({
     config: {
       allowedOrigins: ['http://localhost:3000', '*'],
@@ -21,13 +21,13 @@ const SubServiceWorker: FC<SubIframeProps> = ({ group }) => {
   })
 
   const { emit } = useEventChat('', { group })
-  iframeCtx.provider({ scope: serviceScopeApi, emit })
+  iframeCtx.provider({ scope, emit })
 
   return (
     <ServiceWorkerItem
       disabled={!connected}
       group={group}
-      scope={serviceScopeApi}
+      scope={scope}
       publish={(payload) => {
         rpc
           .request('sendMessage', { payload })
@@ -43,3 +43,7 @@ const SubServiceWorker: FC<SubIframeProps> = ({ group }) => {
 }
 
 export default SubServiceWorker
+
+interface SubServiceWorkerProps extends SubIframeProps {
+  scope?: string
+}

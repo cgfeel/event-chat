@@ -4,11 +4,8 @@ import BaseTransport from './BaseTransport'
 // 主线程，跨窗口、跨 iframe 通信：HTMLIFrameElement.contentWindow, Window, Window.parent, window.open
 class WindowTransport extends BaseTransport<Window> {
   private _errorHandle: ((args: ErrorProps) => void) | null = null
-  private _observerTarget: MutationObserver | null = null
-
   destroy() {
     this._errorHandle?.({ isDestroy: true })
-    this._observerTarget?.disconnect()
   }
 
   // source 和 iframe.contentWidow 比
@@ -32,18 +29,12 @@ class WindowTransport extends BaseTransport<Window> {
     })
   }
 
+  // 不要试图通过 element.isConnected 判断 iframe 是否存在 Dom 中，因为有可能暂时放入了 DocumentFragment
   observe(close?: () => void) {
     const element = this._options.observer?.()
     if (!(element instanceof HTMLIFrameElement) || !Object.is(element.contentWindow, this._target))
       return
 
-    // 链接一个不存在的节点
-    if (!element.isConnected) {
-      close?.()
-      return
-    }
-
-    const parent = element?.parentElement
     if (element) {
       const errorHandle = (error: Partial<ErrorEvent> & ErrorProps) => {
         // 加载失败就直接放弃监听，只能重新创建实例
@@ -55,23 +46,6 @@ class WindowTransport extends BaseTransport<Window> {
       // 无论 iframe 加载 404、500、网络中断、域名无效，浏览器都会自动渲染一个错误页面
       element.addEventListener('error', errorHandle)
       this._errorHandle = errorHandle
-    }
-
-    if (parent) {
-      const observer = new MutationObserver(() => {
-        if (!element.isConnected) {
-          // Dom 被移除了重建实例也不管用
-          observer.disconnect()
-          close?.()
-        }
-      })
-
-      observer.observe(parent, {
-        childList: true,
-        subtree: false,
-      })
-
-      this._observerTarget = observer
     }
   }
 }

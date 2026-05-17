@@ -45,7 +45,7 @@ export default BaseTransport
 
 export interface FactoryOptions {
   message?: boolean | AddEventListenerOptions
-  // 只有 window 和 webSocket 需要观察者用于监控
+  // 只有 window 和 webSocket 观察者用于监控
   observer?: () => unknown
 }
 

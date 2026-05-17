@@ -1,5 +1,5 @@
 import RecipientsProvider from '@/module/rpc/RecipientsProvider'
-import { chatName, iframeName, serviceWorkerGroup } from '@/module/rpc/uitls'
+import { chatName, iframeName, serviceWorkerAction, serviceWorkerGroup } from '@/module/rpc/uitls'
 import { ConfigProvider, theme } from 'antd'
 import { type FC, lazy, useMemo } from 'react'
 import { isKey } from '@/utils/fields'
@@ -7,6 +7,7 @@ import { isKey } from '@/utils/fields'
 const router = Object.freeze({
   [chatName]: lazy(() => import('@/module/iframe/IframeExample')),
   [iframeName]: lazy(() => import('@/module/iframe/IframeChat')),
+  [serviceWorkerAction]: lazy(() => import('@/module/iframe/ActionServiceWorker')),
   [serviceWorkerGroup]: lazy(() => import('@/module/iframe/SubServiceWorker')),
 })
 

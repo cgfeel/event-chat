@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.18](https://github.com/event-chat/event-chat/compare/rpc@v0.1.17...rpc@v0.1.18) (2026-05-17)
+
+
+### Bug Fixes
+
+* remove window ([462b133](https://github.com/event-chat/event-chat/commit/462b13316162e182b79620e3df69d77c27b71d7d))
+* remove window ([9782336](https://github.com/event-chat/event-chat/commit/97823362bbb061e83cb2be9fc35e3c71ece50c14))
+
 ## [0.1.17](https://github.com/event-chat/event-chat/compare/rpc@v0.1.16...rpc@v0.1.17) (2026-05-16)
 
 

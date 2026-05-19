@@ -1,4 +1,4 @@
-import { ListenerType } from '../fields'
+import { ListenerType, MessageItem } from '../fields'
 import BaseTransport from './BaseTransport'
 
 // 主线程，同源跨标签/窗口：BroadcastChannel
@@ -20,7 +20,7 @@ class BroadcastChannelTransport extends BaseTransport<BroadcastChannel, true> {
     this._target.removeEventListener('message', listener, this._options.message)
   }
 
-  postMessage(message: unknown): void {
+  postMessage(message: MessageItem): void {
     this._target.postMessage(message)
   }
 }

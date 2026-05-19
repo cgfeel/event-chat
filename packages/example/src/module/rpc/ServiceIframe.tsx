@@ -4,9 +4,9 @@ import { useRPC } from '@event-chat/rpc/react'
 import { createWindowRPC } from '@event-chat/rpc/window'
 import { type FC, useCallback, useRef } from 'react'
 import z from 'zod'
-import { serviceScopeApi, serviceWorkerGroup } from './uitls'
+import { serviceWorkerGroup } from './uitls'
 
-const ServiceIframe: FC = () => {
+const ServiceIframe: FC<ServiceIframeProps> = ({ scope, sub }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const { rpc } = useRPC({
     config: {
@@ -20,7 +20,7 @@ const ServiceIframe: FC = () => {
     init: () => iframeRef.current,
   })
 
-  const { emit } = useEventChat(serviceScopeApi, {
+  const { emit } = useEventChat(`item-${scope}-${sub}`, {
     group: serviceWorkerGroup,
     schema: z.string(),
     callback: ({ detail }) => {
@@ -37,8 +37,11 @@ const ServiceIframe: FC = () => {
 
   parentCtx.provider({ transmit, emit })
 
-  return (
-    <iframe className="h-full w-full" ref={iframeRef} src={`/iframe?sub=${serviceWorkerGroup}`} />
-  )
+  return <iframe className="h-full w-full" ref={iframeRef} src={`/iframe?sub=${sub}`} />
 }
 export default ServiceIframe
+
+interface ServiceIframeProps {
+  scope: string
+  sub: string
+}

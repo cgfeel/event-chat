@@ -1,4 +1,4 @@
-import { IframeSerializeOptions, ListenerType } from '../fields'
+import { IframeSerializeOptions, ListenerType, MessageItem } from '../fields'
 import BaseTransport from './BaseTransport'
 
 // 主线程，跨窗口、跨 iframe 通信：HTMLIFrameElement.contentWindow, Window, Window.parent, window.open
@@ -21,7 +21,7 @@ class WindowTransport extends BaseTransport<Window> {
     window.removeEventListener('message', listener, this._options.message)
   }
 
-  postMessage(message: unknown, options?: IframeSerializeOptions): void {
+  postMessage(message: MessageItem, options?: IframeSerializeOptions): void {
     const { transfer, targetOrigin = '*' } = options ?? {}
     this._target.postMessage(message, {
       targetOrigin,

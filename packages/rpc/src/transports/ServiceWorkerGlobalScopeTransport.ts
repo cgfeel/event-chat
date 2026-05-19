@@ -1,5 +1,7 @@
-import { IframeSerializeOptions, ListenerType } from '../fields'
+import { IframeSerializeOptions, ListenerType, MessageItem } from '../fields'
 import BaseTransport from './BaseTransport'
+
+declare const self: ServiceWorkerGlobalScope
 
 // SW 内部全局对象：ServiceWorker 监听页面消息
 class ServiceWorkerGlobalScopeTransport extends BaseTransport<ServiceWorkerGlobalScope> {
@@ -32,7 +34,7 @@ class ServiceWorkerGlobalScopeTransport extends BaseTransport<ServiceWorkerGloba
       this._source = event.source
       event.waitUntil(
         new Promise<void>((resove) => {
-          // eslint 不接受 any，允许 unknown，如果遇到协变了再做具体断言
+          // eslint 不接受 any，允许 unknown
           const data = event.data as unknown
           listener({ origin: event.origin, ports: event.ports, source: null, wait: resove, data })
         })
@@ -47,18 +49,21 @@ class ServiceWorkerGlobalScopeTransport extends BaseTransport<ServiceWorkerGloba
       this._target.removeEventListener('message', this._onconnect, this._options.message)
   }
 
-  postMessage(message: unknown, options?: IframeSerializeOptions): void {
+  postMessage(message: MessageItem, options?: IframeSerializeOptions): void {
+    const msg = { ...message, scope: self.registration.scope }
     const { transmit, transfer } = options ?? {}
     // 允许转发请求到指定窗口或 iframe
     if (transmit) {
       transmit()
-        .then((clients) => clients.forEach((client) => client.postMessage(message, { transfer })))
+        .then((clients) => clients.forEach((client) => client.postMessage(msg, { transfer })))
         .catch(() => {})
     } else {
       // 没有接受消息前 source 发不出消息
-      this._source?.postMessage(message, { transfer })
+      this._source?.postMessage(msg, { transfer })
     }
   }
 }
+
+export {}
 
 export default ServiceWorkerGlobalScopeTransport

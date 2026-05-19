@@ -1,4 +1,4 @@
-import { IframeSerializeOptions, ListenerType } from '../fields'
+import { IframeSerializeOptions, ListenerType, MessageItem } from '../fields'
 import BaseTransport from './BaseTransport'
 
 // 主线程给子线程发消息：Worker
@@ -19,7 +19,7 @@ class DedicatedWorkerGlobalScopeTransport extends BaseTransport<DedicatedWorkerG
     this._target.removeEventListener('message', listener, this._options.message)
   }
 
-  postMessage(message: unknown, options?: IframeSerializeOptions): void {
+  postMessage(message: MessageItem, options?: IframeSerializeOptions): void {
     const { transfer } = options ?? {}
     this._target.postMessage(message, { transfer })
   }

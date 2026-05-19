@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.19](https://github.com/event-chat/event-chat/compare/rpc@v0.1.18...rpc@v0.1.19) (2026-05-19)
+
+
+### Bug Fixes
+
+* update RPCAction add scope ([570f8d2](https://github.com/event-chat/event-chat/commit/570f8d240eb7b25387e0c4f8ac856636ae506adc))
+* update RPCAction add scope ([779206c](https://github.com/event-chat/event-chat/commit/779206cf60c2e68892798d3abcd86a3b92824bf1))
+
 ## [0.1.18](https://github.com/event-chat/event-chat/compare/rpc@v0.1.17...rpc@v0.1.18) (2026-05-17)
 
 

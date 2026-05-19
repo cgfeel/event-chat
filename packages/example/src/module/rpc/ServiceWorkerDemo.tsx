@@ -11,6 +11,7 @@ import {
   serviceScopeAction,
   serviceScopeApi,
   serviceScopeParent,
+  serviceWorkerAction,
   serviceWorkerGroup,
 } from './uitls'
 
@@ -19,7 +20,7 @@ const styles = tv({
     item: 'flex min-h-0 flex-col gap-2',
     itemTitle: 'flex flex-none items-center justify-between gap-2 text-gray-500',
     logs: 'flex-1 overflow-auto px-4',
-    panel: 'row-span-2 flex min-h-0 bg-gray-800',
+    panel: 'row-span-3 flex min-h-0 bg-gray-800',
     worker: 'h-full flex-auto overflow-hidden bg-gray-800',
     wrap: 'grid h-162 grid-cols-1 gap-x-4 gap-y-2 md:grid-cols-2',
   },
@@ -62,7 +63,7 @@ const WorkerGrid: FC<PropsWithChildren<WorkerGridProps>> = ({ children, scope })
           size="small"
           value={status}
           onChange={(detail) => {
-            emit({ name: scope, detail })
+            emit({ name: `item-${scope}`, detail })
             setStatus(detail)
           }}
         />
@@ -108,8 +109,11 @@ const ServiceWorkerDemo: FC = () => {
           }}
         />
       </WorkerGrid>
-      <WorkerGrid scope={serviceScopeApi}>
-        <ServiceIframe />
+      <WorkerGrid scope={`${serviceScopeAction}-${serviceWorkerAction}`}>
+        <ServiceIframe scope={serviceScopeAction} sub={serviceWorkerAction} />
+      </WorkerGrid>
+      <WorkerGrid scope={`${serviceScopeApi}-${serviceWorkerGroup}`}>
+        <ServiceIframe scope={serviceScopeApi} sub={serviceWorkerGroup} />
       </WorkerGrid>
     </div>
   )

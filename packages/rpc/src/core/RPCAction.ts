@@ -1,5 +1,6 @@
-import { IframeSerializeOptions, Transport } from '../fields'
+import { IframeSerializeOptions, MessageItem, Transport } from '../fields'
 import { isKey } from '../utils'
+import { receiptStore } from './receiptStore'
 
 const RPC_SIGN = 'RPCActionSign'
 const WINDOW_NAME = '[object Window]'
@@ -17,8 +18,10 @@ const getOrigin = (url: string) =>
 
 class RPCAction {
   private _brodcastListeners: BrodcastItem[] = []
+  private _brodcastRecord: string[] = []
   private _handlers: HandlersRecord = {}
   private _heartbeatTimer: NodeJS.Timeout | null = null
+  private _requestId = ''
   private _isConnected = false
   private _lastHeartbeat = Date.now()
   private _options: RPCOptionsType = {}
@@ -29,6 +32,7 @@ class RPCAction {
     private _target: Transport<boolean>,
     options?: RPCOptionsType
   ) {
+    this._requestId = receiptStore.create()
     this._options = {
       ...defaultOptions,
       ...options,
@@ -46,18 +50,34 @@ class RPCAction {
     this._target.onremove(this._boundMessageHandler)
     this._abort(true)
 
+    this._brodcastRecord.forEach((brodkey) => {
+      const [sign, requestId] = brodkey.split(':')
+      if (sign === this._requestId) receiptStore.minus(requestId)
+    })
+
+    receiptStore.minus(this._requestId)
     this._brodcastListeners = []
+    this._brodcastRecord = []
     this._handlers = {}
     this._heartbeatTimer = null
+    this._requestId = ''
   }
 
   broadcast<T>(options?: Omit<RequestOptions<T>, 'retry'>) {
     const { payload, ...ops } = options ?? {}
     const { channel } = this._options
-    this._target.postMessage(
-      { __RPC__: RPC_SIGN, broadcast: true, kind: 'request', channel, payload },
-      { ...ops, targetOrigin: ops.targetOrigin ?? self?.location?.origin }
-    )
+    const info = this._baseMessage({
+      broadcast: true,
+      kind: 'request',
+      requestId: receiptStore.create(),
+      channel,
+      payload,
+    })
+
+    this._target.postMessage(info, {
+      ...ops,
+      targetOrigin: ops.targetOrigin ?? self?.location?.origin,
+    })
   }
 
   config(options: Omit<RPCOptionsType, 'onConnect' | 'onDisconnect'>) {
@@ -86,11 +106,11 @@ class RPCAction {
         return
       }
 
-      const requestId = this._createRequestId()
+      const requestId = receiptStore.create()
       const timer = setTimeout(() => {
         this._pending.delete(requestId)
+        receiptStore.minus(requestId)
         if (retry < retryTimes) {
-          // 只要不抛出错误就正常
           resolve(this.request(type, { ...options, retry: retry + 1 }))
         } else {
           reject(new Error(`[RPC] 请求超时：${type.toString()}`))
@@ -110,10 +130,11 @@ class RPCAction {
         timer,
       })
 
-      this._target.postMessage(
-        { __RPC__: RPC_SIGN, kind: 'request', channel, payload, requestId, type },
-        { ...ops, targetOrigin: ops.targetOrigin ?? self?.location?.origin }
-      )
+      const info = this._baseMessage({ kind: 'request', channel, payload, requestId, type })
+      this._target.postMessage(info, {
+        ...ops,
+        targetOrigin: ops.targetOrigin ?? self?.location?.origin,
+      })
     })
   }
 
@@ -121,16 +142,16 @@ class RPCAction {
     this._isConnected = false
     this._options?.onDisconnect?.(destroy)
 
-    this._pending.forEach(({ reject, timer }) => {
+    this._pending.forEach(({ reject, timer }, requestId) => {
       clearTimeout(timer)
+      receiptStore.minus(requestId)
       reject(new Error('[RPC] 连接已断开，请求已取消'))
     })
     this._pending.clear()
   }
 
-  private _createRequestId(): string {
-    const requestId = Math.random().toString(36).slice(2, 10)
-    return this._pending.has(requestId) ? this._createRequestId() : requestId
+  private _baseMessage(data: MessageItem): MessageItem {
+    return { ...data, __RPC__: RPC_SIGN, sign: this._requestId }
   }
 
   private _isOriginAllowed(origin: string) {
@@ -148,13 +169,13 @@ class RPCAction {
     }
   ) {
     const { data, origin, ports, source, wait } = event
-    const { __RPC__, broadcast, channel, error, heartbeat, kind, payload, requestId, type } =
+    const { __RPC__, broadcast, channel, error, heartbeat, kind, payload, requestId, sign, type } =
       data ?? {}
 
     // 如果 source、channel、origin、RPC 都无法隔离消息，只能在业务通过 payload 进行隔离
     if (__RPC__ !== RPC_SIGN) return
     if (this._options?.channel !== channel) return
-    if (!this._target.is(source)) return
+    if (!this._target.is(source, data)) return
     if (this._target.getType() === WINDOW_NAME && !this._isOriginAllowed(origin)) return
 
     // 心跳
@@ -171,7 +192,12 @@ class RPCAction {
     // 广播
     const info = { origin, ports, source }
     if (broadcast) {
-      this._brodcastListeners.forEach((listener) => listener(payload, info))
+      const brodsign = [sign, requestId].filter(Boolean)
+      const brodkey = brodsign.join(':')
+      if (brodsign.length === 2 && !this._brodcastRecord.includes(brodkey)) {
+        this._brodcastRecord.push(brodkey)
+        this._brodcastListeners.forEach((listener) => listener(payload, info))
+      }
       return
     }
 
@@ -180,6 +206,8 @@ class RPCAction {
     if (requestId && pending) {
       const { resolve, reject } = pending
       this._pending.delete(requestId)
+      receiptStore.minus(requestId)
+
       if (error !== undefined) {
         reject(new Error(error))
       } else {
@@ -192,6 +220,8 @@ class RPCAction {
 
     // 本地方法调用
     const handler = type && isKey(type, this._handlers) ? this._handlers[type] : undefined
+    const base = this._baseMessage({ kind: 'response', channel, requestId, type })
+
     if (handler) {
       Promise.resolve()
         .then(() => {
@@ -200,23 +230,13 @@ class RPCAction {
           return result
         })
         .then((result) => {
-          this._target.postMessage(
-            { __RPC__: RPC_SIGN, kind: 'response', payload: result, channel, requestId, type },
-            { targetOrigin: origin }
-          )
+          this._target.postMessage({ ...base, payload: result }, { targetOrigin: origin })
           return result
         })
         .catch((err) => {
           const message = err instanceof Error ? err.message : '[RPC] 处理消息时发生错误'
           this._target.postMessage(
-            {
-              __RPC__: RPC_SIGN,
-              error: message,
-              kind: 'response',
-              payload: '',
-              channel,
-              requestId,
-            },
+            { ...base, error: message, payload: '' },
             { targetOrigin: origin }
           )
         })
@@ -224,7 +244,7 @@ class RPCAction {
     }
   }
 
-  // server worker 要额外优化
+  // 心跳不需要 requestId
   private _startHeartbeat() {
     const {
       channel,
@@ -232,8 +252,9 @@ class RPCAction {
       heartbeatTimeout = defaultOptions.heartbeatTimeout,
     } = this._options
 
+    const info = this._baseMessage({ heartbeat: true, kind: 'request', channel })
     const intervalLoops = () => {
-      this._target.postMessage({ __RPC__: RPC_SIGN, heartbeat: true, kind: 'request', channel })
+      this._target.postMessage(info)
 
       // ❌ 心跳超时
       if (!this._isConnected) return
@@ -253,9 +274,8 @@ export { WINDOW_NAME }
 
 export default RPCAction
 
-export type RPCOptionsType = {
+export type RPCOptionsType = Pick<MessageItem, 'channel'> & {
   allowedOrigins?: string[]
-  channel?: string // 同实例情况下，通过 channel 区分
   heartbeatInterval?: number
   heartbeatTimeout?: number
   retryTimeout?: number
@@ -278,18 +298,6 @@ export type RequestOptions<T = unknown> = IframeSerializeOptions & {
 type HandlersRecord = Record<PropertyKey, ActionFunType>
 
 type MessageInfo = Pick<MessageEvent, 'origin' | 'ports' | 'source'>
-
-// scope?: string 如果还不够区分的话，增加属性（观望）
-type MessageItem = Pick<RPCOptionsType, 'channel'> & {
-  payload: unknown
-  __RPC__?: string // 过滤外部消息
-  broadcast?: boolean
-  error?: string
-  heartbeat?: boolean
-  kind?: 'request' | 'response'
-  requestId?: string
-  type?: PropertyKey
-}
 
 type PendingItem = Record<'resolve' | 'reject', (value?: unknown) => void> & {
   timer: NodeJS.Timeout

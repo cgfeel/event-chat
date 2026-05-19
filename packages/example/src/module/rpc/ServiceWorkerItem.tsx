@@ -47,7 +47,7 @@ const ServiceWorkerItem: FC<ServiceWorkerItemProps> = ({
     [connected, disabled, sending]
   )
 
-  const { emit } = useEventChat(scope, {
+  const { emit } = useEventChat(`item-${scope}`, {
     schema: z.string(),
     callback: ({ detail }) => setBroadcast(detail),
     group,

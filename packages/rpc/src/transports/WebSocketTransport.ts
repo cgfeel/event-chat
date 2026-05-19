@@ -1,11 +1,11 @@
-import { FactoryOptions, ListenerType } from '../fields'
+import { FactoryOptions, ListenerType, MessageItem } from '../fields'
 import BaseTransport from './BaseTransport'
 
-function isSafeBufferSource(data: unknown): data is ArrayBuffer | ArrayBufferView<ArrayBuffer> {
-  return (
-    data instanceof ArrayBuffer || (ArrayBuffer.isView(data) && data.buffer instanceof ArrayBuffer)
-  )
-}
+// function isSafeBufferSource(data: unknown): data is ArrayBuffer | ArrayBufferView<ArrayBuffer> {
+//   return (
+//     data instanceof ArrayBuffer || (ArrayBuffer.isView(data) && data.buffer instanceof ArrayBuffer)
+//   )
+// }
 
 // 主线程：WebSocket client
 class WebSocketTransport extends BaseTransport<WebSocket> {
@@ -48,14 +48,20 @@ class WebSocketTransport extends BaseTransport<WebSocket> {
     this._target.onmessage = null
   }
 
-  postMessage(message: unknown): void {
+  postMessage(message: MessageItem): void {
     const target = this._target
     this._onconnect
       .then((open) => {
         if (open)
-          target.send(
-            isSafeBufferSource(message) || message instanceof Blob ? message : String(message)
-          )
+          try {
+            target.send(
+              // 暂且不传 ArrayBuffer，后面再看如何传
+              // isSafeBufferSource(message) || message instanceof Blob ? message : String(message)
+              JSON.stringify(message)
+            )
+          } catch {
+            //
+          }
       })
       .catch(() => {})
   }

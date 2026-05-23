@@ -1,19 +1,20 @@
-import { iframeCtx, parentCtx } from '@/services/serviceWorkerService'
+import { type ParentCtxType, iframeCtx, parentCtx } from '@/services/serviceWorkerService'
 import { useEventChat } from '@event-chat/core'
-import { useRPC } from '@event-chat/rpc/react'
+import { TARGET_TYPE_STRINGS, useRPC } from '@event-chat/rpc/react'
 import { createWindowRPC } from '@event-chat/rpc/window'
-import type { FC } from 'react'
+import { type FC, useCallback } from 'react'
 import { receiptStore } from '@/components/chatLine/receiptStore'
 import ServiceWorkerItem from '../rpc/ServiceWorkerItem'
-import { serviceScopeApi } from '../rpc/uitls'
+import { serviceScopeApi, serviceWorkerGroup } from '../rpc/uitls'
 import type { SubIframeProps } from './SubIframe'
 
 const SubServiceWorker: FC<SubServiceWorkerProps> = ({ group, scope = serviceScopeApi }) => {
-  const { connected, rpc } = useRPC({
+  const { connected, rpc, brodcastScope } = useRPC({
     config: {
       allowedOrigins: ['http://localhost:3000', '*'],
-      channel: 'service-worker',
+      channel: serviceWorkerGroup,
     },
+    brodcast: iframeCtx.brodcasts,
     consume: parentCtx.actions,
     event: iframeCtx.actions,
     drive: createWindowRPC,
@@ -21,7 +22,17 @@ const SubServiceWorker: FC<SubServiceWorkerProps> = ({ group, scope = serviceSco
   })
 
   const { emit } = useEventChat('', { group })
-  iframeCtx.provider({ scope, emit })
+  const broadcat: NonNullable<ParentCtxType['broadcat']> = useCallback(
+    (payload, info) => {
+      brodcastScope(
+        { ...info, payload },
+        { include: [TARGET_TYPE_STRINGS.ServiceWorkerRegistration] }
+      )
+    },
+    [brodcastScope]
+  )
+
+  iframeCtx.provider({ scope, broadcat, emit })
 
   return (
     <ServiceWorkerItem

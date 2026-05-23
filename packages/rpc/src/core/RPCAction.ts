@@ -64,20 +64,22 @@ class RPCAction {
   }
 
   broadcast<T>(options?: Omit<RequestOptions<T>, 'retry'>) {
-    const { payload, ...ops } = options ?? {}
+    const { payload, sign, requestId = '', ...ops } = options ?? {}
     const { channel } = this._options
     const info = this._baseMessage({
       broadcast: true,
       kind: 'request',
-      requestId: receiptStore.create(),
+      requestId: requestId === '' ? receiptStore.create() : requestId,
       channel,
       payload,
     })
 
+    if (sign) info.sign = sign
     this._target.postMessage(info, {
       ...ops,
       targetOrigin: ops.targetOrigin ?? self?.location?.origin,
     })
+    return info
   }
 
   config(options: Omit<RPCOptionsType, 'onConnect' | 'onDisconnect'>) {
@@ -196,7 +198,9 @@ class RPCAction {
       const brodkey = brodsign.join(':')
       if (brodsign.length === 2 && !this._brodcastRecord.includes(brodkey)) {
         this._brodcastRecord.push(brodkey)
-        this._brodcastListeners.forEach((listener) => listener(payload, info))
+        this._brodcastListeners.forEach((listener) =>
+          listener(payload, { ...info, requestId, sign })
+        )
       }
       return
     }
@@ -288,12 +292,17 @@ export type RPCOptionsType = Pick<MessageItem, 'channel'> & {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ActionFunType = (payload?: any, info?: MessageInfo) => any
 
-export type BrodcastItem = (value: unknown, info?: MessageInfo) => void
+// MessageItem 部分信息用于转发消息用于广播
+export type BrodcastItem = (
+  value: unknown,
+  info?: MessageInfo & Pick<MessageItem, 'requestId' | 'sign'>
+) => void
 
-export type RequestOptions<T = unknown> = IframeSerializeOptions & {
-  payload?: T
-  retry?: number
-}
+export type RequestOptions<T = unknown> = IframeSerializeOptions &
+  Pick<MessageItem, 'requestId' | 'sign'> & {
+    payload?: T
+    retry?: number
+  }
 
 type HandlersRecord = Record<PropertyKey, ActionFunType>
 

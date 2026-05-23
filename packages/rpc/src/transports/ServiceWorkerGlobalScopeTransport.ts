@@ -52,9 +52,19 @@ class ServiceWorkerGlobalScopeTransport extends BaseTransport<ServiceWorkerGloba
   postMessage(message: MessageItem, options?: IframeSerializeOptions): void {
     const msg = { ...message, scope: self.registration.scope }
     const { transmit, transfer } = options ?? {}
+
+    // 当多个相同 scope 的实例存在不同的 window 中，避免因为失活无法收到消息
+    const transmitHandle = !msg.heartbeat
+      ? transmit
+      : () =>
+          self.clients.matchAll({
+            type: 'window',
+            includeUncontrolled: true,
+          })
+
     // 允许转发请求到指定窗口或 iframe
-    if (transmit) {
-      transmit()
+    if (transmitHandle) {
+      transmitHandle()
         .then((clients) => clients.forEach((client) => client.postMessage(msg, { transfer })))
         .catch(() => {})
     } else {

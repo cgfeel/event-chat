@@ -3,6 +3,7 @@ import type { useEventChat } from '@event-chat/core'
 import { createCtx, createService } from '@event-chat/rpc/react'
 import z from 'zod'
 import type { itemSchema } from '@/components/chatLine'
+import { receiptStore } from '@/components/chatLine/receiptStore'
 
 const URL =
   process.env.NODE_ENV !== 'production'
@@ -88,18 +89,27 @@ const transmitResult = ({
   }
 }
 
-const iframeCtx = iframeEvent((ctx) => ({
-  broadcast: (detail: string) => {
-    const { scope, emit } = ctx
-    if (scope) emit?.({ name: scope, detail })
-  },
-  sendMessage: (detail: z.infer<typeof resultSchema>) => {
-    const { scope, emit } = ctx
-    if (scope) {
-      emit?.({ name: `chat-${scope}`, detail })
-    }
-  },
-}))
+const iframeCtx = iframeEvent(
+  (ctx) => ({
+    broadcast: (detail: string) => {
+      const { scope, emit } = ctx
+      if (scope) emit?.({ name: `item-${scope}`, detail })
+    },
+    sendMessage: (detail: z.infer<typeof resultSchema>) => {
+      const { scope, emit } = ctx
+      if (scope) {
+        emit?.({ name: `chat-${scope}`, detail })
+      }
+    },
+  }),
+  (ctx) => ({
+    broadcat: (detail, info) => {
+      const { data, success } = requestSchema.safeParse(detail)
+      const { scope, broadcat } = ctx
+      if (scope && success) broadcat?.({ ...data, scope }, info)
+    },
+  })
+)
 
 const mainCtx = createCtx((ctx: Partial<ParentCtxType>) => ({
   sendMessage: (result: z.infer<typeof resultSchema>) => {
@@ -108,7 +118,15 @@ const mainCtx = createCtx((ctx: Partial<ParentCtxType>) => ({
       const detail = transmitResult({
         message: 'success',
         scope: scope.split('-').pop() ?? '',
-        result,
+        result: {
+          ...result,
+          receivedBody: !result.receivedBody
+            ? undefined
+            : {
+                ...result.receivedBody,
+                receipt: receiptStore.addReceipt(),
+              },
+        },
       })
 
       emit?.({ detail, name: scope })
@@ -119,12 +137,18 @@ const mainCtx = createCtx((ctx: Partial<ParentCtxType>) => ({
 
 const parentCtx = createCtx(
   (ctx: Partial<ParentCtxType>) => ({
-    // checkin: (receipt: string) => receiptStore.increasing(receipt),
     sendMessage: (detail: z.infer<typeof itemSchema>) => {
-      ctx.emit?.({ name: `chat-${serviceScopeParent}`, detail: { ...detail, own: false } })
+      ctx.emit?.({
+        name: `chat-${serviceScopeParent}`,
+        detail: { ...detail, own: false, user: `iframe:${detail.user}` },
+      })
     },
   }),
-  brodcastScope
+  (ctx: Partial<ParentCtxType>) => ({
+    brodcast: (detail: unknown, info?: BroadcatInfo) => {
+      ctx.broadcat?.(detail, info)
+    },
+  })
 )
 
 const workerCtx = createCtx(
@@ -150,9 +174,12 @@ export { iframeCtx, mainCtx, parentCtx, resultSchema, workerCtx, transmitResult 
 
 export type ParentCtxType = Pick<ReturnType<typeof useEventChat>, 'emit'> & {
   scope: string
+  broadcat: (detail: unknown, info?: BroadcatInfo) => void
   publish: (detail: z.infer<typeof itemSchema>) => void
-  transmit: (result: z.infer<typeof resultSchema>, single?: boolean) => void
+  transmit: (result: z.infer<typeof resultSchema>, info?: BroadcatInfo) => void
 }
+
+type BroadcatInfo = Partial<Record<'requestId' | 'sign', string>>
 
 type TransmitResultProps = Awaited<ReturnType<typeof sendMessage>> & { scope: string }
 

@@ -1,4 +1,9 @@
-import { iframeCtx, parentCtx, resultSchema } from '@/services/serviceWorkerService'
+import {
+  type ParentCtxType,
+  iframeCtx,
+  parentCtx,
+  resultSchema,
+} from '@/services/serviceWorkerService'
 import { useEventChat } from '@event-chat/core'
 import { useRPC } from '@event-chat/rpc/react'
 import { createWindowRPC } from '@event-chat/rpc/window'
@@ -8,10 +13,10 @@ import { serviceWorkerGroup } from './uitls'
 
 const ServiceIframe: FC<ServiceIframeProps> = ({ scope, sub }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null)
-  const { rpc } = useRPC({
+  const { rpc, brodcastScope } = useRPC({
     config: {
       allowedOrigins: ['http://localhost:3000', '*'],
-      channel: 'service-worker',
+      channel: serviceWorkerGroup,
     },
     brodcast: parentCtx.brodcasts,
     consume: iframeCtx.actions,
@@ -28,14 +33,21 @@ const ServiceIframe: FC<ServiceIframeProps> = ({ scope, sub }) => {
     },
   })
 
+  const broadcat: NonNullable<ParentCtxType['broadcat']> = useCallback(
+    (payload, info) => {
+      brodcastScope({ ...info, payload })
+    },
+    [brodcastScope]
+  )
+
   const transmit = useCallback(
     (payload: z.infer<typeof resultSchema>) => {
-      rpc.request('sendMessage', { payload }).catch(() => {})
+      rpc.broadcast({ payload })
     },
     [rpc]
   )
 
-  parentCtx.provider({ transmit, emit })
+  parentCtx.provider({ broadcat, emit, transmit })
 
   return <iframe className="h-full w-full" ref={iframeRef} src={`/iframe?sub=${sub}`} />
 }

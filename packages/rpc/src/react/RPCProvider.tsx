@@ -1,5 +1,6 @@
 import { FC, PropsWithChildren, useCallback, useEffect, useRef } from 'react'
 import { RequestOptions } from '../core/RPCAction'
+import { MessageItem } from '../fields'
 import { objectValues } from '../utils'
 import {
   RPCInstanceContext,
@@ -19,6 +20,7 @@ const RPCProvider: FC<PropsWithChildren> = ({ children }) => {
         .filter((item) => !include || include.includes(item))
         .map(String)
 
+      let result: MessageItem = {}
       list.current.forEach((group, item) => {
         if (
           'getType' in item &&
@@ -26,7 +28,11 @@ const RPCProvider: FC<PropsWithChildren> = ({ children }) => {
           !typeout?.includes(group) &&
           (!typein || typein.includes(group))
         ) {
-          item.broadcast(data)
+          result = item.broadcast({
+            ...data,
+            requestId: data.requestId ?? result.requestId,
+            sign: data.sign ?? result.sign,
+          })
         }
       })
     }

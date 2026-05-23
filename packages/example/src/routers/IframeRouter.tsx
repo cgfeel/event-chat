@@ -1,6 +1,5 @@
 import RecipientsProvider from '@/module/rpc/RecipientsProvider'
 import { chatName, iframeName, serviceWorkerAction, serviceWorkerGroup } from '@/module/rpc/uitls'
-import { ConfigProvider, theme } from 'antd'
 import { type FC, lazy, useMemo } from 'react'
 import { isKey } from '@/utils/fields'
 
@@ -24,15 +23,9 @@ const IframeRouter: FC = () => {
 
   const IframePage = isKey(subName, router) ? router[subName] : null
   return IframePage ? (
-    <ConfigProvider
-      theme={{
-        algorithm: theme.darkAlgorithm,
-      }}
-    >
-      <RecipientsProvider>
-        <IframePage group={!subName ? undefined : subName} />
-      </RecipientsProvider>
-    </ConfigProvider>
+    <RecipientsProvider>
+      <IframePage group={!subName ? undefined : subName} />
+    </RecipientsProvider>
   ) : null
 }
 

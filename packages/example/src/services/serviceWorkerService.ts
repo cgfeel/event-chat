@@ -176,7 +176,7 @@ export type ParentCtxType = Pick<ReturnType<typeof useEventChat>, 'emit'> & {
   scope: string
   broadcat: (detail: unknown, info?: BroadcatInfo) => void
   publish: (detail: z.infer<typeof itemSchema>) => void
-  transmit: (result: z.infer<typeof resultSchema>, info?: BroadcatInfo) => void
+  transmit: (result: z.infer<typeof resultSchema>) => void
 }
 
 type BroadcatInfo = Partial<Record<'requestId' | 'sign', string>>

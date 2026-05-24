@@ -1,13 +1,26 @@
 import RecipientsProvider from '@/module/rpc/RecipientsProvider'
-import { chatName, iframeName, serviceWorkerAction, serviceWorkerGroup } from '@/module/rpc/uitls'
+import {
+  chatName,
+  iframeName,
+  messagePortService,
+  messagePortWeb,
+  messagePortWindow,
+  serviceWorkerAction,
+  serviceWorkerGroup,
+} from '@/module/rpc/uitls'
 import { type FC, lazy, useMemo } from 'react'
 import { isKey } from '@/utils/fields'
+
+const MessagePort = lazy(() => import('@/module/iframe/SubMessagePort'))
 
 const router = Object.freeze({
   [chatName]: lazy(() => import('@/module/iframe/IframeExample')),
   [iframeName]: lazy(() => import('@/module/iframe/IframeChat')),
   [serviceWorkerAction]: lazy(() => import('@/module/iframe/ActionServiceWorker')),
   [serviceWorkerGroup]: lazy(() => import('@/module/iframe/SubServiceWorker')),
+  [messagePortService]: MessagePort,
+  [messagePortWeb]: MessagePort,
+  [messagePortWindow]: MessagePort,
 })
 
 const IframeRouter: FC = () => {

@@ -1,7 +1,6 @@
 import { useEventChat } from '@event-chat/core'
 import { Empty, Select } from 'antd'
-import { type FC, type PropsWithChildren, useEffect, useState } from 'react'
-import { tv } from 'tailwind-variants'
+import { type FC, type PropsWithChildren, useState } from 'react'
 import Button from '@/components/Button'
 import { ChatScroll } from '@/components/chatLine'
 import { receiptStore } from '@/components/chatLine/receiptStore'
@@ -14,40 +13,30 @@ import {
   serviceWorkerAction,
   serviceWorkerGroup,
 } from './uitls'
+import { panelStyles } from './windowUitls'
 
-const styles = tv({
-  slots: {
-    item: 'flex min-h-0 flex-col gap-2',
-    itemTitle: 'flex flex-none items-center justify-between gap-2 text-gray-500',
-    logs: 'flex-1 overflow-auto px-4',
-    panel: 'row-span-3 flex min-h-0 bg-gray-800',
-    worker: 'h-full flex-auto overflow-hidden bg-gray-800',
-    wrap: 'grid h-162 grid-cols-1 gap-x-4 gap-y-2 md:grid-cols-2',
-  },
-  variants: {
-    closed: {
-      true: {
-        worker: 'flex items-center justify-center',
-      },
-    },
-  },
-})
-
-const { item, itemTitle, logs, panel, worker, wrap } = styles()
+const { item, itemTitle, logs, panel, worker, wrap } = panelStyles()
+const itemList = [
+  { scope: serviceScopeAction, sub: serviceWorkerAction },
+  { scope: serviceScopeApi, sub: serviceWorkerGroup },
+] as const
 
 const WorkerGrid: FC<PropsWithChildren<WorkerGridProps>> = ({ children, scope }) => {
   const { emit } = useEventChat('', { group: serviceWorkerGroup })
   const [status, setStatus] = useState('normal')
   const [open, setOpen] = useState(true)
 
-  useEffect(() => {
-    setStatus('normal')
-  }, [open])
-
   return (
     <div className={item()} data-theme="dark">
       <div className={itemTitle()}>
-        <Button onClick={() => setOpen(!open)}>{open ? 'closed' : 'open'}</Button>
+        <Button
+          onClick={() => {
+            setOpen(!open)
+            setStatus('normal')
+          }}
+        >
+          {open ? 'closed' : 'open'}
+        </Button>
         <Select
           options={[
             { label: '单独发送', value: 'normal' },
@@ -109,12 +98,14 @@ const ServiceWorkerDemo: FC = () => {
           }}
         />
       </WorkerGrid>
-      <WorkerGrid scope={`${serviceScopeAction}-${serviceWorkerAction}`}>
-        <ServiceIframe scope={serviceScopeAction} sub={serviceWorkerAction} />
-      </WorkerGrid>
-      <WorkerGrid scope={`${serviceScopeApi}-${serviceWorkerGroup}`}>
-        <ServiceIframe scope={serviceScopeApi} sub={serviceWorkerGroup} />
-      </WorkerGrid>
+      {itemList.map(({ scope, sub }) => {
+        const keyname = `${scope}-${sub}`
+        return (
+          <WorkerGrid key={keyname} scope={keyname}>
+            <ServiceIframe scope={scope} sub={sub} />
+          </WorkerGrid>
+        )
+      })}
     </div>
   )
 }

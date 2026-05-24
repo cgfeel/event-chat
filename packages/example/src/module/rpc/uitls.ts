@@ -12,5 +12,10 @@ export const serviceWorkerAction = 'service-worker-action'
 export const serviceWorkerGroup = 'service-worker-group'
 export const workerGroup = 'worker-group'
 
+export const messageGroup = 'message-group'
+export const messagePortService = '/static/js/async/port/service'
+export const messagePortWindow = '/static/js/async/port/window'
+export const messagePortWeb = '/static/js/async/port/web'
+
 // 避免 formily 对于 worker:item 这样匹配规则的问题
 export const workerNameFilter = (name: string) => name.replace(/:/g, '-')

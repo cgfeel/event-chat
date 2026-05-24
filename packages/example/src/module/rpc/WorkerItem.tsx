@@ -43,7 +43,7 @@ const WorkerItem: FC<WorkerItemProps> = ({ channel, group, name, feedback }) => 
     name: channel,
     drive: createWorkerRPC,
     init: () =>
-      new Worker(new URL('./worker.ts', import.meta.url), {
+      new Worker(new URL('./worker/worker.ts', import.meta.url), {
         name: 'my-worker',
       }),
   })

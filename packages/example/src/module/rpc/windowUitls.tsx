@@ -1,3 +1,4 @@
+import { Badge } from 'antd'
 import { tv } from 'tailwind-variants'
 
 export const panelStyles = tv({
@@ -16,4 +17,10 @@ export const panelStyles = tv({
       },
     },
   },
+})
+
+export const titleRange = Object.freeze({
+  Connect: <Badge status="success" text="Connect" />,
+  Disconnect: <Badge status="default" text="Disconnect" />,
+  Sending: <Badge status="warning" text="Sending" />,
 })

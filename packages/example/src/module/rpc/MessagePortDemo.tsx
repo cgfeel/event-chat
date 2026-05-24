@@ -1,36 +1,43 @@
 import { useEventChat } from '@event-chat/core'
-import { Empty, Select } from 'antd'
-import { type FC, type PropsWithChildren, useEffect, useState } from 'react'
+import { Select } from 'antd'
+import { type FC, type PropsWithChildren, useState } from 'react'
 import Button from '@/components/Button'
 import { ChatScroll } from '@/components/chatLine'
+import MessagePortIframe from './MessagePortIframe'
+import { messagePortService, messagePortWeb, messagePortWindow } from './uitls'
 import { panelStyles } from './windowUitls'
 
-const group = 'MessagePort'
 const { item, itemTitle, logs, panel, worker, wrap } = panelStyles()
+
+const group = 'MessagePort'
+const itemList = [messagePortService, messagePortWeb, messagePortWindow] as const
 
 const WorkerGrid: FC<PropsWithChildren<WorkerGridProps>> = ({ children, scope }) => {
   const { emit } = useEventChat('', { group })
   const [status, setStatus] = useState('normal')
-  const [open, setOpen] = useState(true)
-
-  useEffect(() => {
-    setStatus('normal')
-  }, [open])
+  const [loading, setLoading] = useState(false)
+  const [connect, setConnect] = useState(false)
 
   return (
     <div className={item()} data-theme="dark">
       <div className={itemTitle()}>
-        <Button onClick={() => setOpen(!open)}>{open ? 'closed' : 'open'}</Button>
+        <Button
+          disabled={loading}
+          loading={loading}
+          variant={connect ? 'secondary' : 'primary'}
+          onClick={() => {
+            setLoading(true)
+            setConnect(true)
+          }}
+        >
+          {(loading ? 'Sending....' : undefined) ?? (connect ? 'Destroy' : 'Connect')}
+        </Button>
         <Select
           options={[
             { label: '单独发送', value: 'normal' },
             {
               label: '全局广播',
               value: 'broadcast',
-            },
-            {
-              label: '全局转发',
-              value: 'transmit',
             },
           ]}
           size="small"
@@ -41,13 +48,7 @@ const WorkerGrid: FC<PropsWithChildren<WorkerGridProps>> = ({ children, scope })
           }}
         />
       </div>
-      {open ? (
-        <div className={worker()}>{children}</div>
-      ) : (
-        <div className={worker({ closed: !open })}>
-          <Empty description="Worker is closed" image={Empty.PRESENTED_IMAGE_SIMPLE} />
-        </div>
-      )}
+      <div className={worker()}>{children}</div>
     </div>
   )
 }
@@ -60,18 +61,22 @@ const WorkerLogs: FC = () => {
   )
 }
 
-const MessageProtDemo: FC = () => {
+const MessagePortDemo: FC = () => {
   return (
     <div className={wrap()}>
       <div className={panel()}>
         <WorkerLogs />
       </div>
-      <WorkerGrid scope="" />
+      {itemList.map((itemkey) => (
+        <WorkerGrid key={itemkey} scope={itemkey}>
+          <MessagePortIframe sub={itemkey} />
+        </WorkerGrid>
+      ))}
     </div>
   )
 }
 
-export default MessageProtDemo
+export default MessagePortDemo
 
 interface WorkerGridProps {
   scope: string

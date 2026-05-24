@@ -7,19 +7,13 @@ import {
 import { useEventChat } from '@event-chat/core'
 import { useRPC } from '@event-chat/rpc/react'
 import { createServiceWorkerRegistrationRPC } from '@event-chat/rpc/serviceWorkerRegistration'
-import { Badge } from 'antd'
 import { type FC, useMemo, useState } from 'react'
 import z from 'zod'
 import { ChatScroll } from '@/components/chatLine'
 import { WorkerPanel } from '@/components/chatLine'
 import { receiptStore } from '@/components/chatLine/receiptStore'
 import { serviceWorkerGroup } from './uitls'
-
-const titleRange = Object.freeze({
-  Connect: <Badge status="success" text="Connect" />,
-  Disconnect: <Badge status="default" text="Disconnect" />,
-  Sending: <Badge status="warning" text="Sending" />,
-})
+import { titleRange } from './windowUitls'
 
 const ServiceWorkerItem: FC<ServiceWorkerItemProps> = ({
   disabled,
@@ -39,7 +33,8 @@ const ServiceWorkerItem: FC<ServiceWorkerItemProps> = ({
     consume: workerCtx.actions,
     event: mainCtx.actions,
     drive: createServiceWorkerRegistrationRPC,
-    init: () => navigator.serviceWorker.register(new URL('./sw.ts', import.meta.url), { scope }),
+    init: () =>
+      navigator.serviceWorker.register(new URL('./worker/sw.ts', import.meta.url), { scope }),
   })
 
   const allow = useMemo(

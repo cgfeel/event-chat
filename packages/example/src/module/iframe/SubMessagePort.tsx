@@ -6,7 +6,13 @@ import { createWorkerRPC } from '@event-chat/rpc/worker'
 import { type FC, useMemo, useState } from 'react'
 import { ChatScroll, WorkerPanel } from '@/components/chatLine'
 import { isKey } from '@/utils/fields'
-import { messageGroup, messagePortService, messagePortWeb, messagePortWindow } from '../rpc/uitls'
+import {
+  allowedOrigins,
+  messageGroup,
+  messagePortService,
+  messagePortWeb,
+  messagePortWindow,
+} from '../rpc/uitls'
 import { titleRange } from '../rpc/windowUitls'
 
 const MessagePortItem: FC<MessagePortItemProps> = ({ disabled, scope }) => {
@@ -32,12 +38,15 @@ const MessagePortItem: FC<MessagePortItemProps> = ({ disabled, scope }) => {
 
 const ServiceWorkerRPC: FC<MessagePortItemProps> = ({ disabled, scope }) => {
   const { connected } = useRPC({
+    config: {
+      channel: messageGroup,
+    },
     drive: createServiceWorkerRegistrationRPC,
     init: () =>
       navigator.serviceWorker.register(new URL('../rpc/worker/msw.ts', import.meta.url), { scope }),
   })
 
-  const connecting = useMemo(() => !disabled && !connected, [connected, disabled])
+  const connecting = useMemo(() => (!disabled ? !connected : true), [connected, disabled])
   return <MessagePortItem disabled={connecting} scope={scope} />
 }
 
@@ -51,6 +60,9 @@ const WindowRPC: FC<MessagePortItemProps> = (props) => {
 
 const WorkerRPC: FC<MessagePortItemProps> = ({ disabled, scope }) => {
   const { connected } = useRPC({
+    config: {
+      channel: messageGroup,
+    },
     drive: createWorkerRPC,
     init: () =>
       new Worker(new URL('../rpc/worker/mworker.ts', import.meta.url), {
@@ -58,7 +70,7 @@ const WorkerRPC: FC<MessagePortItemProps> = ({ disabled, scope }) => {
       }),
   })
 
-  const connecting = useMemo(() => !disabled && !connected, [connected, disabled])
+  const connecting = useMemo(() => (!disabled ? !connected : true), [connected, disabled])
 
   return <MessagePortItem disabled={connecting} scope={scope} />
 }
@@ -72,10 +84,14 @@ const RPCRecord = Object.freeze({
 const SubMessagePort: FC<SubMessagePortProps> = ({ group }) => {
   const ComRPC = useMemo(() => (isKey(group, RPCRecord) ? RPCRecord[group] : null), [group])
   const { connected } = useRPC({
+    config: {
+      channel: messageGroup,
+      allowedOrigins,
+    },
     drive: createWindowRPC,
     init: () => window.parent,
   })
-  return !ComRPC || !group ? null : <ComRPC disabled={connected} scope={group} />
+  return !ComRPC || !group ? null : <ComRPC disabled={!connected} scope={group} />
 }
 
 export default SubMessagePort

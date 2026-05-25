@@ -1,6 +1,6 @@
 import { createContext } from 'react'
-import RPCAction, { RequestOptions, WINDOW_NAME } from '../core/RPCAction'
-import { Transport } from '../fields'
+import RPCAction, { RequestOptions } from '../core/RPCAction'
+import { Transport, WINDOW_NAME } from '../fields'
 import { ValueOf } from '../utils'
 
 export const RPCInstanceContext = createContext<RPCInstanceContextIns>({})

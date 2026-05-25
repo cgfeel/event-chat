@@ -16,6 +16,8 @@ export const TARGET_TYPE_STRINGS = Object.freeze({
   DedicatedWorkerGlobalScope: '[object DedicatedWorkerGlobalScope]',
 })
 
+export const WINDOW_NAME = '[object Window]'
+
 export interface FactoryOptions {
   message?: boolean | AddEventListenerOptions
 }
@@ -42,12 +44,14 @@ export interface RPCInstanceContextIns {
 }
 
 export interface Transport<ONLYBD extends boolean = false> {
+  allow: (origin: string, current?: string[]) => boolean
   destroy: () => void
   getType: () => string
   is: (source: MessageEventSource | null, message?: MessageItem) => boolean
   observe: (close?: () => void) => void
   onmessage: (listener: ListenerType) => void
   onremove: (listener: ListenerType) => void
+  originFilter: (origin?: string[]) => string[] | undefined
   postMessage: (message: MessageItem, options?: IframeSerializeOptions) => void
   upset: (options: FactoryOptions) => void
   onlyBrod?: ONLYBD

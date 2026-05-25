@@ -1,11 +1,19 @@
 import { IframeSerializeOptions, ListenerType, MessageItem } from '../fields'
 import BaseTransport from './BaseTransport'
 
+const getOrigin = (url: string) =>
+  typeof self?.location?.origin === 'string' ? new URL(url, self.location.origin).origin : ''
+
 // 主线程，跨窗口、跨 iframe 通信：HTMLIFrameElement.contentWindow, Window, Window.parent, window.open
 class WindowTransport extends BaseTransport<Window> {
   private _errorHandle: ((args: ErrorProps) => void) | null = null
   destroy() {
     this._errorHandle?.({ isDestroy: true })
+  }
+
+  // 只有 window 需要对比
+  allow(origin: string, current?: string[]) {
+    return current?.some((item) => item === '*' || getOrigin(item) === getOrigin(origin)) ?? false
   }
 
   // source 和 iframe.contentWidow 比
@@ -19,6 +27,10 @@ class WindowTransport extends BaseTransport<Window> {
 
   onremove(listener: ListenerType): void {
     window.removeEventListener('message', listener, this._options.message)
+  }
+
+  originFilter(origin?: string[]) {
+    return origin?.map((item) => (item === '*' ? item : getOrigin(item))).filter(Boolean)
   }
 
   postMessage(message: MessageItem, options?: IframeSerializeOptions): void {

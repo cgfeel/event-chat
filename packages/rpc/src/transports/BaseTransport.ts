@@ -10,13 +10,21 @@ abstract class BaseTransport<
     protected _options: FactoryOptions = {}
   ) {}
 
+  // 只有 window 需要对比
+  allow(origin: string, current?: string[]) {
+    return origin ? true : (current?.length ?? 0) > -1
+  }
+
   getType() {
     return `${Object.prototype.toString.call(this._target)}`
   }
 
-  // 只有 window 需要对比 source
   is(source: MessageEventSource | null) {
     return !(source instanceof BaseTransport)
+  }
+
+  originFilter(origin?: string[]) {
+    return origin
   }
 
   upset(options: FactoryOptions) {

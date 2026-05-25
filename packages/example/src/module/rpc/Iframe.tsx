@@ -8,7 +8,7 @@ import { ChatLine, ChatScroll } from '@/components/chatLine'
 import CardSelect from '@/components/chatLine/CardSelect'
 import { receiptStore } from '@/components/chatLine/receiptStore'
 import { useRecipients } from './createRecipientsStore'
-import { chatName, iframeName } from './uitls'
+import { allowedOrigins, chatName, iframeName } from './uitls'
 
 const group = 'root'
 
@@ -26,13 +26,13 @@ const Iframe: FC = () => {
     brodcastScope,
   } = useRPC({
     config: {
-      allowedOrigins: ['http://localhost:3000', '*'],
       onConnect: () => {
         store.addRecipient(rpc1)
       },
       onDisconnect: () => {
         store.delRecipient(rpc1)
       },
+      allowedOrigins,
     },
     brodcast: mainCtx.brodcasts,
     consume: childIframeCtx.actions,
@@ -44,13 +44,13 @@ const Iframe: FC = () => {
 
   const { connected: connected2, rpc: rpc2 } = useRPC({
     config: {
-      allowedOrigins: ['http://localhost:3000', '*'],
       onConnect: () => {
         store.addRecipient(rpc2)
       },
       onDisconnect: () => {
         store.delRecipient(rpc2)
       },
+      allowedOrigins,
     },
     brodcast: mainCtx.brodcasts,
     consume: childIframeCtx.actions,

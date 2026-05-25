@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.21](https://github.com/event-chat/event-chat/compare/rpc@v0.1.20...rpc@v0.1.21) (2026-05-25)
+
+
+### Bug Fixes
+
+* add RPCAction options debug method & split window origin to wind… ([a73ad3d](https://github.com/event-chat/event-chat/commit/a73ad3da91d30ef896e06fa070a1a8bb102a0dcf))
+* add RPCAction options debug method & split window origin to windowTransport ([25b87fc](https://github.com/event-chat/event-chat/commit/25b87fc7a8ced6a110cc87d36aca39a686c0026e))
+
 ## [0.1.20](https://github.com/event-chat/event-chat/compare/rpc@v0.1.19...rpc@v0.1.20) (2026-05-23)
 
 

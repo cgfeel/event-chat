@@ -3,8 +3,6 @@ import { isKey } from '../utils'
 import { receiptStore } from './receiptStore'
 
 const RPC_SIGN = 'RPCActionSign'
-const WINDOW_NAME = '[object Window]'
-
 const defaultOptions = {
   allowedOrigins: [],
   heartbeatInterval: 3000,
@@ -12,9 +10,6 @@ const defaultOptions = {
   retryTimeout: 5000,
   retryTimes: 2,
 } satisfies RPCOptionsType
-
-const getOrigin = (url: string) =>
-  typeof self?.location?.origin === 'string' ? new URL(url, self.location.origin).origin : ''
 
 class RPCAction {
   private _brodcastListeners: BrodcastItem[] = []
@@ -36,9 +31,7 @@ class RPCAction {
     this._options = {
       ...defaultOptions,
       ...options,
-      allowedOrigins: options?.allowedOrigins
-        ?.map((item) => (item === '*' ? item : getOrigin(item)))
-        .filter(Boolean),
+      allowedOrigins: this._target.originFilter(options?.allowedOrigins),
     }
 
     this._target.onmessage(this._boundMessageHandler)
@@ -156,14 +149,6 @@ class RPCAction {
     return { ...data, __RPC__: RPC_SIGN, sign: this._requestId }
   }
 
-  private _isOriginAllowed(origin: string) {
-    return (
-      this._options?.allowedOrigins?.some(
-        (item) => item === '*' || getOrigin(item) === getOrigin(origin)
-      ) ?? false
-    )
-  }
-
   // 这里收到的消息还要再考虑下，如果不是对象，比如 ArrayBuff
   private _messageHandler(
     event: Pick<MessageEvent<MessageItem | undefined>, 'data' | 'origin' | 'ports' | 'source'> & {
@@ -174,11 +159,19 @@ class RPCAction {
     const { __RPC__, broadcast, channel, error, heartbeat, kind, payload, requestId, sign, type } =
       data ?? {}
 
+    const info = { origin, ports, source }
+    const { debug, onConnect, ...options } = this._options
+
     // 如果 source、channel、origin、RPC 都无法隔离消息，只能在业务通过 payload 进行隔离
     if (__RPC__ !== RPC_SIGN) return
-    if (this._options?.channel !== channel) return
+    if (data) {
+      Reflect.deleteProperty(options, 'onDisconnect')
+      debug?.({ data, info, options })
+    }
+
+    if (options?.channel !== channel) return
     if (!this._target.is(source, data)) return
-    if (this._target.getType() === WINDOW_NAME && !this._isOriginAllowed(origin)) return
+    if (!this._target.allow(origin, this._options.allowedOrigins)) return
 
     // 心跳
     if (heartbeat) {
@@ -186,13 +179,12 @@ class RPCAction {
       // ✅ 心跳恢复：标记连接成功
       if (!this._isConnected) {
         this._isConnected = true
-        this._options?.onConnect?.()
+        onConnect?.()
       }
       return
     }
 
     // 广播
-    const info = { origin, ports, source }
     if (broadcast) {
       const brodsign = [sign, requestId].filter(Boolean)
       const brodkey = brodsign.join(':')
@@ -274,8 +266,6 @@ class RPCAction {
   }
 }
 
-export { WINDOW_NAME }
-
 export default RPCAction
 
 export type RPCOptionsType = Pick<MessageItem, 'channel'> & {
@@ -284,6 +274,11 @@ export type RPCOptionsType = Pick<MessageItem, 'channel'> & {
   heartbeatTimeout?: number
   retryTimeout?: number
   retryTimes?: number
+  debug?: (arg: {
+    data: MessageItem
+    info: MessageInfo
+    options: Omit<RPCOptionsType, 'debug' | 'onConnect' | 'onDisconnect'>
+  }) => void
   onConnect?: () => void
   onDisconnect?: (destroy?: boolean) => void
 }

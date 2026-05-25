@@ -1,5 +1,7 @@
 import { createContext } from 'react'
 
+export const allowedOrigins = ['http://localhost:3000', '*']
+
 export const chatItem = 'chat-item'
 export const chatName = 'chat'
 export const iframeName = 'iframe'

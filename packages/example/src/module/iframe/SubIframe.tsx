@@ -8,7 +8,7 @@ import CardSelect from '@/components/chatLine/CardSelect'
 import { receiptStore } from '@/components/chatLine/receiptStore'
 import { isKey } from '@/utils/fields'
 import { useRecipients } from '../rpc/createRecipientsStore'
-import { chatItem, iframeName } from '../rpc/uitls'
+import { allowedOrigins, chatItem, iframeName } from '../rpc/uitls'
 
 const SubIframe: FC<SubIframeProps> = ({ group = iframeName }) => {
   const [store, recipients] = useRecipients()
@@ -18,13 +18,13 @@ const SubIframe: FC<SubIframeProps> = ({ group = iframeName }) => {
   const { emit } = useEventChat(chatItem, { group: groupName })
   const { connected, rpc, brodcastScope, mount } = useRPC({
     config: {
-      allowedOrigins: ['http://localhost:3000', '*'],
       onConnect: () => {
         store.addRecipient(rpc)
       },
       onDisconnect: () => {
         store.delRecipient(rpc)
       },
+      allowedOrigins,
     },
     brodcast: childIframeCtx.brodcasts,
     consume: mainCtx.actions,

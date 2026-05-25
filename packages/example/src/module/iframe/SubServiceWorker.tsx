@@ -5,14 +5,14 @@ import { createWindowRPC } from '@event-chat/rpc/window'
 import { type FC, useCallback } from 'react'
 import { receiptStore } from '@/components/chatLine/receiptStore'
 import ServiceWorkerItem from '../rpc/ServiceWorkerItem'
-import { serviceScopeApi, serviceWorkerGroup } from '../rpc/uitls'
+import { allowedOrigins, serviceScopeApi, serviceWorkerGroup } from '../rpc/uitls'
 import type { SubIframeProps } from './SubIframe'
 
 const SubServiceWorker: FC<SubServiceWorkerProps> = ({ group, scope = serviceScopeApi }) => {
   const { connected, rpc, brodcastScope } = useRPC({
     config: {
-      allowedOrigins: ['http://localhost:3000', '*'],
       channel: serviceWorkerGroup,
+      allowedOrigins,
     },
     brodcast: iframeCtx.brodcasts,
     consume: parentCtx.actions,

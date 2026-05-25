@@ -4,7 +4,7 @@ import { useRPC } from '@event-chat/rpc/react'
 import { createWindowRPC } from '@event-chat/rpc/window'
 import { type FC, useContext, useEffect, useRef } from 'react'
 import { StoreContext } from '../rpc/createRecipientsStore'
-import { GroupProvider, chatItem } from '../rpc/uitls'
+import { GroupProvider, allowedOrigins, chatItem } from '../rpc/uitls'
 
 const eventName = 'sub-chat'
 
@@ -17,13 +17,13 @@ const SubChat: FC = () => {
 
   const { connected, rpc, brodcastScope } = useRPC({
     config: {
-      allowedOrigins: ['http://localhost:3000', '*'],
       onConnect: () => {
         store.addRecipient(rpc)
       },
       onDisconnect: () => {
         store.delRecipient(rpc)
       },
+      allowedOrigins,
     },
     brodcast: childIframeCtx.brodcasts,
     consume: childIframeCtx.actions,

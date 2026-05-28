@@ -2,7 +2,9 @@ import { IframeSerializeOptions, ListenerType, MessageItem } from '../fields'
 import BaseTransport from './BaseTransport'
 
 class MessagePortTransport extends BaseTransport<MessagePort> {
-  destroy() {}
+  destroy() {
+    this._target.close()
+  }
 
   // 和 ServiceWorkerRegistrationTransport 一样得不到准确的结果
   observe(): void {}

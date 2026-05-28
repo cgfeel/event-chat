@@ -1,0 +1,27 @@
+import { IframeSerializeOptions, ListenerType, MessageItem } from '../fields'
+import BaseTransport from './BaseTransport'
+
+class MessagePortTransport extends BaseTransport<MessagePort> {
+  destroy() {}
+
+  // 和 ServiceWorkerRegistrationTransport 一样得不到准确的结果
+  observe(): void {}
+
+  onmessage(listener: ListenerType): void {
+    this._target.addEventListener('message', listener, this._options.message)
+    this._target.start()
+  }
+
+  onremove(listener: ListenerType): void {
+    this._target.removeEventListener('message', listener, this._options.message)
+  }
+
+  postMessage(message: MessageItem, options?: IframeSerializeOptions): void {
+    const { transfer } = options ?? {}
+    this._target.postMessage(message, {
+      transfer,
+    })
+  }
+}
+
+export default MessagePortTransport

@@ -57,6 +57,7 @@ export interface FactoryOptions {
 // ServiceWorkerContainer 没办法拿到当前的 active，这里采用 ServiceWorkerRegistration
 export type TargetType =
   | BroadcastChannel
+  | MessagePort
   | WebSocket
   | Window
   //   | ServiceWorkerContainer

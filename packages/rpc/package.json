@@ -32,6 +32,10 @@
       "types": "./dist/entry/broadcastChannel.d.ts",
       "import": "./dist/entry/broadcastChannel.js"
     },
+    "./messagePort": {
+      "types": "./dist/entry/messagePort.d.ts",
+      "import": "./dist/entry/messagePort.js"
+    },
     "./sharedWorker": {
       "types": "./dist/entry/sharedWorker.d.ts",
       "import": "./dist/entry/sharedWorker.js"

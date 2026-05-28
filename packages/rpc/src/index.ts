@@ -1,5 +1,6 @@
 export * from './createCtx'
-export { type RPCInstanceContextIns, TARGET_TYPE_STRINGS } from './fields'
+export { type RPCInstanceContextIns, type Transport, TARGET_TYPE_STRINGS } from './fields'
 export { default as useRPC } from './hooks'
-export { default as RPCDecorator } from './RPCDecorator'
+export { type DecoratorContext, default as RPCDecorator } from './core/RPCDecorator'
 export { default as RPCProvider } from './RPCProvider'
+export type { MessageInfo } from './core/RPCAction'

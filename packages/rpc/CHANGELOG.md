@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.1.22](https://github.com/event-chat/event-chat/compare/rpc@v0.1.21...rpc@v0.1.22) (2026-05-28)
+
+
+### Bug Fixes
+
+* add debug & add messageport ([e7508f1](https://github.com/event-chat/event-chat/commit/e7508f19f2b035cdcdac7541f1a822f0d0ea3433))
+* add debug & add messageport ([0c746a7](https://github.com/event-chat/event-chat/commit/0c746a7211f612579b8ff58acaf34631df19eeda))
+* update debug type sort ([87f4df0](https://github.com/event-chat/event-chat/commit/87f4df0de351116b5cfdcd6741a5d5f10c5ec028))
+* update message destroy ([0e99f1a](https://github.com/event-chat/event-chat/commit/0e99f1a27eb77dcb36b5f397a911f02f6a7f7453))
+
 ## [0.1.21](https://github.com/event-chat/event-chat/compare/rpc@v0.1.20...rpc@v0.1.21) (2026-05-25)
 
 

@@ -279,10 +279,10 @@ export type RPCOptionsType = Pick<MessageItem, 'channel'> & {
   retryTimes?: number
   debug?: (arg: {
     data: MessageItem
+    handlers: string[]
     info: MessageInfo
     options: Omit<RPCOptionsType, 'debug' | 'onConnect' | 'onDisconnect'>
     pending: string[]
-    handlers: string[]
   }) => void
   onConnect?: () => void
   onDisconnect?: (destroy?: boolean) => void

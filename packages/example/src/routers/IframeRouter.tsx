@@ -11,7 +11,7 @@ import {
 import { type FC, lazy, useMemo } from 'react'
 import { isKey } from '@/utils/fields'
 
-const MessagePort = lazy(() => import('@/module/iframe/SubMessagePort'))
+const MessagePort = lazy(() => import('@/module/iframe/messagePort'))
 
 const router = Object.freeze({
   [chatName]: lazy(() => import('@/module/iframe/IframeExample')),

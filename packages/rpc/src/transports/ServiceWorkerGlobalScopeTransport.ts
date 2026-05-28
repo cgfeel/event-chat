@@ -20,16 +20,6 @@ class ServiceWorkerGlobalScopeTransport extends BaseTransport<ServiceWorkerGloba
   // 在 Service worker 内部线程是不稳定的，因此 setTimeout 和 setInterval 是不稳定的
   // 但是在主线程会定时心跳唤醒 Service worker，因此只要心跳时间 ＜ service worker 闲置事件就视为活跃
   onmessage(listener: ListenerType): void {
-    // 先保留，后面看看要不要端口
-    // this._onconnect = (event) => {
-    //   const ports = event.ports.map((i) => i)
-    //   const source = event.source instanceof Client ? null : event.source
-
-    //   const messageEvent = new MessageEvent('serverWork', { ...event, ports, source })
-    //   listener(messageEvent)
-    // }
-    // this._target.addEventListener('message', this._onconnect, this._options.message)
-
     this._onconnect = (event) => {
       this._source = event.source
       event.waitUntil(

@@ -17,6 +17,13 @@ registerTransport({
 })
 
 registerTransport({
+  name: 'messagePort',
+  in: () => typeof MessagePort !== 'undefined',
+  match: (t): t is MessagePort => t instanceof MessagePort,
+  load: () => import('../transports/MessagePortTransport'),
+})
+
+registerTransport({
   name: 'serviceWorkerGlobalScope',
   in: () => typeof ServiceWorkerGlobalScope !== 'undefined',
   match: (t): t is ServiceWorkerGlobalScope => t instanceof ServiceWorkerGlobalScope,

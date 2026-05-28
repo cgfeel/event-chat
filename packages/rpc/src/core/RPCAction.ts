@@ -166,7 +166,10 @@ class RPCAction {
     if (__RPC__ !== RPC_SIGN) return
     if (data) {
       Reflect.deleteProperty(options, 'onDisconnect')
-      debug?.({ data, info, options })
+      const pending = Array.from(this._pending.keys())
+      const handlers = Object.keys(this._handlers)
+
+      debug?.({ data, handlers, info, options, pending })
     }
 
     if (options?.channel !== channel) return
@@ -276,8 +279,10 @@ export type RPCOptionsType = Pick<MessageItem, 'channel'> & {
   retryTimes?: number
   debug?: (arg: {
     data: MessageItem
+    handlers: string[]
     info: MessageInfo
     options: Omit<RPCOptionsType, 'debug' | 'onConnect' | 'onDisconnect'>
+    pending: string[]
   }) => void
   onConnect?: () => void
   onDisconnect?: (destroy?: boolean) => void
@@ -293,6 +298,8 @@ export type BrodcastItem = (
   info?: MessageInfo & Pick<MessageItem, 'requestId' | 'sign'>
 ) => void
 
+export type MessageInfo = Pick<MessageEvent, 'origin' | 'ports' | 'source'>
+
 export type RequestOptions<T = unknown> = IframeSerializeOptions &
   Pick<MessageItem, 'requestId' | 'sign'> & {
     payload?: T
@@ -300,8 +307,6 @@ export type RequestOptions<T = unknown> = IframeSerializeOptions &
   }
 
 type HandlersRecord = Record<PropertyKey, ActionFunType>
-
-type MessageInfo = Pick<MessageEvent, 'origin' | 'ports' | 'source'>
 
 type PendingItem = Record<'resolve' | 'reject', (value?: unknown) => void> & {
   timer: NodeJS.Timeout

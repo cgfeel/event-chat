@@ -1,9 +1,5 @@
-import {
-  type ParentCtxType,
-  mainCtx,
-  transmitResult,
-  workerCtx,
-} from '@/services/serviceWorkerService'
+import { transmitResult } from '@/services/baseSWService'
+import { type ParentCtxType, mainCtx, workerCtx } from '@/services/serviceWorkerService'
 import { useEventChat } from '@event-chat/core'
 import { useRPC } from '@event-chat/rpc/react'
 import { createServiceWorkerRegistrationRPC } from '@event-chat/rpc/serviceWorkerRegistration'

@@ -1,15 +1,10 @@
 /// <reference lib="webworker" />
 import { mainCtx, portWorkerCtx, workerCtx } from '@/services/messagePortService'
 import { createDedicatedWorkerGlobalScopeRPC } from '@event-chat/rpc/dedicatedWorkerGlobalScope'
-import { messageGroup, messagePortWeb } from '../uitls'
+import { messageGroup } from '../uitls'
 
 declare const self: DedicatedWorkerGlobalScope
-const defaultDestroy = () => {}
-
 const target = self
-const portRef = {
-  destroy: defaultDestroy,
-}
 
 const [rpc] = createDedicatedWorkerGlobalScopeRPC(target, {
   context: {
@@ -19,27 +14,24 @@ const [rpc] = createDedicatedWorkerGlobalScopeRPC(target, {
   },
 })
 
-workerCtx.provider({
-  scope: messagePortWeb,
-  connect: (instance) => {
-    const [, destroy] = instance ?? []
-    if (destroy) portRef.destroy = destroy
-    rpc.request('connect').catch(() => {})
-  },
-  destroy: (payload) => {
-    rpc.request('destroy', { payload }).catch(() => {})
-  },
-})
-
 portWorkerCtx.provider({
-  destroy: () => {
-    rpc
-      .request('destroy', { payload: undefined })
-      .then(() => {
-        portRef.destroy()
-        portRef.destroy = defaultDestroy
-      })
-      .catch(() => {})
+  filter: (receivedBody) => {
+    const payload = {
+      message: 'success',
+      result: {
+        code: 200,
+        data: {
+          date: new Date(),
+          id: Date.now(),
+          name: 'mworker',
+        },
+        message: `${receivedBody.message}-(transmit:ww-port)`,
+        receivedBody,
+      },
+    }
+
+    rpc.request('sendMessage', { payload }).catch(() => {})
+    return Promise.resolve(payload)
   },
 })
 

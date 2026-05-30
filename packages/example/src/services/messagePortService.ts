@@ -1,99 +1,73 @@
-import { messageGroup } from '@/module/rpc/uitls'
 import type { useEventChat } from '@event-chat/core'
 import type { MessageInfo } from '@event-chat/rpc'
 import { createMessagePortRPC } from '@event-chat/rpc/messagePort'
 import { createService } from '@event-chat/rpc/react'
+import type { InputProps } from 'antd'
+import { type WorkerMessage, sendMessage } from './baseSWService'
 
 const messagePortEvent = createService<MessagePortCtx>()
+const generatePortMainCtx = () => messagePortEvent(() => ({}))
 
-const portMainCtx = messagePortEvent((ctx) => ({
-  connect: (scope: string) => {
-    ctx.emit?.({ detail: 'connected', name: `chat-${scope}` })
-  },
-  destroy: () => {},
-}))
-
+const portMainCtx = generatePortMainCtx()
 const portWorkerCtx = messagePortEvent((ctx) => ({
-  destroy: () => {
-    ctx.destroy?.()
-  },
+  sendMessage: (text: WorkerMessage) => ctx.filter?.(text),
 }))
 
-const createMessagePort = (
-  port: MessagePort,
-  { scope, onConnect, onDisconnect }: MessageConfigType
-) => {
-  const RPCResult = createMessagePortRPC(port, {
+const createMessagePort = (port: MessagePort, channel: string) =>
+  createMessagePortRPC(port, {
     context: {
-      config: {
-        channel: messageGroup,
-        onConnect: () => {
-          RPCResult[0].request('connect', { payload: scope }).catch(() => {})
-          onConnect?.(RPCResult)
-        },
-        onDisconnect,
-      },
+      config: { channel },
       consume: portMainCtx.actions,
       event: portWorkerCtx.actions,
     },
   })
-  return RPCResult
-}
 
 // ------ port end -------
 
-const iframeCtx = messagePortEvent((ctx) => ({
-  connect: (destroy?: boolean, info?: MessageInfo) => {
-    const { ports } = info ?? {}
-    if (destroy) {
-      ctx.destroy?.()
-      return
-    }
-    if (ports?.[0]) ctx.create?.(ports[0])
-  },
-}))
+const generateParentCtx = () =>
+  messagePortEvent((ctx) => ({
+    connect: (text: InputProps['value'], info?: MessageInfo) => {
+      const { ports } = info ?? {}
+      if (ports?.[0]) ctx.connect?.({ port: ports[0], text })
+    },
+  }))
+
+const iframeCtx = messagePortEvent(() => ({}))
 
 const mainCtx = messagePortEvent((ctx) => ({
-  connect: () => {
-    ctx.connect?.()
-  },
-  destroy: (offline?: boolean) => {
-    ctx.destroy?.(offline)
-  },
-  sendMessage: () => {},
+  sendMessage: (data: Awaited<ResultType>) => ctx.print?.(data),
 }))
 
-const parentCtx = messagePortEvent((ctx) => ({
-  mount: (scope: string) => {
-    ctx.emit?.({ detail: 'loaded', name: `chat-${scope}` })
-  },
-}))
-
-const workerCtx = messagePortEvent((ctx) => ({
-  connect: (destroy?: boolean, info?: MessageInfo) => {
-    if (destroy) return
-    const { destroy: onDisconnect, scope, connect } = ctx
+const parentCtx = generateParentCtx()
+const workerCtx = messagePortEvent(() => ({
+  connect: (channel: string, info?: MessageInfo) => {
     const { ports } = info ?? {}
-    if (ports?.[0] && scope) {
-      createMessagePort(ports[0], { onConnect: connect, scope, onDisconnect })
-    }
+    if (ports?.[0]) createMessagePort(ports[0], channel)
   },
-  destroy: () => {},
+  // destroy: () => {},
 }))
 
-export { iframeCtx, mainCtx, parentCtx, portMainCtx, portWorkerCtx, workerCtx, createMessagePort }
-
-type MessagePortCtx = Pick<ReturnType<typeof useEventChat>, 'emit'> & {
-  scope: string
-  destroy: (offline?: boolean) => void
-  connect: (rpc?: RPCInstance) => void
-  create: (port: MessagePort) => void
+export {
+  iframeCtx,
+  mainCtx,
+  parentCtx,
+  portMainCtx,
+  portWorkerCtx,
+  workerCtx,
+  createMessagePort,
+  generateParentCtx,
+  generatePortMainCtx,
 }
 
-type MessageConfigType = {
-  scope: string
-  onConnect?: (rpc: RPCInstance) => void
-  onDisconnect?: (destroy?: boolean) => void
+export type ConnectInitType = {
+  port: MessagePort
+  text: InputProps['value']
 }
 
-type RPCInstance = ReturnType<typeof createMessagePort>
+export type MessagePortCtx = Pick<ReturnType<typeof useEventChat>, 'emit'> & {
+  connect: (info: ConnectInitType) => void
+  filter: (text: WorkerMessage) => ResultType
+  print: (data: Awaited<ResultType>) => ResultType
+}
+
+type ResultType = ReturnType<typeof sendMessage>

@@ -1,42 +1,84 @@
 import { messageGroup } from '@/module/rpc/uitls'
 import { titleRange } from '@/module/rpc/windowUitls'
-import { createMessagePort, mainCtx, portWorkerCtx, workerCtx } from '@/services/messagePortService'
+import { transmitResult } from '@/services/baseSWService'
+import {
+  type MessagePortCtx,
+  createMessagePort,
+  mainCtx,
+  portWorkerCtx,
+  workerCtx,
+} from '@/services/messagePortService'
 import { useEventChat } from '@event-chat/core'
-import type { RPCDecorator, Transport } from '@event-chat/rpc'
+import { RPCDecorator, type Transport } from '@event-chat/rpc'
 import { useRPC } from '@event-chat/rpc/react'
 import { createServiceWorkerRegistrationRPC } from '@event-chat/rpc/serviceWorkerRegistration'
 import { createWorkerRPC } from '@event-chat/rpc/worker'
-import {
-  type FC,
-  type ForwardedRef,
-  forwardRef,
-  useEffect,
-  useImperativeHandle,
-  useMemo,
-  useRef,
-  useState,
-} from 'react'
+import type { InputProps } from 'antd'
+import { type FC, useCallback, useMemo, useState } from 'react'
 import { ChatScroll, WorkerPanel } from '@/components/chatLine'
 
-const useConnect = (ref: ForwardedRef<MessagePortInstance>, { disabled, rpc }: ConnectInfoType) => {
-  const [online, setLine] = useState(false)
-  useImperativeHandle(ref, () => ({
-    connect: (port) => {
-      rpc?.request('connect', { payload: false, transfer: [port] }).catch(() => {})
-    },
-    destroy: () => {
-      rpc?.request('destroy').catch(() => {})
-    },
-  }))
+const useConnect = ({ rpc, scope, connect, emit }: ConnectInfoType) => {
+  const [sending, setSending] = useState(false)
+  const onSubmit = useCallback(
+    (text: InputProps['value']) => {
+      const messageChannel = new MessageChannel()
 
-  const connect = useMemo(() => (!disabled ? !online : true), [disabled, online])
-  mainCtx.provider({ connect: () => setLine(true), destroy: () => setLine(false) })
+      setSending(true)
+      connect({ port: messageChannel.port1, text })
 
-  return [connect] as const
+      if (rpc) {
+        rpc
+          .request('connect', { payload: messageGroup, transfer: [messageChannel.port2] })
+          .catch(() => {})
+      } else {
+        createMessagePort(messageChannel.port2, messageGroup)
+      }
+    },
+    [rpc, connect]
+  )
+
+  const print: MessagePortCtx['print'] = useCallback(
+    (info) => {
+      const detail = transmitResult({ ...info, scope: `iframe:${scope}` })
+      setSending(false)
+
+      emit({ name: `chat-${scope}`, detail })
+      return Promise.resolve(info)
+    },
+    [scope, emit]
+  )
+
+  const filter: MessagePortCtx['filter'] = useCallback(
+    (receivedBody) =>
+      print({
+        message: 'success',
+        result: {
+          code: 200,
+          data: {
+            date: new Date(),
+            id: Date.now(),
+            name: 'mworker',
+          },
+          message: `${receivedBody.message}-(transmit:ww-port)`,
+          receivedBody,
+        },
+      }),
+    [print]
+  )
+
+  // 主线程由 iframe 提供上下文，分支线程由分支提供上下文
+  portWorkerCtx.provider({ filter })
+  mainCtx.provider({ print })
+
+  return [sending, onSubmit] as const
 }
 
-const MessagePortItem: FC<Omit<MessagePortItemProps, 'connect'>> = ({ disabled, scope }) => {
-  const [sending, setSending] = useState(false)
+const MessagePortItem: FC<
+  Omit<MessagePortItemProps, 'connect'> & {
+    sending: boolean
+    onSubmit?: (text: InputProps['value']) => void
+  }
+> = ({ disabled, scope, sending, onSubmit }) => {
   const allow = useMemo(
     () => (sending ? 'Sending' : undefined) ?? (!disabled ? 'Connect' : 'Disconnect'),
     [disabled, sending]
@@ -44,104 +86,77 @@ const MessagePortItem: FC<Omit<MessagePortItemProps, 'connect'>> = ({ disabled, 
 
   return (
     <WorkerPanel
-      disabled={disabled}
+      disabled={!disabled ? sending : true}
       name={`iframe:${scope}`}
+      placeholder="Please input message"
       title={titleRange[allow]}
-      onSubmit={() => {
-        setSending(true)
-      }}
+      onSubmit={onSubmit}
+      button
     >
       <ChatScroll direction="vertical" group={messageGroup} name={`chat-${scope}`} />
     </WorkerPanel>
   )
 }
 
-const ServiceWorkerRPC = forwardRef<MessagePortInstance, MessagePortItemProps>(
-  ({ disabled, scope, connect }, ref) => {
-    const { connected, rpc } = useRPC({
-      config: {
-        channel: messageGroup,
-        onConnect: () => connect?.(true),
-        onDisconnect: () => connect?.(false),
-      },
-      consume: workerCtx.actions,
-      event: mainCtx.actions,
-      drive: createServiceWorkerRegistrationRPC,
-      init: () =>
-        navigator.serviceWorker.register(new URL('../../rpc/worker/msw.ts', import.meta.url), {
-          scope,
-        }),
-    })
-
-    const [connecting] = useConnect(ref, { disabled: !disabled ? !connected : true, rpc })
-    return <MessagePortItem disabled={connecting} scope={scope} />
-  }
-)
-
-const WorkerRPC = forwardRef<MessagePortInstance, MessagePortItemProps>(
-  ({ disabled, scope, connect }, ref) => {
-    const { connected, rpc } = useRPC({
-      config: {
-        channel: messageGroup,
-        onConnect: () => connect?.(true),
-        onDisconnect: () => connect?.(false),
-      },
-      consume: workerCtx.actions,
-      event: mainCtx.actions,
-      drive: createWorkerRPC,
-      init: () =>
-        new Worker(new URL('../../rpc/worker/mworker.ts', import.meta.url), {
-          name: 'my-worker',
-        }),
-    })
-
-    const [connecting] = useConnect(ref, { disabled: !disabled ? !connected : true, rpc })
-    return <MessagePortItem disabled={connecting} scope={scope} />
-  }
-)
-
-const WindowRPC = forwardRef<MessagePortInstance, MessagePortItemProps>(
-  ({ disabled, scope, connect }, ref) => {
-    const portRef = useRef<ReturnType<typeof createMessagePort> | null>(null)
-    const [online, setLine] = useState(false)
-
-    useEventChat('', {
-      // 处理收到的消息，并转发到消息列表
-      callback: () => {},
-    })
-
-    useEffect(() => {
-      connect?.(true)
-    }, [connect])
-
-    useImperativeHandle(
-      ref,
-      () => ({
-        connect: (port) => {
-          portRef.current = createMessagePort(port, {
-            onConnect: () => setLine(true),
-            onDisconnect: () => setLine(false),
-            scope,
-          })
-        },
-        destroy: () => {
-          portRef.current?.[1]?.()
-          portRef.current = null
-        },
+const ServiceWorkerRPC: FC<MessagePortItemProps> = ({ disabled, scope, connect }) => {
+  const { connected, rpc } = useRPC({
+    config: {
+      channel: messageGroup,
+    },
+    consume: workerCtx.actions,
+    event: mainCtx.actions,
+    drive: createServiceWorkerRegistrationRPC,
+    init: () =>
+      navigator.serviceWorker.register(new URL('../../rpc/worker/msw.ts', import.meta.url), {
+        scope,
       }),
-      [scope]
-    )
+  })
 
-    portWorkerCtx.provider({})
+  const { emit } = useEventChat('', { group: messageGroup })
+  const [sending, onSubmit] = useConnect({ rpc, scope, connect, emit })
 
-    return <MessagePortItem disabled={!disabled ? !online : true} scope={scope} />
-  }
-)
+  return (
+    <MessagePortItem
+      disabled={!disabled ? !connected : true}
+      scope={scope}
+      sending={sending}
+      onSubmit={onSubmit}
+    />
+  )
+}
 
-if (process.env.NODE_ENV !== 'production') {
-  ServiceWorkerRPC.displayName = 'ServiceWorkerRPC'
-  WindowRPC.displayName = 'WindowRPC'
-  WorkerRPC.displayName = 'WorkerRPC'
+const WorkerRPC: FC<MessagePortItemProps> = ({ disabled, scope, connect }) => {
+  const { connected, rpc } = useRPC({
+    config: {
+      channel: messageGroup,
+    },
+    consume: workerCtx.actions,
+    event: mainCtx.actions,
+    drive: createWorkerRPC,
+    init: () =>
+      new Worker(new URL('../../rpc/worker/mworker.ts', import.meta.url), {
+        name: 'my-worker',
+      }),
+  })
+
+  const { emit } = useEventChat('', { group: messageGroup })
+  const [sending, onSubmit] = useConnect({ rpc, scope, connect, emit })
+
+  return (
+    <MessagePortItem
+      disabled={!disabled ? !connected : true}
+      scope={scope}
+      sending={sending}
+      onSubmit={onSubmit}
+    />
+  )
+}
+
+const WindowRPC: FC<MessagePortItemProps> = ({ disabled, scope, connect }) => {
+  const { emit } = useEventChat('', { group: messageGroup })
+  const [sending, onSubmit] = useConnect({ scope, connect, emit })
+
+  return <MessagePortItem disabled={disabled} scope={scope} sending={sending} onSubmit={onSubmit} />
 }
 
 export { ServiceWorkerRPC, WindowRPC, WorkerRPC }
@@ -151,16 +166,17 @@ export interface MessagePortInstance {
   destroy: () => void
 }
 
-interface MessagePortItemProps {
+interface MessagePortItemProps extends Pick<MessagePortCtx, 'connect'> {
   scope: string
   disabled?: boolean
-  connect?: (online: boolean) => void
 }
 
 type RPCInstance = ReturnType<
   typeof RPCDecorator<Transport, typeof mainCtx.actions, typeof workerCtx.actions>
 >[0]
 
-type ConnectInfoType = Pick<MessagePortItemProps, 'disabled'> & {
-  rpc?: RPCInstance
-}
+type ConnectInfoType = Pick<MessagePortItemProps, 'connect'> &
+  Pick<MessagePortCtx, 'emit'> & {
+    scope: string
+    rpc?: RPCInstance
+  }

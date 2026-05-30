@@ -20,9 +20,7 @@ class MessagePortTransport extends BaseTransport<MessagePort> {
 
   postMessage(message: MessageItem, options?: IframeSerializeOptions): void {
     const { transfer } = options ?? {}
-    this._target.postMessage(message, {
-      transfer,
-    })
+    this._target.postMessage(message, { transfer })
   }
 }
 

@@ -1,23 +1,38 @@
-import { iframeCtx, parentCtx, portMainCtx, portWorkerCtx } from '@/services/messagePortService'
+import { transmitResult } from '@/services/baseSWService'
+import {
+  type ConnectInitType,
+  generateParentCtx,
+  generatePortMainCtx,
+  iframeCtx,
+  portWorkerCtx,
+} from '@/services/messagePortService'
 import { useEventChat } from '@event-chat/core'
 import { createMessagePortRPC } from '@event-chat/rpc/messagePort'
 import { useRPC } from '@event-chat/rpc/react'
 import { createWindowRPC } from '@event-chat/rpc/window'
-import { type FC, useCallback, useRef } from 'react'
+import { type FC, useCallback, useMemo, useRef } from 'react'
 import z from 'zod'
+import { receiptStore } from '@/components/chatLine/receiptStore'
 import { allowedOrigins, messageGroup } from './uitls'
 
-const schema = z.object({
-  type: z.enum(['broad', 'connect']),
-  broad: z.enum(['broadcast', 'normal']).optional(),
-  online: z.boolean().optional(),
-})
+const schema = z.enum(['broadcast', 'normal'])
 
 const MessagePortIframe: FC<MessagePortIframeProps> = ({ sub }) => {
+  const broadRef = useRef<z.infer<typeof schema>>('normal')
   const iframeRef = useRef<HTMLIFrameElement>(null)
-  const portRef = useRef<RPCInstance | null>(null)
 
-  const { rpc } = useRPC({
+  const parentCtx = useMemo(() => generateParentCtx(), [])
+  const portMainCtx = useMemo(() => generatePortMainCtx(), [])
+
+  const { emit } = useEventChat(`item-${sub}`, {
+    group: messageGroup,
+    callback: ({ detail }) => {
+      broadRef.current = detail
+    },
+    schema,
+  })
+
+  useRPC({
     config: {
       channel: messageGroup,
       allowedOrigins,
@@ -28,49 +43,43 @@ const MessagePortIframe: FC<MessagePortIframeProps> = ({ sub }) => {
     init: () => iframeRef.current,
   })
 
-  const connectMessagePort = useCallback(() => {
-    const channel = new MessageChannel()
-    portRef.current = createMessagePortRPC(channel.port1, {
-      context: {
-        config: { channel: messageGroup },
-        consume: portWorkerCtx.actions,
-        event: portMainCtx.actions,
-      },
-    })
+  const connect = useCallback(
+    ({ port, text }: ConnectInitType) => {
+      const [portRPC] = createMessagePortRPC(port, {
+        context: {
+          config: {
+            channel: messageGroup,
+            onConnect: () => {
+              const payload = {
+                broadcast: broadRef.current,
+                message: Array.isArray(text) ? text.join() : String(text ?? ''),
+                receipt: receiptStore.addReceipt(),
+                scope: sub,
+              }
 
-    rpc.request('connect', { payload: undefined, transfer: [channel.port2] }).catch(() => {})
-  }, [rpc])
+              portRPC
+                .request('sendMessage', { payload })
+                .then((info) => {
+                  if (info) {
+                    const { receipt } = info.result?.receivedBody ?? {}
+                    if (receipt) receiptStore.increasing(receipt)
 
-  const { emit } = useEventChat(`item-${sub}`, {
-    group: messageGroup,
-    callback: ({ detail }) => {
-      const { online, type } = detail
-      const [portRPC] = portRef.current ?? []
-
-      if (type === 'connect') {
-        if (online) {
-          connectMessagePort()
-        } else {
-          portRPC
-            ?.request('destroy')
-            .then(() => {
-              portRef.current = null
-              emit({ detail: 'loaded', name: `chat-${sub}` })
-            })
-            .catch(() => {})
-        }
-        return
-      }
-
-      // 待续
-      portRPC?.request('destroy').catch(() => {})
-      // portRef.current?.()
+                    const detail = transmitResult({ ...info, scope: sub })
+                    emit({ name: 'chat-message-port', detail })
+                  }
+                })
+                .catch(() => {})
+            },
+          },
+          consume: portWorkerCtx.actions,
+          event: portMainCtx.actions,
+        },
+      })
     },
-    schema,
-  })
+    [portMainCtx, sub, emit]
+  )
 
-  parentCtx.provider({ emit })
-  portMainCtx.provider({ emit })
+  parentCtx.provider({ connect })
 
   return <iframe className="h-full w-full" ref={iframeRef} src={`/iframe?sub=${sub}`} />
 }
@@ -80,7 +89,3 @@ export default MessagePortIframe
 interface MessagePortIframeProps {
   sub: string
 }
-
-type RPCInstance = ReturnType<
-  typeof createMessagePortRPC<typeof portMainCtx.actions, typeof portWorkerCtx.actions>
->

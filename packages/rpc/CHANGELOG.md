@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.23](https://github.com/event-chat/event-chat/compare/rpc@v0.1.22...rpc@v0.1.23) (2026-05-30)
+
+
+### Bug Fixes
+
+* update messageport transfer ([c63b960](https://github.com/event-chat/event-chat/commit/c63b9609d7fc507ad06a7a70e403f65ea73606da))
+* update messageport transfer ([63e61be](https://github.com/event-chat/event-chat/commit/63e61bedc70150911a150bb5acb7bdd79faa3f96))
+
 ## [0.1.22](https://github.com/event-chat/event-chat/compare/rpc@v0.1.21...rpc@v0.1.22) (2026-05-28)
 
 

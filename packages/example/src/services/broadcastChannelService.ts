@@ -5,19 +5,20 @@ import { type ResultType, generateFakePrint, requestSchema } from './baseSWServi
 
 const broadcastChannelEvent = createService<BroadcastChannelCtx>()
 
-export const broadcastCtx = broadcastChannelEvent(
-  () => ({}),
-  (ctx) => ({
-    broadcast: (result: unknown, info) => {
-      const { data, success } = requestSchema.safeParse(result)
-      const { broadcast, print } = ctx
-      if (success) {
-        print?.(generateFakePrint(data, 'broadcast'))
-        broadcast?.(data, info)
-      }
-    },
-  })
-)
+export const generateBroadcastChannelCtx = () =>
+  broadcastChannelEvent(
+    () => ({}),
+    (ctx) => ({
+      broadcast: (result: unknown, info) => {
+        const { data, success } = requestSchema.safeParse(result)
+        const { broadcast, print } = ctx
+        if (success) {
+          print?.(generateFakePrint(data, 'broadcast'))
+          broadcast?.(data, info)
+        }
+      },
+    })
+  )
 
 export type BroadcastChannelCtx = {
   broadcast: (

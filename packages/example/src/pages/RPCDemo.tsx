@@ -114,6 +114,43 @@ const RPCDemo: FC = () => {
       </RecipientsProvider>
       <RecipientsProvider>
         <Card
+          footer={
+            <FooterTips>
+              <ul className="m-4 list-disc text-sm text-gray-400">
+                <li>
+                  这个实例演示了通过 <Tag>BroadcastChannel</Tag> 进行同域跨 <Tag>Window</Tag>{' '}
+                  通信，演示中存在两个 <Tag>action</Tag> 实例，一个 <Tag>api</Tag> 实例，默认情况下{' '}
+                  <Tag>Api</Tag> 需要点击 <Tag>Open</Tag> 按钮后，创建多个同 <Tag>channel</Tag>{' '}
+                  实例才能正常通信。
+                </li>
+                <li>
+                  由于 <Tag>BroadcastChannel</Tag> 本身用于广播，因此在 <Tag>useRPC</Tag> 中提供{' '}
+                  <Tag>BroadcastChannel</Tag> 不支持通过 <Tag>request</Tag>{' '}
+                  一对一发起请求，仅支持发起广播。
+                </li>
+                <li>
+                  由于广播是同步发送消息，不支持异步获取返回发送消息结果，因此无论发送是否送达，不能通过广播方法本身获取，但允许业务通过消息发送的逻辑完成回执的过程。因此本实例所有已读均为
+                  1，只做演示不是实际已读情况。
+                </li>
+                <li>
+                  发送的消息可以通过 <Tag>RPC</Tag> 对象的 <Tag>broadcast</Tag> 向同{' '}
+                  <Tag>channel</Tag> 实例发送广播，在示例中叫“全局转发“；也支持通过{' '}
+                  <Tag>useRPC</Tag> 提供的 <Tag>brodcastScope</Tag>{' '}
+                  向所有的实例对象转发消息，在示例中叫“全局广播“。
+                </li>
+                <li>
+                  如果需要跨域可以通过 <Tag>iframe</Tag> 转发通信，上面演示已经展示不再重复演示。
+                </li>
+                <li>
+                  需要注意的是，无论是 <Tag>BroadcastChannel</Tag> 实例，还是 <Tag>Worker</Tag>{' '}
+                  实例，<Tag>window</Tag>{' '}
+                  实例，在同一个网页主线程下，它们共享同一个线程。因此相同上下文的实例，它的上下文一定不能是一个固定的对象，而是类似于当前实例中，在组件内部通过方法{' '}
+                  <Tag>generateBroadcastChannelCtx</Tag> 动态生成剩下文。而分支线程，比如{' '}
+                  <Tag>Worker</Tag> 内部，每个线程单独一个上下文，无需动态创建
+                </li>
+              </ul>
+            </FooterTips>
+          }
           title={
             <>
               <Tag>BroadcastChannel</Tag> 广播

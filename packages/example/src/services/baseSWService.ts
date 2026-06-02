@@ -24,6 +24,20 @@ export const resultSchema = z.object({
   receivedBody: requestSchema.optional(),
 })
 
+export const generateFakePrint = (receivedBody: WorkerMessage, name: string) => ({
+  message: 'success',
+  result: {
+    code: 200,
+    data: {
+      date: new Date(),
+      id: Date.now(),
+      name: 'mworker',
+    },
+    message: `${receivedBody.message}-(transmit:${name})`,
+    receivedBody,
+  },
+})
+
 export const sendMessage = (data: WorkerMessage) =>
   fetch(`${URL}api/health`, {
     headers: { 'Content-Type': 'application/json' },
@@ -75,5 +89,7 @@ export const transmitResult = ({
 }
 
 export type WorkerMessage = z.infer<typeof requestSchema>
+
+export type ResultType = ReturnType<typeof sendMessage>
 
 type TransmitResultProps = Awaited<ReturnType<typeof sendMessage>> & { scope: string }

@@ -1,5 +1,7 @@
 import RecipientsProvider from '@/module/rpc/RecipientsProvider'
 import {
+  broadcastAction,
+  broadcastApi,
   chatName,
   iframeName,
   messagePortService,
@@ -11,6 +13,7 @@ import {
 import { type FC, lazy, useMemo } from 'react'
 import { isKey } from '@/utils/fields'
 
+const BroadcastItem = lazy(() => import('@/module/iframe/messagePort/SubBroadcastItem'))
 const MessagePort = lazy(() => import('@/module/iframe/messagePort'))
 
 const router = Object.freeze({
@@ -18,6 +21,8 @@ const router = Object.freeze({
   [iframeName]: lazy(() => import('@/module/iframe/IframeChat')),
   [serviceWorkerAction]: lazy(() => import('@/module/iframe/ActionServiceWorker')),
   [serviceWorkerGroup]: lazy(() => import('@/module/iframe/SubServiceWorker')),
+  [broadcastAction]: BroadcastItem,
+  [broadcastApi]: BroadcastItem,
   [messagePortService]: MessagePort,
   [messagePortWeb]: MessagePort,
   [messagePortWindow]: MessagePort,

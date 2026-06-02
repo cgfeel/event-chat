@@ -1,9 +1,10 @@
 import { FooterTips } from '@/module/form'
 import Iframe from '@/module/rpc/Iframe'
-import MessagePortDemo from '@/module/rpc/MessagePortDemo'
 import RecipientsProvider from '@/module/rpc/RecipientsProvider'
 import ServiceWorkerDemo from '@/module/rpc/ServiceWorkerDemo'
 import WorkerDemo from '@/module/rpc/WorkerDemo'
+import { BroadcastChannelDemo } from '@/module/rpc/broadcastChannel'
+import { MessagePortDemo } from '@/module/rpc/messagePort'
 import { Tag } from 'antd'
 import type { FC } from 'react'
 import Card from '@/components/Card'
@@ -81,13 +82,45 @@ const RPCDemo: FC = () => {
       </RecipientsProvider>
       <RecipientsProvider>
         <Card
+          footer={
+            <FooterTips>
+              <ul className="m-4 list-disc text-sm text-gray-400">
+                <li>
+                  这个实例演示了通过 <Tag>MessagePort</Tag> 实现跨 <Tag>Window</Tag> 跨{' '}
+                  <Tag>Worker</Tag> 通信。发起消息时，会将消息和 <Tag>Port</Tag> 一起发送给顶层{' '}
+                  <Tag>Window</Tag> 主线程，和 <Tag>iframe</Tag> 所在的线程进行通信。
+                </li>
+                <li>
+                  不要试图通过 <Tag>MessagePort</Tag>{' '}
+                  在跨线程情况下保持长通信，因为线程的生命周期不受控制。
+                </li>
+                <li>
+                  在 <Tag>Service Worker</Tag> 下为了保持通信能够顺利收到，在 <Tag>service</Tag>{' '}
+                  方法中通过 <Tag>await</Tag> 的方式，等待 <Tag>MessagePort</Tag>{' '}
+                  收到主线程发来的消息才会结束。这是 <Tag>@event-chat/rpc</Tag> 中{' '}
+                  <Tag>Service Worker</Tag> 的特性
+                </li>
+              </ul>
+            </FooterTips>
+          }
           title={
             <>
-              <Tag>Message Port</Tag> 手动通信
+              <Tag>MessagePort</Tag> 手动通信
             </>
           }
         >
           <MessagePortDemo />
+        </Card>
+      </RecipientsProvider>
+      <RecipientsProvider>
+        <Card
+          title={
+            <>
+              <Tag>BroadcastChannel</Tag> 广播
+            </>
+          }
+        >
+          <BroadcastChannelDemo />
         </Card>
       </RecipientsProvider>
     </div>

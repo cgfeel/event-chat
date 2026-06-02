@@ -1,6 +1,6 @@
 import { messageGroup } from '@/module/rpc/uitls'
 import { titleRange } from '@/module/rpc/windowUitls'
-import { transmitResult } from '@/services/baseSWService'
+import { generateFakePrint, transmitResult } from '@/services/baseSWService'
 import {
   type MessagePortCtx,
   createMessagePort,
@@ -14,7 +14,7 @@ import { useRPC } from '@event-chat/rpc/react'
 import { createServiceWorkerRegistrationRPC } from '@event-chat/rpc/serviceWorkerRegistration'
 import { createWorkerRPC } from '@event-chat/rpc/worker'
 import type { InputProps } from 'antd'
-import { type FC, useCallback, useMemo, useState } from 'react'
+import { type FC, forwardRef, useCallback, useImperativeHandle, useMemo, useState } from 'react'
 import { ChatScroll, WorkerPanel } from '@/components/chatLine'
 
 const useConnect = ({ rpc, scope, connect, emit }: ConnectInfoType) => {
@@ -49,20 +49,7 @@ const useConnect = ({ rpc, scope, connect, emit }: ConnectInfoType) => {
   )
 
   const filter: MessagePortCtx['filter'] = useCallback(
-    (receivedBody) =>
-      print({
-        message: 'success',
-        result: {
-          code: 200,
-          data: {
-            date: new Date(),
-            id: Date.now(),
-            name: 'mworker',
-          },
-          message: `${receivedBody.message}-(transmit:ww-port)`,
-          receivedBody,
-        },
-      }),
+    (receivedBody) => print(generateFakePrint(receivedBody, 'iframe-port')),
     [print]
   )
 
@@ -70,7 +57,7 @@ const useConnect = ({ rpc, scope, connect, emit }: ConnectInfoType) => {
   portWorkerCtx.provider({ filter })
   mainCtx.provider({ print })
 
-  return [sending, onSubmit] as const
+  return Object.freeze({ sending, onSubmit, print })
 }
 
 const MessagePortItem: FC<
@@ -98,73 +85,87 @@ const MessagePortItem: FC<
   )
 }
 
-const ServiceWorkerRPC: FC<MessagePortItemProps> = ({ disabled, scope, connect }) => {
-  const { connected, rpc } = useRPC({
-    config: {
-      channel: messageGroup,
-    },
-    consume: workerCtx.actions,
-    event: mainCtx.actions,
-    drive: createServiceWorkerRegistrationRPC,
-    init: () =>
-      navigator.serviceWorker.register(new URL('../../rpc/worker/msw.ts', import.meta.url), {
-        scope,
-      }),
-  })
+const ServiceWorkerRPC = forwardRef<MessagePortInstance, MessagePortItemProps>(
+  ({ disabled, scope, connect }, ref) => {
+    const { connected, rpc } = useRPC({
+      config: {
+        channel: messageGroup,
+      },
+      consume: workerCtx.actions,
+      event: mainCtx.actions,
+      drive: createServiceWorkerRegistrationRPC,
+      init: () =>
+        navigator.serviceWorker.register(new URL('../../rpc/worker/msw.ts', import.meta.url), {
+          scope,
+        }),
+    })
 
-  const { emit } = useEventChat('', { group: messageGroup })
-  const [sending, onSubmit] = useConnect({ rpc, scope, connect, emit })
+    const { emit } = useEventChat('', { group: messageGroup })
+    const { sending, onSubmit, print } = useConnect({ rpc, scope, connect, emit })
+    useImperativeHandle(ref, () => ({ print }))
 
-  return (
-    <MessagePortItem
-      disabled={!disabled ? !connected : true}
-      scope={scope}
-      sending={sending}
-      onSubmit={onSubmit}
-    />
-  )
-}
+    return (
+      <MessagePortItem
+        disabled={!disabled ? !connected : true}
+        scope={scope}
+        sending={sending}
+        onSubmit={onSubmit}
+      />
+    )
+  }
+)
 
-const WorkerRPC: FC<MessagePortItemProps> = ({ disabled, scope, connect }) => {
-  const { connected, rpc } = useRPC({
-    config: {
-      channel: messageGroup,
-    },
-    consume: workerCtx.actions,
-    event: mainCtx.actions,
-    drive: createWorkerRPC,
-    init: () =>
-      new Worker(new URL('../../rpc/worker/mworker.ts', import.meta.url), {
-        name: 'my-worker',
-      }),
-  })
+const WorkerRPC = forwardRef<MessagePortInstance, MessagePortItemProps>(
+  ({ disabled, scope, connect }, ref) => {
+    const { connected, rpc } = useRPC({
+      config: {
+        channel: messageGroup,
+      },
+      consume: workerCtx.actions,
+      event: mainCtx.actions,
+      drive: createWorkerRPC,
+      init: () =>
+        new Worker(new URL('../../rpc/worker/mworker.ts', import.meta.url), {
+          name: 'my-worker',
+        }),
+    })
 
-  const { emit } = useEventChat('', { group: messageGroup })
-  const [sending, onSubmit] = useConnect({ rpc, scope, connect, emit })
+    const { emit } = useEventChat('', { group: messageGroup })
+    const { sending, onSubmit, print } = useConnect({ rpc, scope, connect, emit })
+    useImperativeHandle(ref, () => ({ print }))
 
-  return (
-    <MessagePortItem
-      disabled={!disabled ? !connected : true}
-      scope={scope}
-      sending={sending}
-      onSubmit={onSubmit}
-    />
-  )
-}
+    return (
+      <MessagePortItem
+        disabled={!disabled ? !connected : true}
+        scope={scope}
+        sending={sending}
+        onSubmit={onSubmit}
+      />
+    )
+  }
+)
 
-const WindowRPC: FC<MessagePortItemProps> = ({ disabled, scope, connect }) => {
-  const { emit } = useEventChat('', { group: messageGroup })
-  const [sending, onSubmit] = useConnect({ scope, connect, emit })
+const WindowRPC = forwardRef<MessagePortInstance, MessagePortItemProps>(
+  ({ disabled, scope, connect }, ref) => {
+    const { emit } = useEventChat('', { group: messageGroup })
+    const { sending, onSubmit, print } = useConnect({ scope, connect, emit })
 
-  return <MessagePortItem disabled={disabled} scope={scope} sending={sending} onSubmit={onSubmit} />
+    useImperativeHandle(ref, () => ({ print }))
+    return (
+      <MessagePortItem disabled={disabled} scope={scope} sending={sending} onSubmit={onSubmit} />
+    )
+  }
+)
+
+if (process.env.NODE_ENV !== 'production') {
+  ServiceWorkerRPC.displayName = 'ServiceWorkerRPC'
+  WorkerRPC.displayName = 'WorkerRPC'
+  WindowRPC.displayName = 'WindowRPC'
 }
 
 export { ServiceWorkerRPC, WindowRPC, WorkerRPC }
 
-export interface MessagePortInstance {
-  connect: (port: MessagePort) => void
-  destroy: () => void
-}
+export interface MessagePortInstance extends Pick<MessagePortCtx, 'print'> {}
 
 interface MessagePortItemProps extends Pick<MessagePortCtx, 'connect'> {
   scope: string

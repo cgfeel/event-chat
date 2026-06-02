@@ -168,8 +168,9 @@ class RPCAction {
       Reflect.deleteProperty(options, 'onDisconnect')
       const pending = Array.from(this._pending.keys())
       const handlers = Object.keys(this._handlers)
+      const brodcast = this._brodcastListeners.length
 
-      debug?.({ data, handlers, info, options, pending })
+      debug?.({ brodcast, data, handlers, info, options, pending })
     }
 
     if (options?.channel !== channel) return
@@ -278,6 +279,7 @@ export type RPCOptionsType = Pick<MessageItem, 'channel'> & {
   retryTimeout?: number
   retryTimes?: number
   debug?: (arg: {
+    brodcast: number
     data: MessageItem
     handlers: string[]
     info: MessageInfo

@@ -7,6 +7,10 @@ export const chatName = 'chat'
 export const iframeName = 'iframe'
 export const GroupProvider = createContext({ group: iframeName })
 
+export const broadcastAction = 'broadcast-action'
+export const broadcastApi = 'broadcast-api'
+export const broadcastGroup = 'broadcast-group'
+
 export const serviceScopeAction = '/static/js/async/action/'
 export const serviceScopeApi = '/static/js/async/api/'
 export const serviceScopeParent = '/static/js/async/'

@@ -1,4 +1,4 @@
-import { transmitResult } from '@/services/baseSWService'
+import { type ResultType, transmitResult } from '@/services/baseSWService'
 import {
   type ConnectInitType,
   generateParentCtx,
@@ -8,16 +8,17 @@ import {
 } from '@/services/messagePortService'
 import { useEventChat } from '@event-chat/core'
 import { createMessagePortRPC } from '@event-chat/rpc/messagePort'
-import { useRPC } from '@event-chat/rpc/react'
+import { RPCInstanceContext, useRPC } from '@event-chat/rpc/react'
 import { createWindowRPC } from '@event-chat/rpc/window'
-import { type FC, useCallback, useMemo, useRef } from 'react'
+import { type FC, useCallback, useContext, useMemo, useRef } from 'react'
 import z from 'zod'
 import { receiptStore } from '@/components/chatLine/receiptStore'
-import { allowedOrigins, messageGroup } from './uitls'
+import { allowedOrigins, messageGroup } from '../uitls'
 
 const schema = z.enum(['broadcast', 'normal'])
 
 const MessagePortIframe: FC<MessagePortIframeProps> = ({ sub }) => {
+  const { brodcastScope, mount } = useContext(RPCInstanceContext)
   const broadRef = useRef<z.infer<typeof schema>>('normal')
   const iframeRef = useRef<HTMLIFrameElement>(null)
 
@@ -32,16 +33,19 @@ const MessagePortIframe: FC<MessagePortIframeProps> = ({ sub }) => {
     schema,
   })
 
-  useRPC({
-    config: {
-      channel: messageGroup,
-      allowedOrigins,
+  const print = useCallback(
+    (info?: Awaited<ResultType>, broadcast?: boolean) => {
+      if (info) {
+        const { receipt, scope } = info.result?.receivedBody ?? {}
+        if (receipt) receiptStore.increasing(receipt)
+        if (!broadcast || scope === sub) {
+          const detail = transmitResult({ ...info, scope: sub })
+          emit({ name: 'chat-message-port', detail })
+        }
+      }
     },
-    consume: iframeCtx.actions,
-    event: parentCtx.actions,
-    drive: createWindowRPC,
-    init: () => iframeRef.current,
-  })
+    [sub, emit]
+  )
 
   const connect = useCallback(
     ({ port, text }: ConnectInitType) => {
@@ -57,17 +61,16 @@ const MessagePortIframe: FC<MessagePortIframeProps> = ({ sub }) => {
                 scope: sub,
               }
 
+              // 广播发送消息后以便释放 GC（不释放也会在下次更换）
+              if (broadRef.current === 'broadcast') {
+                brodcastScope?.({ payload })
+                mount?.(portRPC)
+                return
+              }
+
               portRPC
                 .request('sendMessage', { payload })
-                .then((info) => {
-                  if (info) {
-                    const { receipt } = info.result?.receivedBody ?? {}
-                    if (receipt) receiptStore.increasing(receipt)
-
-                    const detail = transmitResult({ ...info, scope: sub })
-                    emit({ name: 'chat-message-port', detail })
-                  }
-                })
+                .then(print)
                 .catch(() => {})
             },
           },
@@ -75,11 +78,33 @@ const MessagePortIframe: FC<MessagePortIframeProps> = ({ sub }) => {
           event: portMainCtx.actions,
         },
       })
+
+      if (broadRef.current === 'broadcast') {
+        mount?.(portRPC, `iframe-port-${sub}`)
+      }
     },
-    [portMainCtx, sub, emit]
+    [portMainCtx, sub, brodcastScope, mount, print]
   )
 
-  parentCtx.provider({ connect })
+  useRPC({
+    config: {
+      channel: messageGroup,
+      allowedOrigins,
+    },
+    brodcast: parentCtx.brodcasts,
+    consume: iframeCtx.actions,
+    event: parentCtx.actions,
+    drive: createWindowRPC,
+    init: () => iframeRef.current,
+  })
+
+  parentCtx.provider({
+    print: (data) => {
+      print(data, true)
+      return Promise.resolve(data)
+    },
+    connect,
+  })
 
   return <iframe className="h-full w-full" ref={iframeRef} src={`/iframe?sub=${sub}`} />
 }

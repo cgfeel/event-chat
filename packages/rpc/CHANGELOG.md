@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.24](https://github.com/event-chat/event-chat/compare/rpc@v0.1.23...rpc@v0.1.24) (2026-06-02)
+
+
+### Bug Fixes
+
+* debug add broadcast num & export broadcast type ([d41ef51](https://github.com/event-chat/event-chat/commit/d41ef513dba2d8b299afac28ed40a7ff8308c199))
+* debug add broadcast num & export broadcast type ([f0eb00d](https://github.com/event-chat/event-chat/commit/f0eb00d2522c35ec691e5c24db885243a3259c9c))
+
 ## [0.1.23](https://github.com/event-chat/event-chat/compare/rpc@v0.1.22...rpc@v0.1.23) (2026-05-30)
 
 

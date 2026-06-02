@@ -1,5 +1,8 @@
 import { transmitResult } from '@/services/baseSWService'
-import { type BroadcastChannelCtx, broadcastCtx } from '@/services/broadcastChannelService'
+import {
+  type BroadcastChannelCtx,
+  generateBroadcastChannelCtx,
+} from '@/services/broadcastChannelService'
 import { useEventChat } from '@event-chat/core'
 import { createBroadcastChannelRPC } from '@event-chat/rpc/broadcastChannel'
 import { useRPC } from '@event-chat/rpc/react'
@@ -18,6 +21,9 @@ const BroadcastIframe: FC<Pick<BroadcastItemProps, 'scope'>> = ({ scope }) => {
 }
 
 const BroadcastItem: FC<BroadcastItemProps> = ({ iframe, scope, title }) => {
+  const name = useMemo(() => (iframe ? `iframe:${scope}` : scope), [iframe, scope])
+  const broadcastCtx = useMemo(() => generateBroadcastChannelCtx(), [])
+
   const broadRef = useRef<z.infer<typeof schema>>('transmit')
   const { connected, rpc, brodcastScope } = useRPC({
     config: { channel: broadcastGroup },
@@ -26,8 +32,13 @@ const BroadcastItem: FC<BroadcastItemProps> = ({ iframe, scope, title }) => {
     init: () => new BroadcastChannel(scope),
   })
 
-  const { emit } = useEventChat(`item-${scope}`, { group: broadcastGroup, schema })
-  const name = useMemo(() => (iframe ? `iframe:${scope}` : scope), [iframe, scope])
+  const { emit } = useEventChat(`item-${scope}`, {
+    group: broadcastGroup,
+    callback: ({ detail }) => {
+      broadRef.current = detail
+    },
+    schema,
+  })
 
   const print: BroadcastChannelCtx['print'] = useCallback(
     (data) => {
@@ -41,7 +52,14 @@ const BroadcastItem: FC<BroadcastItemProps> = ({ iframe, scope, title }) => {
   )
 
   broadcastCtx.provider({
-    broadcast: (payload, info) => rpc.broadcast({ ...info, payload }),
+    broadcast: (payload, info) => {
+      const data = { ...info, payload }
+      if (payload.broadcast === 'broadcast') {
+        brodcastScope(data)
+      } else {
+        rpc.broadcast(data)
+      }
+    },
     print,
   })
 

@@ -23,5 +23,8 @@ export const messagePortService = '/static/js/async/port/service/'
 export const messagePortWindow = '/static/js/async/port/window/'
 export const messagePortWeb = '/static/js/async/port/web/'
 
+export const transferAction = 'transfer-action'
+export const transferGroup = 'transfer-group'
+
 // 避免 formily 对于 worker:item 这样匹配规则的问题
 export const workerNameFilter = (name: string) => name.replace(/:/g, '-')

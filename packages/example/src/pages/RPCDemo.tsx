@@ -5,6 +5,7 @@ import ServiceWorkerDemo from '@/module/rpc/ServiceWorkerDemo'
 import WorkerDemo from '@/module/rpc/WorkerDemo'
 import { BroadcastChannelDemo } from '@/module/rpc/broadcastChannel'
 import { MessagePortDemo } from '@/module/rpc/messagePort'
+import TransferDemo from '@/module/rpc/transfer'
 import { Tag } from 'antd'
 import type { FC } from 'react'
 import Card from '@/components/Card'
@@ -158,6 +159,17 @@ const RPCDemo: FC = () => {
           }
         >
           <BroadcastChannelDemo />
+        </Card>
+      </RecipientsProvider>
+      <RecipientsProvider>
+        <Card
+          title={
+            <>
+              <Tag>transfer</Tag> 转移对象
+            </>
+          }
+        >
+          <TransferDemo />
         </Card>
       </RecipientsProvider>
     </div>

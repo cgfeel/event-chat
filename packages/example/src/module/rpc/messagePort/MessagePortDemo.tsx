@@ -12,13 +12,11 @@ const itemList = [
   { scope: messagePortWindow, title: 'IframePort-ParentPort' },
 ] as const
 
-const WorkerLogs: FC = () => {
-  return (
-    <div className={logs()}>
-      <ChatScroll direction="vertical" group={messageGroup} name="chat-message-port" />
-    </div>
-  )
-}
+const WorkerLogs: FC = () => (
+  <div className={logs()}>
+    <ChatScroll direction="vertical" group={messageGroup} name="chat-message-port" />
+  </div>
+)
 
 const MessagePortDemo: FC = () => {
   return (

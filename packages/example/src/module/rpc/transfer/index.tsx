@@ -5,7 +5,7 @@ import { type FC, type PropsWithChildren, useCallback, useRef } from 'react'
 import Button, { type ButtonProps } from '@/components/Button'
 import { allowedOrigins, transferAction, transferGroup } from '../uitls'
 
-const OffscreenCanvas: FC<PropsWithChildren<TransferItemProps>> = ({
+const MessagePortBtn: FC<PropsWithChildren<TransferItemProps>> = ({
   children,
   disabled,
   onSubmit,
@@ -13,7 +13,31 @@ const OffscreenCanvas: FC<PropsWithChildren<TransferItemProps>> = ({
   <Button
     disabled={disabled}
     onClick={() => {
-      onSubmit?.(new MessageChannel().port1)
+      const channel = new MessageChannel()
+      onSubmit?.(channel.port2)
+    }}
+  >
+    {children}
+  </Button>
+)
+
+const OffscreenCanvasBtn: FC<PropsWithChildren<TransferItemProps & { bitmap?: boolean }>> = ({
+  bitmap,
+  children,
+  disabled,
+  onSubmit,
+}) => (
+  <Button
+    disabled={disabled}
+    onClick={() => {
+      const canvas = new OffscreenCanvas(400, 300)
+      if (!bitmap) return onSubmit?.(canvas)
+
+      const ctx = canvas.getContext('2d')
+      ctx?.fillRect(0, 0, 100, 100)
+
+      const bitmapData = canvas.transferToImageBitmap()
+      onSubmit?.(bitmapData)
     }}
   >
     {children}
@@ -31,9 +55,10 @@ const TransferDemo: FC = () => {
 
   const onSubmit = useCallback(
     (transfer: Transferable) => {
+      const date = new Date()
       rpc
         .request('sendMessage', {
-          payload: transfer instanceof MessagePort ? {} : { transfer },
+          payload: transfer instanceof MessagePort ? { date } : { date, transfer },
           transfer: [transfer],
         })
         .catch(() => {})
@@ -44,11 +69,15 @@ const TransferDemo: FC = () => {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap gap-2">
-        <OffscreenCanvas disabled={!connected} onSubmit={onSubmit}>
+        <OffscreenCanvasBtn disabled={!connected} onSubmit={onSubmit}>
           OffscreenCanvas
-        </OffscreenCanvas>
-        <Button disabled={!connected}>ImageBitmap</Button>
-        <Button disabled={!connected}>MessagePort</Button>
+        </OffscreenCanvasBtn>
+        <OffscreenCanvasBtn disabled={!connected} onSubmit={onSubmit} bitmap>
+          ImageBitmap
+        </OffscreenCanvasBtn>
+        <MessagePortBtn disabled={!connected} onSubmit={onSubmit}>
+          MessagePort
+        </MessagePortBtn>
         <Button disabled={!connected}>MediaSourceHandle</Button>
         <Button disabled={!connected}>ReadableStream</Button>
         <Button disabled={!connected}>WritableStream</Button>

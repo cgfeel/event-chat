@@ -1,9 +1,9 @@
 import { allowedOrigins, transferGroup } from '@/module/rpc/uitls'
-import { name, transferCtx } from '@/services/transferService'
+import { type TransferCtxType, name, transferCtx } from '@/services/transferService'
 import { useEventChat } from '@event-chat/core'
 import { useRPC } from '@event-chat/rpc/react'
 import { createWindowRPC } from '@event-chat/rpc/window'
-import type { FC } from 'react'
+import { type FC, useCallback, useRef } from 'react'
 import { ChatScroll } from '@/components/chatLine'
 import { panelStyles } from '../rpc/windowUitls'
 
@@ -17,6 +17,7 @@ const WorkerLogs: FC = () => (
 
 const TransferItem: FC = () => {
   const { emit } = useEventChat('', { group: transferGroup })
+  const videoRef = useRef<HTMLVideoElement>(null)
   useRPC({
     config: { channel: transferGroup, allowedOrigins },
     event: transferCtx.actions,
@@ -24,13 +25,46 @@ const TransferItem: FC = () => {
     init: () => window.parent,
   })
 
-  transferCtx.provider({ emit })
+  const connectVideo: TransferCtxType['connectVideo'] = useCallback((transfer) => {
+    const video = videoRef.current
+    if (!video) return null
+
+    video.srcObject = transfer
+    return new Promise((resolve) => {
+      video.onloadedmetadata = () => {
+        try {
+          const data = {
+            duration: video.duration,
+            height: video.height,
+            readyState: video.readyState >= 2,
+            width: video.videoWidth,
+          }
+          resolve(JSON.stringify(data))
+        } catch {
+          resolve('video metadata parse faild')
+        }
+      }
+    })
+  }, [])
+
+  transferCtx.provider({ connectVideo, emit })
 
   return (
     <div className="flex h-full bg-gray-800">
       <WorkerLogs />
+      <div className="hidden">
+        <video ref={videoRef} />
+      </div>
     </div>
   )
 }
 
+export {}
+
 export default TransferItem
+
+declare global {
+  interface HTMLVideoElement {
+    srcObject: MediaSourceHandle | MediaProvider | null
+  }
+}

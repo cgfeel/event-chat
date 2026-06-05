@@ -1,9 +1,61 @@
-import { transferCtx } from '@/services/transferService'
+import { mainCtx, messageCtx, transferCtx, workerCtx } from '@/services/transferService'
+import { useEventChat } from '@event-chat/core'
+import { createMessagePortRPC } from '@event-chat/rpc/messagePort'
 import { useRPC } from '@event-chat/rpc/react'
 import { createWindowRPC } from '@event-chat/rpc/window'
+import { createWorkerRPC } from '@event-chat/rpc/worker'
+import { Tooltip } from 'antd'
 import { type FC, type PropsWithChildren, useCallback, useRef } from 'react'
 import Button, { type ButtonProps } from '@/components/Button'
+import { toastOpen } from '@/utils/event'
 import { allowedOrigins, transferAction, transferGroup } from '../uitls'
+
+const MediaSourceHandleBtn: FC<PropsWithChildren<TransferItemProps>> = ({
+  children,
+  disabled,
+  onSubmit,
+}) => {
+  const { connected, rpc } = useRPC({
+    config: { channel: transferGroup },
+    consume: workerCtx.actions,
+    event: mainCtx.actions,
+    drive: createWorkerRPC,
+    init: () =>
+      new Worker(new URL('./worker.ts', import.meta.url), {
+        name: 'transfer-worker',
+      }),
+  })
+
+  const { emit } = useEventChat('')
+  mainCtx.provider({
+    connectMedia: ({ compatible, media }) => {
+      if (!compatible) {
+        emit({
+          detail: {
+            message: '当前浏览器不支持: MediaSourceHandle',
+            title: `转移对象失败`,
+            type: 'error',
+          },
+          name: toastOpen,
+        })
+        return
+      }
+
+      if (media) onSubmit?.(media)
+    },
+  })
+
+  return (
+    <Button
+      disabled={!(!disabled && connected && Boolean(MediaSource.canConstructInDedicatedWorker))}
+      onClick={() => {
+        rpc.request('createMediaSource').catch(() => {})
+      }}
+    >
+      {children}
+    </Button>
+  )
+}
 
 const MessagePortBtn: FC<PropsWithChildren<TransferItemProps>> = ({
   children,
@@ -14,6 +66,17 @@ const MessagePortBtn: FC<PropsWithChildren<TransferItemProps>> = ({
     disabled={disabled}
     onClick={() => {
       const channel = new MessageChannel()
+      const [rpc] = createMessagePortRPC(channel.port1, {
+        context: {
+          config: {
+            channel: transferGroup,
+            onConnect: () => {
+              rpc.request('sendMessage', { payload: 'msg-from-main-messageport' }).catch(() => {})
+            },
+          },
+          consume: messageCtx.actions,
+        },
+      })
       onSubmit?.(channel.port2)
     }}
   >
@@ -78,7 +141,11 @@ const TransferDemo: FC = () => {
         <MessagePortBtn disabled={!connected} onSubmit={onSubmit}>
           MessagePort
         </MessagePortBtn>
-        <Button disabled={!connected}>MediaSourceHandle</Button>
+        <Tooltip title="仅支持：Chrome 90+、Edge 90+、Opera 76+">
+          <MediaSourceHandleBtn disabled={!connected} onSubmit={onSubmit}>
+            MediaSourceHandle
+          </MediaSourceHandleBtn>
+        </Tooltip>
         <Button disabled={!connected}>ReadableStream</Button>
         <Button disabled={!connected}>WritableStream</Button>
         <Button disabled={!connected}>TransformStream</Button>

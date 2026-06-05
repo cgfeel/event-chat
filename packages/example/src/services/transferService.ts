@@ -4,10 +4,11 @@ import { createMessagePortRPC } from '@event-chat/rpc/messagePort'
 import { createCtx } from '@event-chat/rpc/react'
 import { receiptStore } from '@/components/chatLine/receiptStore'
 
-export const name = 'chat-message-port'
-const messageCtx = createCtx((ctx: Partial<MessageCtxType>) => ({
+export const messageCtx = createCtx((ctx: Partial<MessageCtxType>) => ({
   sendMessage: (msg: string) => ctx.print?.(msg),
 }))
+
+export const name = 'chat-message-port'
 
 const readBlobToBase64 = (blob: Blob) =>
   new Promise<string>((resolve) => {
@@ -48,10 +49,15 @@ export const connectMessagePort = (transfer: MessagePort) =>
   createMessagePortRPC(transfer, {
     context: {
       config: { channel: transferGroup },
-      consume: messageCtx.actions,
       event: messageCtx.actions,
     },
   })
+
+export const mainCtx = createCtx((ctx: Partial<mainCtxType>) => ({
+  connectMedia: (data: MediaInfo) => {
+    ctx.connectMedia?.(data)
+  },
+}))
 
 export const transferCtx = createCtx((ctx: Partial<TransferCtxType>) => ({
   sendMessage: ({ date, transfer }: MessageDataType, info) => {
@@ -67,6 +73,10 @@ export const transferCtx = createCtx((ctx: Partial<TransferCtxType>) => ({
       .map((item): [Transferable, Promise<string>] | null => {
         if (item instanceof ImageBitmap) {
           return [item, printImageBitmap(item)]
+        }
+        if (item instanceof MediaSourceHandle) {
+          const result = ctx.connectVideo?.(item) ?? null
+          return result ? [item, result] : null
         }
         if (item instanceof MessagePort) {
           return [item, printMessagePort(item)]
@@ -91,6 +101,20 @@ export const transferCtx = createCtx((ctx: Partial<TransferCtxType>) => ({
   },
 }))
 
-export type TransferCtxType = Pick<ReturnType<typeof useEventChat>, 'emit'>
+export const workerCtx = createCtx((ctx: Partial<WorkerCtxType>) => ({
+  createMediaSource: () => {
+    // 从 worker 内部创建对象，这里是公共环境，MediaSource 不存在 handle
+    ctx.connectMedia?.()
+  },
+}))
+
+export type TransferCtxType = Pick<ReturnType<typeof useEventChat>, 'emit'> & {
+  connectVideo: (transfer: MediaSourceHandle) => Promise<string> | null
+}
+
 type MessageCtxType = { print: (msg: string) => void }
 type MessageDataType = { date: Date; transfer?: Transferable }
+
+type mainCtxType = { connectMedia: (data: MediaInfo) => void }
+type MediaInfo = { compatible: boolean; media?: MediaSourceHandle }
+type WorkerCtxType = { connectMedia: () => void }

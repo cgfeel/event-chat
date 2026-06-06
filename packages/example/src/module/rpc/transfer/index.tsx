@@ -1,4 +1,4 @@
-import { mainCtx, messageCtx, transferCtx, workerCtx } from '@/services/transferService'
+import { mainCtx, messageCtx, parentCtx, transferCtx, workerCtx } from '@/services/transferService'
 import { useEventChat } from '@event-chat/core'
 import { createMessagePortRPC } from '@event-chat/rpc/messagePort'
 import { useRPC } from '@event-chat/rpc/react'
@@ -137,11 +137,24 @@ const ReadableStreamBtn: FC<PropsWithChildren<TransferItemProps>> = ({
   </Button>
 )
 
+const WritableStreamBtn: FC<
+  PropsWithChildren<
+    Omit<TransferItemProps, 'onSubmit'> & {
+      onSubmit?: () => void
+    }
+  >
+> = ({ children, disabled, onSubmit }) => (
+  <Button disabled={disabled} onClick={onSubmit}>
+    {children}
+  </Button>
+)
+
 const TransferDemo: FC = () => {
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const { connected, rpc } = useRPC({
     config: { channel: transferGroup, allowedOrigins },
     consume: transferCtx.actions,
+    event: parentCtx.actions,
     drive: createWindowRPC,
     init: () => iframeRef.current,
   })
@@ -185,7 +198,18 @@ const TransferDemo: FC = () => {
             </ReadableStreamBtn>
           </span>
         </Tooltip>
-        <Button disabled={!connected}>WritableStream</Button>
+        <Tooltip title="会分段发送 3 条消息">
+          <span>
+            <WritableStreamBtn
+              disabled={!connected}
+              onSubmit={() => {
+                rpc.request('createWritableStream').catch(() => {})
+              }}
+            >
+              WritableStream
+            </WritableStreamBtn>
+          </span>
+        </Tooltip>
         <Button disabled={!connected}>TransformStream</Button>
         <Button disabled={!connected}>AudioData</Button>
         <Button disabled={!connected}>VideoFrame</Button>

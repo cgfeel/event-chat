@@ -1,5 +1,5 @@
 import { allowedOrigins, transferGroup } from '@/module/rpc/uitls'
-import { type TransferCtxType, name, transferCtx } from '@/services/transferService'
+import { type TransferCtxType, name, parentCtx, transferCtx } from '@/services/transferService'
 import { useEventChat } from '@event-chat/core'
 import { useRPC } from '@event-chat/rpc/react'
 import { createWindowRPC } from '@event-chat/rpc/window'
@@ -18,8 +18,9 @@ const WorkerLogs: FC = () => (
 const TransferItem: FC = () => {
   const { emit } = useEventChat('', { group: transferGroup })
   const videoRef = useRef<HTMLVideoElement>(null)
-  useRPC({
+  const { rpc } = useRPC({
     config: { channel: transferGroup, allowedOrigins },
+    consume: parentCtx.actions,
     event: transferCtx.actions,
     drive: createWindowRPC,
     init: () => window.parent,
@@ -47,7 +48,14 @@ const TransferItem: FC = () => {
     })
   }, [])
 
-  transferCtx.provider({ connectVideo, emit })
+  const connectWritableStream: TransferCtxType['connectWritableStream'] = useCallback(
+    (payload) => {
+      rpc.request('connectWritableStream', { transfer: [payload], payload }).catch(() => {})
+    },
+    [rpc]
+  )
+
+  transferCtx.provider({ connectVideo, connectWritableStream, emit })
 
   return (
     <div className="flex h-full bg-gray-800">

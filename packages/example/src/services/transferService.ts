@@ -10,6 +10,12 @@ export const messageCtx = createCtx((ctx: Partial<MessageCtxType>) => ({
 
 export const name = 'chat-message-port'
 
+const getReceipt = () => {
+  const receipt = receiptStore.addReceipt()
+  receiptStore.increasing(receipt)
+  return receipt
+}
+
 const readBlobToBase64 = (blob: Blob) =>
   new Promise<string>((resolve) => {
     const reader = new FileReader()
@@ -70,22 +76,60 @@ export const connectMessagePort = (transfer: MessagePort) =>
     },
   })
 
-export const mainCtx = createCtx((ctx: Partial<mainCtxType>) => ({
+export const mainCtx = createCtx((ctx: Partial<MainCtxType>) => ({
   connectMedia: (data: MediaInfo) => {
     ctx.connectMedia?.(data)
   },
 }))
 
+export const parentCtx = createCtx(() => ({
+  connectWritableStream: async (writable: WritableStream<WritableStreamData>) => {
+    const writer = writable.getWriter()
+    const generate = (message: string) => ({ date: new Date(), message })
+
+    await writer.write(generate('write-1'))
+    await writer.write(generate('write-2'))
+    await writer.write(generate('write-3'))
+    await writer.close()
+  },
+}))
+
 export const transferCtx = createCtx((ctx: Partial<TransferCtxType>) => ({
+  createWritableStream: () => {
+    let user = ''
+    const generate = <T extends Record<string, unknown> & { date?: Date }>(data: T) => ({
+      ...data,
+      date: data.date ? new Date(data.date) : new Date(),
+      own: true,
+      receipt: getReceipt(),
+      user,
+    })
+
+    const writable = new WritableStream<WritableStreamData>({
+      abort: (err: unknown) => {
+        ctx.emit?.({
+          detail: generate({ message: err instanceof Error ? err.message : 'write-abort' }),
+          name,
+        })
+      },
+      close: () => {
+        ctx.emit?.({ detail: generate({ message: 'write-close' }), name })
+      },
+      async write(chunk) {
+        ctx.emit?.({ detail: generate(chunk), name })
+        await new Promise((reslove) => setTimeout(reslove, 1000))
+      },
+    })
+
+    user = Object.prototype.toString.call(writable)
+    ctx.connectWritableStream?.(writable)
+  },
   sendMessage: ({ date, transfer }: MessageDataType, info) => {
     const { ports } = info ?? {}
     const mport = ports?.filter((item) => item instanceof MessagePort) ?? []
     const list = transfer ? [transfer].concat(mport) : mport
 
-    const receipt = receiptStore.addReceipt()
-    const baseData = { own: true, date, receipt }
-
-    receiptStore.increasing(receipt)
+    const baseData = { own: true, receipt: getReceipt(), date }
     const runEmit = (itemData: [Transferable, Promise<string>] | null) => {
       const [item, result] = itemData ?? []
       if (item && result) {
@@ -133,11 +177,13 @@ export const workerCtx = createCtx((ctx: Partial<WorkerCtxType>) => ({
 
 export type TransferCtxType = Pick<ReturnType<typeof useEventChat>, 'emit'> & {
   connectVideo: (transfer: MediaSourceHandle) => Promise<string> | null
+  connectWritableStream: (writable: WritableStream<WritableStreamData>) => void
 }
 
 type MessageCtxType = { print: (msg: string) => void }
 type MessageDataType = { date: Date; transfer?: Transferable }
 
-type mainCtxType = { connectMedia: (data: MediaInfo) => void }
+type MainCtxType = { connectMedia: (data: MediaInfo) => void }
 type MediaInfo = { compatible: boolean; media?: MediaSourceHandle }
 type WorkerCtxType = { connectMedia: () => void }
+type WritableStreamData = { date: Date; message: string }

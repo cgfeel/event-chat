@@ -107,6 +107,36 @@ const OffscreenCanvasBtn: FC<PropsWithChildren<TransferItemProps & { bitmap?: bo
   </Button>
 )
 
+const ReadableStreamBtn: FC<PropsWithChildren<TransferItemProps>> = ({
+  children,
+  disabled,
+  onSubmit,
+}) => (
+  <Button
+    disabled={disabled}
+    onClick={() => {
+      onSubmit?.(
+        new ReadableStream({
+          start(controller) {
+            let count = 0
+            controller.enqueue(`message-${count++}: ${Date.now()}`)
+
+            const timer = setInterval(() => {
+              controller.enqueue(`message-${count++}: ${Date.now()}`)
+              if (count >= 5) {
+                clearInterval(timer)
+                controller.close()
+              }
+            }, 1000)
+          },
+        })
+      )
+    }}
+  >
+    {children}
+  </Button>
+)
+
 const TransferDemo: FC = () => {
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const { connected, rpc } = useRPC({
@@ -141,12 +171,20 @@ const TransferDemo: FC = () => {
         <MessagePortBtn disabled={!connected} onSubmit={onSubmit}>
           MessagePort
         </MessagePortBtn>
-        <Tooltip title="仅支持：Chrome 90+、Edge 90+、Opera 76+">
-          <MediaSourceHandleBtn disabled={!connected} onSubmit={onSubmit}>
-            MediaSourceHandle
-          </MediaSourceHandleBtn>
+        <Tooltip title="仅支持：Chrome 108+、Edge 108+、Opera 94+、Safari 18+">
+          <span>
+            <MediaSourceHandleBtn disabled={!connected} onSubmit={onSubmit}>
+              MediaSourceHandle
+            </MediaSourceHandleBtn>
+          </span>
         </Tooltip>
-        <Button disabled={!connected}>ReadableStream</Button>
+        <Tooltip title="会分段发送 5 条消息">
+          <span>
+            <ReadableStreamBtn disabled={!connected} onSubmit={onSubmit}>
+              ReadableStream
+            </ReadableStreamBtn>
+          </span>
+        </Tooltip>
         <Button disabled={!connected}>WritableStream</Button>
         <Button disabled={!connected}>TransformStream</Button>
         <Button disabled={!connected}>AudioData</Button>

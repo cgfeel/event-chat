@@ -45,6 +45,23 @@ const printOffscreenCanvas = async (transfer: OffscreenCanvas) => {
   return readBlobToBase64(blob)
 }
 
+const printReadableStream = <T>(
+  transfer: ReadableStream<T>,
+  emit: (itemData: [Transferable, Promise<string>] | null) => void
+) => {
+  const reader = transfer.getReader()
+  const next = async () => {
+    const { done, value } = await reader.read()
+    if (done) return
+
+    emit([transfer, Promise.resolve(String(value ?? ''))])
+    next().catch(() => {})
+  }
+
+  next().catch(() => {})
+  return null
+}
+
 export const connectMessagePort = (transfer: MessagePort) =>
   createMessagePortRPC(transfer, {
     context: {
@@ -69,6 +86,19 @@ export const transferCtx = createCtx((ctx: Partial<TransferCtxType>) => ({
     const baseData = { own: true, date, receipt }
 
     receiptStore.increasing(receipt)
+    const runEmit = (itemData: [Transferable, Promise<string>] | null) => {
+      const [item, result] = itemData ?? []
+      if (item && result) {
+        const user = Object.prototype.toString.call(item)
+        result
+          .then((message) => {
+            const detail = { ...baseData, message, user }
+            ctx.emit?.({ detail, name })
+          })
+          .catch(() => {})
+      }
+    }
+
     list
       .map((item): [Transferable, Promise<string>] | null => {
         if (item instanceof ImageBitmap) {
@@ -84,20 +114,13 @@ export const transferCtx = createCtx((ctx: Partial<TransferCtxType>) => ({
         if (item instanceof OffscreenCanvas) {
           return [item, printOffscreenCanvas(item)]
         }
+        if (item instanceof ReadableStream) {
+          // 由内部分批输出，所以这里返回 null
+          return printReadableStream(item, runEmit)
+        }
         return null
       })
-      .forEach((itemData) => {
-        const [item, result] = itemData ?? []
-        if (item && result) {
-          const user = Object.prototype.toString.call(item)
-          result
-            .then((message) => {
-              const detail = { ...baseData, message, user }
-              ctx.emit?.({ detail, name })
-            })
-            .catch(() => {})
-        }
-      })
+      .forEach(runEmit)
   },
 }))
 

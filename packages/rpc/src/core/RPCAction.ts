@@ -105,7 +105,7 @@ class RPCAction {
       const timer = setTimeout(() => {
         this._pending.delete(requestId)
         receiptStore.minus(requestId)
-        if (retry < retryTimes) {
+        if (retry < retryTimes && !(ops.transfer?.length ?? 0)) {
           resolve(this.request(type, { ...options, retry: retry + 1 }))
         } else {
           reject(new Error(`[RPC] 请求超时：${type.toString()}`))

@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.25](https://github.com/event-chat/event-chat/compare/rpc@v0.1.24...rpc@v0.1.25) (2026-06-06)
+
+
+### Bug Fixes
+
+* update RPCAction provider transfer then retry is avoid ([91b501d](https://github.com/event-chat/event-chat/commit/91b501dabbaf5a8392649ccd2841d10c26d6688a))
+* update RPCAction provider transfer then retry is avoid ([5e39330](https://github.com/event-chat/event-chat/commit/5e39330f051034161f38904b2702bf6551f3d7be))
+
 ## [0.1.24](https://github.com/event-chat/event-chat/compare/rpc@v0.1.23...rpc@v0.1.24) (2026-06-02)
 
 

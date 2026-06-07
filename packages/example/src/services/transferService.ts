@@ -68,6 +68,31 @@ const printReadableStream = <T>(
   return null
 }
 
+const printTransformStream = (transfer: TransformStream) =>
+  new Promise<string>((resolve) => {
+    const source = new ReadableStream<string>({
+      start(controller) {
+        controller.enqueue('hello transformstream!')
+        controller.close()
+      },
+    })
+
+    let result = ''
+    const sink = new WritableStream<string>({
+      write(chunk) {
+        result += chunk
+      },
+      close() {
+        resolve(result)
+      },
+    })
+
+    source
+      .pipeThrough(transfer)
+      .pipeTo(sink)
+      .catch(() => {})
+  })
+
 export const connectMessagePort = (transfer: MessagePort) =>
   createMessagePortRPC(transfer, {
     context: {
@@ -161,6 +186,9 @@ export const transferCtx = createCtx((ctx: Partial<TransferCtxType>) => ({
         if (item instanceof ReadableStream) {
           // 由内部分批输出，所以这里返回 null
           return printReadableStream(item, runEmit)
+        }
+        if (item instanceof TransformStream) {
+          return [item, printTransformStream(item)]
         }
         return null
       })

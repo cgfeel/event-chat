@@ -137,6 +137,27 @@ const ReadableStreamBtn: FC<PropsWithChildren<TransferItemProps>> = ({
   </Button>
 )
 
+const TransformStreamBtn: FC<PropsWithChildren<TransferItemProps>> = ({
+  children,
+  disabled,
+  onSubmit,
+}) => (
+  <Button
+    disabled={disabled}
+    onClick={() => {
+      const upperCaseTransform = new TransformStream<string, string>({
+        transform(chunk, controller) {
+          const upperChunk = chunk.toUpperCase()
+          controller.enqueue(upperChunk)
+        },
+      })
+      onSubmit?.(upperCaseTransform)
+    }}
+  >
+    {children}
+  </Button>
+)
+
 const WritableStreamBtn: FC<
   PropsWithChildren<
     Omit<TransferItemProps, 'onSubmit'> & {
@@ -210,7 +231,9 @@ const TransferDemo: FC = () => {
             </WritableStreamBtn>
           </span>
         </Tooltip>
-        <Button disabled={!connected}>TransformStream</Button>
+        <TransformStreamBtn disabled={!connected} onSubmit={onSubmit}>
+          TransformStream
+        </TransformStreamBtn>
         <Button disabled={!connected}>AudioData</Button>
         <Button disabled={!connected}>VideoFrame</Button>
         <Button disabled={!connected}>RTCDataChannel</Button>

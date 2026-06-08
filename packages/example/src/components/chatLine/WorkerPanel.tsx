@@ -1,8 +1,8 @@
+import type { SendMessage } from '@/fields/chatField'
 import { SendOutlined, SyncOutlined } from '@ant-design/icons'
 import { Input, type InputProps } from 'antd'
 import { type FC, type PropsWithChildren, type ReactNode, useState } from 'react'
 import { tv } from 'tailwind-variants'
-import type { SendMessage } from './fields'
 import { baseStyle } from './utils'
 
 const styles = tv({

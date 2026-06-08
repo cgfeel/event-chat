@@ -10,6 +10,8 @@ import Button, { type ButtonProps } from '@/components/Button'
 import { toastOpen } from '@/utils/event'
 import { allowedOrigins, transferAction, transferGroup } from '../uitls'
 
+// import { waitVideoReady } from './units'
+
 const AudioDataBtn: FC<PropsWithChildren<TransferItemProps>> = ({
   children,
   disabled,
@@ -182,6 +184,30 @@ const TransformStreamBtn: FC<PropsWithChildren<TransferItemProps>> = ({
   </Button>
 )
 
+const VideoFrameBtn: FC<PropsWithChildren<TransferItemProps>> = ({
+  children,
+  disabled,
+  onSubmit,
+}) => (
+  <Button
+    disabled={disabled}
+    onClick={() => {
+      const video = document.createElement('video')
+      video.src = '/sample-320x240_new.mp4'
+      video.muted = true
+      video
+        .play()
+        .then(() => {
+          const frame = new VideoFrame(video, { timestamp: 0 })
+          onSubmit?.(frame)
+        })
+        .catch(() => {})
+    }}
+  >
+    {children}
+  </Button>
+)
+
 const WritableStreamBtn: FC<
   PropsWithChildren<
     Omit<TransferItemProps, 'onSubmit'> & {
@@ -261,7 +287,9 @@ const TransferDemo: FC = () => {
         <AudioDataBtn disabled={!connected} onSubmit={onSubmit}>
           AudioData
         </AudioDataBtn>
-        <Button disabled={!connected}>VideoFrame</Button>
+        <VideoFrameBtn disabled={!connected} onSubmit={onSubmit}>
+          VideoFrame
+        </VideoFrameBtn>
         <Button disabled={!connected}>RTCDataChannel</Button>
         <Button disabled={!connected}>ArrayBuffer</Button>
       </div>

@@ -169,6 +169,25 @@ const printTransformStream = (transfer: TransformStream) =>
       .catch(() => {})
   })
 
+const printVideoFrame = (transfer: VideoFrame) =>
+  new Promise<ResultType>((resolve) => {
+    const canvas = new OffscreenCanvas(transfer.displayWidth, transfer.displayHeight)
+    const ctx = canvas.getContext('2d')
+
+    createImageBitmap(transfer)
+      .then((bitmap) => {
+        ctx?.drawImage(bitmap, 0, 0)
+        bitmap.close()
+      })
+      .then(() => canvas.convertToBlob())
+      .then((blob) => readBlobToBase64(blob))
+      .then((img) => resolve({ message: 'create img from videoFrame', img }))
+      .catch(() => {})
+      .finally(() => {
+        transfer.close()
+      })
+  })
+
 export const connectMessagePort = (transfer: MessagePort) =>
   createMessagePortRPC(transfer, {
     context: {
@@ -268,6 +287,9 @@ export const transferCtx = createCtx((ctx: Partial<TransferCtxType>) => ({
         }
         if (item instanceof TransformStream) {
           return [item, printTransformStream(item)]
+        }
+        if (item instanceof VideoFrame) {
+          return [item, printVideoFrame(item)]
         }
         return null
       })

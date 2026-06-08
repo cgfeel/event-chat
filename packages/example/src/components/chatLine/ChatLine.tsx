@@ -1,3 +1,4 @@
+import { type SendMessage, itemSchema } from '@/fields/chatField'
 import useSubmit from '@/hooks/useSubmit'
 import { ChartName } from '@/services/baseService'
 import { SendOutlined, SyncOutlined } from '@ant-design/icons'
@@ -15,7 +16,6 @@ import {
 } from 'react'
 import { tv } from 'tailwind-variants'
 import z from 'zod'
-import { type SendMessage, itemSchema } from './fields'
 import { receiptStore } from './receiptStore'
 import { baseStyle } from './utils'
 
@@ -99,12 +99,23 @@ const style = tv({
 const { scrollInner } = style()
 
 const ChatItems: FC<ChatItemProps> = ({ item, receipt, direction = 'horizontal' }) => {
-  const { broadcast, busy, date, message, own, user, card = 0 } = item
+  const { audio, broadcast, busy, date, img, message, own, user, video, card = 0 } = item
   const { itemInner, itemUser, itemWrap, msg, msgtext, name, receiptTag, tag } = style({
     card: card > 0,
     type: own ? 'own' : undefined,
     direction,
   })
+
+  const videoRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const parent = videoRef.current
+    if (!parent || !video) return
+
+    parent.appendChild(video)
+    return () => {
+      if (parent.contains(video)) parent.removeChild(video)
+    }
+  }, [video])
 
   return (
     <div className={itemWrap()}>
@@ -125,6 +136,17 @@ const ChatItems: FC<ChatItemProps> = ({ item, receipt, direction = 'horizontal' 
             )}
           </span>
         </div>
+        {img && (
+          <div>
+            <img src={img} alt="" />
+          </div>
+        )}
+        {audio && (
+          <div>
+            <audio src={audio} controls />
+          </div>
+        )}
+        {video && <div ref={videoRef} />}
       </div>
     </div>
   )

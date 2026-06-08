@@ -1,14 +1,68 @@
+import type { itemSchema } from '@/fields/chatField'
 import { transferGroup } from '@/module/rpc/uitls'
 import type { useEventChat } from '@event-chat/core'
 import { createMessagePortRPC } from '@event-chat/rpc/messagePort'
 import { createCtx } from '@event-chat/rpc/react'
+import type z from 'zod'
 import { receiptStore } from '@/components/chatLine/receiptStore'
 
 export const messageCtx = createCtx((ctx: Partial<MessageCtxType>) => ({
-  sendMessage: (msg: string) => ctx.print?.(msg),
+  sendMessage: (message: string) => ctx.print?.({ message }),
 }))
 
 export const name = 'chat-message-port'
+
+// 工具函数：AudioBuffer → WAV Blob
+const bufferToWavBlob = (buffer: AudioBuffer) => {
+  const length = buffer.length * buffer.numberOfChannels * 2
+  const arrayBuffer = new ArrayBuffer(44 + length)
+  const view = new DataView(arrayBuffer)
+  const channels = []
+
+  let offset = 0
+  let pos = 0
+
+  // 写入 WAV 头部
+  const setUint16 = (data: number) => {
+    view.setUint16(pos, data, true)
+    pos += 2
+  }
+
+  const setUint32 = (data: number) => {
+    view.setUint32(pos, data, true)
+    pos += 4
+  }
+
+  setUint32(0x46464952)
+  setUint32(36 + length)
+  setUint32(0x45564157)
+  setUint32(0x20746d66)
+  setUint32(16)
+  setUint16(1)
+  setUint16(buffer.numberOfChannels)
+  setUint32(buffer.sampleRate)
+  setUint32(buffer.sampleRate * 2 * buffer.numberOfChannels)
+  setUint16(buffer.numberOfChannels * 2)
+  setUint16(16)
+  setUint32(0x61746164)
+  setUint32(length)
+
+  // 写入 PCM 数据
+  for (let i = 0; i < buffer.numberOfChannels; i++) {
+    channels.push(buffer.getChannelData(i))
+  }
+
+  while (pos < 44 + length) {
+    for (let i = 0; i < buffer.numberOfChannels; i++) {
+      const sample = Math.max(-1, Math.min(1, channels[i][offset]))
+      view.setInt16(pos, sample < 0 ? sample * 0x8000 : sample * 0x7fff, true)
+      pos += 2
+    }
+    offset++
+  }
+
+  return new Blob([view], { type: 'audio/wav' })
+}
 
 const getReceipt = () => {
   const receipt = receiptStore.addReceipt()
@@ -28,17 +82,39 @@ const readBlobToBase64 = (blob: Blob) =>
     reader.readAsDataURL(blob)
   })
 
+const printAudioData = async (transfer: AudioData) => {
+  // 读取数据
+  const data = new Float32Array(44100)
+  transfer.copyTo(data, { planeIndex: 0 })
+
+  // 生成 440Hz 声音
+  for (let i = 0; i < data.length; i++) {
+    data[i] = Math.sin((2 * Math.PI * 440 * i) / 44100)
+  }
+
+  // 创建音频缓冲区
+  const audioContext = new AudioContext()
+  await audioContext.resume()
+
+  const buffer = audioContext.createBuffer(1, 44100, 44100)
+  buffer.copyToChannel(data, 0)
+
+  // 转换成 WAV 格式生成 URL
+  const blob = bufferToWavBlob(buffer)
+  return { audio: URL.createObjectURL(blob), message: 'create AudioData' }
+}
+
 const printImageBitmap = async (transfer: ImageBitmap) => {
-  const canvas = new OffscreenCanvas(400, 300)
+  const canvas = new OffscreenCanvas(100, 100)
   const ctx = canvas.getContext('bitmaprenderer')
   ctx?.transferFromImageBitmap(transfer)
 
   const blob = await canvas.convertToBlob()
-  return readBlobToBase64(blob)
+  return readBlobToBase64(blob).then((img) => ({ message: 'Img from ImageBitmap', img }))
 }
 
 const printMessagePort = (transfer: MessagePort) =>
-  new Promise<string>((print) => {
+  new Promise<ResultType>((print) => {
     connectMessagePort(transfer)
     messageCtx.provider({ print })
   })
@@ -48,19 +124,19 @@ const printOffscreenCanvas = async (transfer: OffscreenCanvas) => {
   ctx?.fillRect(0, 0, 100, 100)
 
   const blob = await transfer.convertToBlob()
-  return readBlobToBase64(blob)
+  return readBlobToBase64(blob).then((img) => ({ message: 'Img from OffscreenCanvas', img }))
 }
 
 const printReadableStream = <T>(
   transfer: ReadableStream<T>,
-  emit: (itemData: [Transferable, Promise<string>] | null) => void
+  emit: (itemData: [Transferable, Promise<ResultType>] | null) => void
 ) => {
   const reader = transfer.getReader()
   const next = async () => {
     const { done, value } = await reader.read()
     if (done) return
 
-    emit([transfer, Promise.resolve(String(value ?? ''))])
+    emit([transfer, Promise.resolve({ message: String(value ?? '') })])
     next().catch(() => {})
   }
 
@@ -69,7 +145,7 @@ const printReadableStream = <T>(
 }
 
 const printTransformStream = (transfer: TransformStream) =>
-  new Promise<string>((resolve) => {
+  new Promise<ResultType>((resolve) => {
     const source = new ReadableStream<string>({
       start(controller) {
         controller.enqueue('hello transformstream!')
@@ -77,13 +153,13 @@ const printTransformStream = (transfer: TransformStream) =>
       },
     })
 
-    let result = ''
+    let message = ''
     const sink = new WritableStream<string>({
       write(chunk) {
-        result += chunk
+        message += chunk
       },
       close() {
-        resolve(result)
+        resolve({ message })
       },
     })
 
@@ -155,13 +231,13 @@ export const transferCtx = createCtx((ctx: Partial<TransferCtxType>) => ({
     const list = transfer ? [transfer].concat(mport) : mport
 
     const baseData = { own: true, receipt: getReceipt(), date }
-    const runEmit = (itemData: [Transferable, Promise<string>] | null) => {
+    const runEmit = (itemData: [Transferable, Promise<ResultType>] | null) => {
       const [item, result] = itemData ?? []
       if (item && result) {
         const user = Object.prototype.toString.call(item)
         result
-          .then((message) => {
-            const detail = { ...baseData, message, user }
+          .then((resultData) => {
+            const detail = { ...baseData, ...resultData, user }
             ctx.emit?.({ detail, name })
           })
           .catch(() => {})
@@ -169,7 +245,10 @@ export const transferCtx = createCtx((ctx: Partial<TransferCtxType>) => ({
     }
 
     list
-      .map((item): [Transferable, Promise<string>] | null => {
+      .map((item): [Transferable, Promise<ResultType>] | null => {
+        if (item instanceof AudioData) {
+          return [item, printAudioData(item)]
+        }
         if (item instanceof ImageBitmap) {
           return [item, printImageBitmap(item)]
         }
@@ -204,14 +283,17 @@ export const workerCtx = createCtx((ctx: Partial<WorkerCtxType>) => ({
 }))
 
 export type TransferCtxType = Pick<ReturnType<typeof useEventChat>, 'emit'> & {
-  connectVideo: (transfer: MediaSourceHandle) => Promise<string> | null
+  connectVideo: (transfer: MediaSourceHandle) => Promise<ResultType> | null
   connectWritableStream: (writable: WritableStream<WritableStreamData>) => void
 }
 
-type MessageCtxType = { print: (msg: string) => void }
+type MessageCtxType = { print: (result: ResultType) => void }
 type MessageDataType = { date: Date; transfer?: Transferable }
 
 type MainCtxType = { connectMedia: (data: MediaInfo) => void }
 type MediaInfo = { compatible: boolean; media?: MediaSourceHandle }
+
+type ResultType = Pick<z.infer<typeof itemSchema>, 'img' | 'message' | 'video'>
+
 type WorkerCtxType = { connectMedia: () => void }
 type WritableStreamData = { date: Date; message: string }

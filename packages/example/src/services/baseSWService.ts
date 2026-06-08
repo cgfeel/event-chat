@@ -1,5 +1,5 @@
+import { itemSchema } from '@/fields/chatField'
 import z from 'zod'
-import type { itemSchema } from '@/components/chatLine'
 
 const URL =
   process.env.NODE_ENV !== 'production'

@@ -1,6 +1,6 @@
+import type { SendMessage } from '@/fields/chatField'
 import type { useEventChat } from '@event-chat/core'
-import { type RPCInstanceContextIns } from '@event-chat/rpc/react'
-import { type SendMessage } from '@/components/chatLine'
+import type { RPCInstanceContextIns } from '@event-chat/rpc/react'
 import { receiptStore } from '@/components/chatLine/receiptStore'
 
 export const ChartName = 'chat-scroll'

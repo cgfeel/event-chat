@@ -1,8 +1,8 @@
+import { itemSchema } from '@/fields/chatField'
 import { serviceScopeParent } from '@/module/rpc/uitls'
 import type { useEventChat } from '@event-chat/core'
 import { createCtx, createService } from '@event-chat/rpc/react'
 import z from 'zod'
-import type { itemSchema } from '@/components/chatLine'
 import { receiptStore } from '@/components/chatLine/receiptStore'
 import {
   type WorkerMessage,

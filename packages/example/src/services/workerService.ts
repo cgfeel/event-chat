@@ -1,5 +1,5 @@
+import { messageSchema } from '@/fields/chatField'
 import { createCtx, createService } from '@event-chat/rpc/react'
-import { messageSchema } from '@/components/chatLine/fields'
 import { type CtxType, baseChatServer, baseServer } from './baseService'
 
 // messageSchema 不要通过 @/components/chatLine 加载，worker 进程不支持 React

@@ -1,6 +1,6 @@
+import { messageSchema } from '@/fields/chatField'
 import { TARGET_TYPE_STRINGS, createCtx, createService } from '@event-chat/rpc/react'
 import z from 'zod'
-import { messageSchema } from '@/components/chatLine'
 import { receiptStore } from '@/components/chatLine/receiptStore'
 import { type CtxType, baseChatServer, baseServer } from './baseService'
 

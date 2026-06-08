@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
+import { itemSchema } from '@/fields/chatField'
 import { mainCtx, workerChatCtx } from '@/services/workerService'
 import { createDedicatedWorkerGlobalScopeRPC } from '@event-chat/rpc/dedicatedWorkerGlobalScope'
-import { itemSchema } from '@/components/chatLine'
 
 declare const self: DedicatedWorkerGlobalScope
 

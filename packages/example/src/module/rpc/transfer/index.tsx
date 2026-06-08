@@ -10,6 +10,30 @@ import Button, { type ButtonProps } from '@/components/Button'
 import { toastOpen } from '@/utils/event'
 import { allowedOrigins, transferAction, transferGroup } from '../uitls'
 
+const AudioDataBtn: FC<PropsWithChildren<TransferItemProps>> = ({
+  children,
+  disabled,
+  onSubmit,
+}) => (
+  <Button
+    disabled={disabled}
+    onClick={() =>
+      onSubmit?.(
+        new AudioData({
+          format: 'f32-planar',
+          sampleRate: 44100,
+          numberOfChannels: 1,
+          numberOfFrames: 44100,
+          timestamp: 0,
+          data: new Float32Array(44100),
+        })
+      )
+    }
+  >
+    {children}
+  </Button>
+)
+
 const MediaSourceHandleBtn: FC<PropsWithChildren<TransferItemProps>> = ({
   children,
   disabled,
@@ -93,7 +117,7 @@ const OffscreenCanvasBtn: FC<PropsWithChildren<TransferItemProps & { bitmap?: bo
   <Button
     disabled={disabled}
     onClick={() => {
-      const canvas = new OffscreenCanvas(400, 300)
+      const canvas = new OffscreenCanvas(100, 100)
       if (!bitmap) return onSubmit?.(canvas)
 
       const ctx = canvas.getContext('2d')
@@ -234,7 +258,9 @@ const TransferDemo: FC = () => {
         <TransformStreamBtn disabled={!connected} onSubmit={onSubmit}>
           TransformStream
         </TransformStreamBtn>
-        <Button disabled={!connected}>AudioData</Button>
+        <AudioDataBtn disabled={!connected} onSubmit={onSubmit}>
+          AudioData
+        </AudioDataBtn>
         <Button disabled={!connected}>VideoFrame</Button>
         <Button disabled={!connected}>RTCDataChannel</Button>
         <Button disabled={!connected}>ArrayBuffer</Button>

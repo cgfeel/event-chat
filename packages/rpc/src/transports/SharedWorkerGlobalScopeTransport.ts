@@ -1,4 +1,4 @@
-import { IframeSerializeOptions, ListenerType, MessageItem } from '../fields'
+import { IframeSerializeOptions, ListenerType, MessageItem, ProxyPromise } from '../fields'
 import BaseTransport from './BaseTransport'
 
 // 共享 Worker 内部，共享 Worker 收发所有页面消息：SharedWorkerGlobalScope
@@ -38,13 +38,11 @@ class SharedWorkerGlobalScopeTransport extends BaseTransport<SharedWorkerGlobalS
       .catch(() => {})
   }
 
-  postMessage(message: MessageItem, options?: IframeSerializeOptions): void {
+  postMessage(message: MessageItem, options?: IframeSerializeOptions) {
     const { transfer } = options ?? {}
-    this._onconnect
-      ?.then((messagePort) => {
-        messagePort?.postMessage(message, { transfer })
-      })
-      .catch(() => {})
+    return this._onconnect?.then((messagePort) =>
+      ProxyPromise.try(() => messagePort?.postMessage(message, { transfer }))
+    )
   }
 }
 

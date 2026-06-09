@@ -1,4 +1,4 @@
-import { FactoryOptions, ListenerType, MessageItem } from '../fields'
+import { FactoryOptions, ListenerType, MessageItem, ProxyPromise } from '../fields'
 import BaseTransport from './BaseTransport'
 
 // function isSafeBufferSource(data: unknown): data is ArrayBuffer | ArrayBufferView<ArrayBuffer> {
@@ -48,22 +48,18 @@ class WebSocketTransport extends BaseTransport<WebSocket> {
     this._target.onmessage = null
   }
 
-  postMessage(message: MessageItem): void {
+  postMessage(message: MessageItem) {
     const target = this._target
-    this._onconnect
-      .then((open) => {
+    return this._onconnect.then((open) =>
+      ProxyPromise.try(() => {
         if (open)
-          try {
-            target.send(
-              // 暂且不传 ArrayBuffer，后面再看如何传
-              // isSafeBufferSource(message) || message instanceof Blob ? message : String(message)
-              JSON.stringify(message)
-            )
-          } catch {
-            //
-          }
+          target.send(
+            // 暂且不传 ArrayBuffer，后面再看如何传
+            // isSafeBufferSource(message) || message instanceof Blob ? message : String(message)
+            JSON.stringify(message)
+          )
       })
-      .catch(() => {})
+    )
   }
 }
 

@@ -1,4 +1,4 @@
-import { IframeSerializeOptions, MessageItem, Transport } from '../fields'
+import { IframeSerializeOptions, MessageItem, Transport, getError } from '../fields'
 import { isKey } from '../utils'
 import { receiptStore } from './receiptStore'
 
@@ -56,7 +56,7 @@ class RPCAction {
     this._requestId = ''
   }
 
-  broadcast<T>(options?: Omit<RequestOptions<T>, 'retry'>) {
+  broadcast<T>(options?: Omit<RequestOptions<T>, 'retry'>, fallback?: (error: unknown) => void) {
     const { payload, sign, requestId = '', ...ops } = options ?? {}
     const { channel } = this._options
     const info = this._baseMessage({
@@ -68,10 +68,13 @@ class RPCAction {
     })
 
     if (sign) info.sign = sign
-    this._target.postMessage(info, {
-      ...ops,
-      targetOrigin: ops.targetOrigin ?? self?.location?.origin,
-    })
+    this._target
+      .postMessage(info, {
+        ...ops,
+        targetOrigin: ops.targetOrigin ?? self?.location?.origin,
+      })
+      .catch(fallback ?? (() => {}))
+
     return info
   }
 
@@ -126,10 +129,18 @@ class RPCAction {
       })
 
       const info = this._baseMessage({ kind: 'request', channel, payload, requestId, type })
-      this._target.postMessage(info, {
-        ...ops,
-        targetOrigin: ops.targetOrigin ?? self?.location?.origin,
-      })
+      this._target
+        .postMessage(info, {
+          ...ops,
+          targetOrigin: ops.targetOrigin ?? self?.location?.origin,
+        })
+        .catch((error) => {
+          clearTimeout(timer)
+          receiptStore.minus(requestId)
+
+          this._pending.delete(requestId)
+          reject(getError(error))
+        })
     })
   }
 
@@ -230,15 +241,16 @@ class RPCAction {
           return result
         })
         .then((result) => {
-          this._target.postMessage({ ...base, payload: result }, { targetOrigin: origin })
+          this._target
+            .postMessage({ ...base, payload: result }, { targetOrigin: origin })
+            .catch(() => {})
           return result
         })
         .catch((err) => {
           const message = err instanceof Error ? err.message : '[RPC] 处理消息时发生错误'
-          this._target.postMessage(
-            { ...base, error: message, payload: '' },
-            { targetOrigin: origin }
-          )
+          this._target
+            .postMessage({ ...base, error: message, payload: '' }, { targetOrigin: origin })
+            .catch(() => {})
         })
         .finally(() => wait?.())
     }
@@ -254,7 +266,7 @@ class RPCAction {
 
     const info = this._baseMessage({ heartbeat: true, kind: 'request', channel })
     const intervalLoops = () => {
-      this._target.postMessage(info)
+      this._target.postMessage(info).catch(() => {})
 
       // ❌ 心跳超时
       if (!this._isConnected) return

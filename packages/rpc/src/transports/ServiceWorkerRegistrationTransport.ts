@@ -1,4 +1,4 @@
-import { IframeSerializeOptions, ListenerType, MessageItem } from '../fields'
+import { IframeSerializeOptions, ListenerType, MessageItem, ProxyPromise } from '../fields'
 import BaseTransport from './BaseTransport'
 
 // 主线程 → ServiceWorker，页面给 ServiceWorker 发消息：navigator.serviceWorker
@@ -25,24 +25,20 @@ class ServiceWorkerRegistrationTransport extends BaseTransport<ServiceWorkerRegi
     navigator.serviceWorker.removeEventListener('message', listener, this._options.message)
   }
 
-  postMessage(message: MessageItem, options?: IframeSerializeOptions): void {
+  postMessage(message: MessageItem, options?: IframeSerializeOptions) {
     const { transfer } = options ?? {}
     if (message.heartbeat) {
       // 如果是心跳只有当前激活的实例才能发送，而相同 scope 实例都会收到
       this._target.active?.postMessage(message, { transfer })
-      return
+      return Promise.resolve()
     }
 
-    navigator.serviceWorker
-      .getRegistrations()
-      .then((registrations) => {
-        const matched = registrations.find(
-          (registration) =>
-            registration.scope === this._target.scope && Boolean(registration.active)
-        )
-        matched?.active?.postMessage(message, { transfer })
-      })
-      .catch(() => {})
+    return navigator.serviceWorker.getRegistrations().then((registrations) => {
+      const matched = registrations.find(
+        (registration) => registration.scope === this._target.scope && Boolean(registration.active)
+      )
+      return ProxyPromise.try(() => matched?.active?.postMessage(message, { transfer }))
+    })
   }
 }
 

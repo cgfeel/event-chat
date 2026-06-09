@@ -1,4 +1,4 @@
-import { IframeSerializeOptions, ListenerType, MessageItem } from '../fields'
+import { IframeSerializeOptions, ListenerType, MessageItem, ProxyPromise } from '../fields'
 import BaseTransport from './BaseTransport'
 
 declare const self: ServiceWorkerGlobalScope
@@ -39,7 +39,7 @@ class ServiceWorkerGlobalScopeTransport extends BaseTransport<ServiceWorkerGloba
       this._target.removeEventListener('message', this._onconnect, this._options.message)
   }
 
-  postMessage(message: MessageItem, options?: IframeSerializeOptions): void {
+  postMessage(message: MessageItem, options?: IframeSerializeOptions) {
     const msg = { ...message, scope: self.registration.scope }
     const { transmit, transfer } = options ?? {}
 
@@ -54,12 +54,14 @@ class ServiceWorkerGlobalScopeTransport extends BaseTransport<ServiceWorkerGloba
 
     // 允许转发请求到指定窗口或 iframe
     if (transmitHandle) {
-      transmitHandle()
-        .then((clients) => clients.forEach((client) => client.postMessage(msg, { transfer })))
-        .catch(() => {})
+      return transmitHandle().then((clients) =>
+        Promise.all(
+          clients.map((client) => ProxyPromise.try(() => client.postMessage(msg, { transfer })))
+        )
+      )
     } else {
       // 没有接受消息前 source 发不出消息
-      this._source?.postMessage(msg, { transfer })
+      return ProxyPromise.try(() => this._source?.postMessage(msg, { transfer }))
     }
   }
 }

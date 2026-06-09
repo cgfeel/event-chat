@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.26](https://github.com/event-chat/event-chat/compare/rpc@v0.1.25...rpc@v0.1.26) (2026-06-09)
+
+
+### Bug Fixes
+
+* add Promise.try & update postMessage return Promise & catch error ([1e0c297](https://github.com/event-chat/event-chat/commit/1e0c297cdfaf809cee689751da4e68096cb66656))
+* add Promise.try & update postMessage return Promise & catch error ([0bda8fe](https://github.com/event-chat/event-chat/commit/0bda8fee623d610ab41479a8bf03ea000bf50a4b))
+
 ## [0.1.25](https://github.com/event-chat/event-chat/compare/rpc@v0.1.24...rpc@v0.1.25) (2026-06-06)
 
 

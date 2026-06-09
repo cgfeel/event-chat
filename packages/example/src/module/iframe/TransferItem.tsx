@@ -47,6 +47,13 @@ const TransferItem: FC = () => {
     })
   }, [])
 
+  const connectWebRTC: TransferCtxType['connectWebRTC'] = useCallback(
+    (payload) => {
+      rpc.request('connectWebRTC', { transfer: [payload], payload }).catch(() => {})
+    },
+    [rpc]
+  )
+
   const connectWritableStream: TransferCtxType['connectWritableStream'] = useCallback(
     (payload) => {
       rpc.request('connectWritableStream', { transfer: [payload], payload }).catch(() => {})
@@ -54,7 +61,7 @@ const TransferItem: FC = () => {
     [rpc]
   )
 
-  transferCtx.provider({ connectVideo, connectWritableStream, emit })
+  transferCtx.provider({ connectVideo, connectWebRTC, connectWritableStream, emit })
 
   return (
     <div className="flex h-full bg-gray-800">

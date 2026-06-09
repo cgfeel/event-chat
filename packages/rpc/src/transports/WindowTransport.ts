@@ -1,4 +1,4 @@
-import { IframeSerializeOptions, ListenerType, MessageItem } from '../fields'
+import { IframeSerializeOptions, ListenerType, MessageItem, ProxyPromise } from '../fields'
 import BaseTransport from './BaseTransport'
 
 const getOrigin = (url: string) =>
@@ -33,12 +33,9 @@ class WindowTransport extends BaseTransport<Window> {
     return origin?.map((item) => (item === '*' ? item : getOrigin(item))).filter(Boolean)
   }
 
-  postMessage(message: MessageItem, options?: IframeSerializeOptions): void {
+  postMessage(message: MessageItem, options?: IframeSerializeOptions) {
     const { transfer, targetOrigin = '*' } = options ?? {}
-    this._target.postMessage(message, {
-      targetOrigin,
-      transfer,
-    })
+    return ProxyPromise.try(() => this._target.postMessage(message, { targetOrigin, transfer }))
   }
 
   // 不要试图通过 element.isConnected 判断 iframe 是否存在 Dom 中，因为有可能暂时放入了 DocumentFragment

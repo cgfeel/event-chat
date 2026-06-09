@@ -1,4 +1,4 @@
-import { IframeSerializeOptions, ListenerType, MessageItem } from '../fields'
+import { IframeSerializeOptions, ListenerType, MessageItem, ProxyPromise } from '../fields'
 import BaseTransport from './BaseTransport'
 
 class MessagePortTransport extends BaseTransport<MessagePort> {
@@ -18,9 +18,9 @@ class MessagePortTransport extends BaseTransport<MessagePort> {
     this._target.removeEventListener('message', listener, this._options.message)
   }
 
-  postMessage(message: MessageItem, options?: IframeSerializeOptions): void {
+  postMessage(message: MessageItem, options?: IframeSerializeOptions) {
     const { transfer } = options ?? {}
-    this._target.postMessage(message, { transfer })
+    return ProxyPromise.try(() => this._target.postMessage(message, { transfer }))
   }
 }
 

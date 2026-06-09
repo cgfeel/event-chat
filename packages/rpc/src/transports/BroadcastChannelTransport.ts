@@ -1,4 +1,4 @@
-import { ListenerType, MessageItem } from '../fields'
+import { ListenerType, MessageItem, ProxyPromise } from '../fields'
 import BaseTransport from './BaseTransport'
 
 // 主线程，同源跨标签/窗口：BroadcastChannel
@@ -20,8 +20,8 @@ class BroadcastChannelTransport extends BaseTransport<BroadcastChannel, true> {
     this._target.removeEventListener('message', listener, this._options.message)
   }
 
-  postMessage(message: MessageItem): void {
-    this._target.postMessage(message)
+  postMessage(message: MessageItem) {
+    return ProxyPromise.try(() => this._target.postMessage(message))
   }
 }
 

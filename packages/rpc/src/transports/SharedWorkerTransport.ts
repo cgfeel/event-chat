@@ -1,4 +1,4 @@
-import { IframeSerializeOptions, ListenerType, MessageItem } from '../fields'
+import { IframeSerializeOptions, ListenerType, MessageItem, ProxyPromise } from '../fields'
 import BaseTransport from './BaseTransport'
 
 // 主线程 → 共享 Worker，多页面共享一个 Worker 线程：SharedWorker
@@ -18,9 +18,9 @@ class SharedWorkerTransport extends BaseTransport<SharedWorker> {
     this._target.port.removeEventListener('message', listener, this._options.message)
   }
 
-  postMessage(message: MessageItem, options?: IframeSerializeOptions): void {
+  postMessage(message: MessageItem, options?: IframeSerializeOptions) {
     const { transfer } = options ?? {}
-    this._target.port.postMessage(message, { transfer })
+    return ProxyPromise.try(() => this._target.port.postMessage(message, { transfer }))
   }
 }
 

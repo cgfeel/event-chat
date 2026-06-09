@@ -42,7 +42,7 @@ abstract class BaseTransport<
 
   // 只提供监听、移除的方法，记录方法的事件需要外部处理
   abstract onremove(listener: ListenerType): void
-  abstract postMessage(message: MessageItem, options?: IframeSerializeOptions): void
+  abstract postMessage(message: MessageItem, options?: IframeSerializeOptions): Promise<unknown>
 }
 
 export default BaseTransport

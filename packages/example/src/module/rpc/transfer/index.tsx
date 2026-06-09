@@ -10,8 +10,6 @@ import Button, { type ButtonProps } from '@/components/Button'
 import { toastOpen } from '@/utils/event'
 import { allowedOrigins, transferAction, transferGroup } from '../uitls'
 
-// import { waitVideoReady } from './units'
-
 const AudioDataBtn: FC<PropsWithChildren<TransferItemProps>> = ({
   children,
   disabled,
@@ -163,6 +161,18 @@ const ReadableStreamBtn: FC<PropsWithChildren<TransferItemProps>> = ({
   </Button>
 )
 
+const RTCDataChannelBtn: FC<
+  PropsWithChildren<
+    Omit<TransferItemProps, 'onSubmit'> & {
+      onSubmit?: () => void
+    }
+  >
+> = ({ children, disabled, onSubmit }) => (
+  <Button disabled={disabled} onClick={onSubmit}>
+    {children}
+  </Button>
+)
+
 const TransformStreamBtn: FC<PropsWithChildren<TransferItemProps>> = ({
   children,
   disabled,
@@ -200,6 +210,9 @@ const VideoFrameBtn: FC<PropsWithChildren<TransferItemProps>> = ({
         .then(() => {
           const frame = new VideoFrame(video, { timestamp: 0 })
           onSubmit?.(frame)
+          video.pause() // 停止播放
+          video.src = '' // 清空视频源
+          video.load() // 强制释放资源
         })
         .catch(() => {})
     }}
@@ -290,7 +303,14 @@ const TransferDemo: FC = () => {
         <VideoFrameBtn disabled={!connected} onSubmit={onSubmit}>
           VideoFrame
         </VideoFrameBtn>
-        <Button disabled={!connected}>RTCDataChannel</Button>
+        <RTCDataChannelBtn
+          disabled={!connected}
+          onSubmit={() => {
+            rpc.request('createRTCDataChannel').catch(() => {})
+          }}
+        >
+          RTCDataChannel
+        </RTCDataChannelBtn>
         <Button disabled={!connected}>ArrayBuffer</Button>
       </div>
       <iframe className="h-56" ref={iframeRef} src={`/iframe?sub=${transferAction}`} />

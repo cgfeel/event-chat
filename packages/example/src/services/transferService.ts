@@ -5,64 +5,13 @@ import { createMessagePortRPC } from '@event-chat/rpc/messagePort'
 import { createCtx } from '@event-chat/rpc/react'
 import type z from 'zod'
 import { receiptStore } from '@/components/chatLine/receiptStore'
+import { bufferToWavBlob, startConnection } from './baseTransferService'
 
 export const messageCtx = createCtx((ctx: Partial<MessageCtxType>) => ({
   sendMessage: (message: string) => ctx.print?.({ message }),
 }))
 
 export const name = 'chat-message-port'
-
-// 工具函数：AudioBuffer → WAV Blob
-const bufferToWavBlob = (buffer: AudioBuffer) => {
-  const length = buffer.length * buffer.numberOfChannels * 2
-  const arrayBuffer = new ArrayBuffer(44 + length)
-  const view = new DataView(arrayBuffer)
-  const channels = []
-
-  let offset = 0
-  let pos = 0
-
-  // 写入 WAV 头部
-  const setUint16 = (data: number) => {
-    view.setUint16(pos, data, true)
-    pos += 2
-  }
-
-  const setUint32 = (data: number) => {
-    view.setUint32(pos, data, true)
-    pos += 4
-  }
-
-  setUint32(0x46464952)
-  setUint32(36 + length)
-  setUint32(0x45564157)
-  setUint32(0x20746d66)
-  setUint32(16)
-  setUint16(1)
-  setUint16(buffer.numberOfChannels)
-  setUint32(buffer.sampleRate)
-  setUint32(buffer.sampleRate * 2 * buffer.numberOfChannels)
-  setUint16(buffer.numberOfChannels * 2)
-  setUint16(16)
-  setUint32(0x61746164)
-  setUint32(length)
-
-  // 写入 PCM 数据
-  for (let i = 0; i < buffer.numberOfChannels; i++) {
-    channels.push(buffer.getChannelData(i))
-  }
-
-  while (pos < 44 + length) {
-    for (let i = 0; i < buffer.numberOfChannels; i++) {
-      const sample = Math.max(-1, Math.min(1, channels[i][offset]))
-      view.setInt16(pos, sample < 0 ? sample * 0x8000 : sample * 0x7fff, true)
-      pos += 2
-    }
-    offset++
-  }
-
-  return new Blob([view], { type: 'audio/wav' })
-}
 
 const getReceipt = () => {
   const receipt = receiptStore.addReceipt()
@@ -203,6 +152,15 @@ export const mainCtx = createCtx((ctx: Partial<MainCtxType>) => ({
 }))
 
 export const parentCtx = createCtx(() => ({
+  connectWebRTC: (channel: RTCDataChannel) => {
+    channel.addEventListener(
+      'open',
+      () => {
+        channel.send('Send message from  webRTC')
+      },
+      { once: true }
+    )
+  },
   connectWritableStream: async (writable: WritableStream<WritableStreamData>) => {
     const writer = writable.getWriter()
     const generate = (message: string) => ({ date: new Date(), message })
@@ -215,6 +173,26 @@ export const parentCtx = createCtx(() => ({
 }))
 
 export const transferCtx = createCtx((ctx: Partial<TransferCtxType>) => ({
+  createRTCDataChannel: () => {
+    let user = 'webRTC'
+    startConnection((message) =>
+      ctx.emit?.({
+        detail: {
+          date: new Date(),
+          message: String(message.data ?? ''),
+          own: true,
+          receipt: getReceipt(),
+          user,
+        },
+        name,
+      })
+    )
+      .then((channel) => {
+        user = Object.prototype.toString.call(channel)
+        return ctx.connectWebRTC?.(channel)
+      })
+      .catch(() => {})
+  },
   createWritableStream: () => {
     let user = ''
     const generate = <T extends Record<string, unknown> & { date?: Date }>(data: T) => ({
@@ -306,6 +284,7 @@ export const workerCtx = createCtx((ctx: Partial<WorkerCtxType>) => ({
 
 export type TransferCtxType = Pick<ReturnType<typeof useEventChat>, 'emit'> & {
   connectVideo: (transfer: MediaSourceHandle) => Promise<ResultType> | null
+  connectWebRTC: (transfer: RTCDataChannel) => void
   connectWritableStream: (writable: WritableStream<WritableStreamData>) => void
 }
 

@@ -1,7 +1,7 @@
 import type { useEventChat } from '@event-chat/core'
 import type { MessageInfo, MessageItem } from '@event-chat/rpc'
+import { createService } from '@event-chat/rpc'
 import { createMessagePortRPC } from '@event-chat/rpc/messagePort'
-import { createService } from '@event-chat/rpc/react'
 import type { InputProps } from 'antd'
 import {
   type ResultType,

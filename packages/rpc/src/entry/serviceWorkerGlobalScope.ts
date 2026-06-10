@@ -1,7 +1,7 @@
 import { ActionRecord } from '../core/RPCDecorator'
 import RPCDecorator from '../core/RPCDecorator'
+import { EntryOptions } from '../fields'
 import ServiceWorkerGlobalScopeTransport from '../transports/ServiceWorkerGlobalScopeTransport'
-import { EntryOptions } from '../transports/fields'
 
 export function createServiceWorkerGlobalScopeRPC<
   EVENT extends ActionRecord,

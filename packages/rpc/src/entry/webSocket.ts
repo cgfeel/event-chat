@@ -1,7 +1,7 @@
 import { ActionRecord } from '../core/RPCDecorator'
 import RPCDecorator from '../core/RPCDecorator'
+import { EntryOptions } from '../fields'
 import WebSocketTransport from '../transports/WebSocketTransport'
-import { EntryOptions } from '../transports/fields'
 
 export function createWebSocketRPC<EVENT extends ActionRecord, CONSUME extends ActionRecord>(
   target: WebSocket,

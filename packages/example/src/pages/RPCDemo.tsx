@@ -53,6 +53,19 @@ const RPCDemo: FC = () => {
       </RecipientsProvider>
       <RecipientsProvider>
         <Card
+          footer={
+            <FooterTips>
+              <ul className="m-4 list-disc text-sm text-gray-400">
+                <li>
+                  在网页主线程上下文中，无论是 <Tag>BroadcastChannel</Tag> 实例，还是{' '}
+                  <Tag>Worker</Tag> 实例，<Tag>window</Tag>{' '}
+                  实例，它们共享同一个线程。因此相同上下文的实例，它的上下文一定不能是一个固定的对象，而是类似于当前实例中，在组件内部通过方法{' '}
+                  <Tag>generateMainCtx</Tag> 动态生成上下文。而分支线程，比如{' '}
+                  <Tag>DedicatedWorkerGlobalScope</Tag> 内部，每个线程单独一个上下文，无需动态创建。
+                </li>
+              </ul>
+            </FooterTips>
+          }
           title={
             <>
               <Tag>Web Worker</Tag> 通信演示
@@ -176,11 +189,8 @@ const RPCDemo: FC = () => {
                   如果需要跨域可以通过 <Tag>iframe</Tag> 转发通信，上面演示已经展示不再重复演示。
                 </li>
                 <li>
-                  需要注意的是，无论是 <Tag>BroadcastChannel</Tag> 实例，还是 <Tag>Worker</Tag>{' '}
-                  实例，<Tag>window</Tag>{' '}
-                  实例，在同一个网页主线程下，它们共享同一个线程。因此相同上下文的实例，它的上下文一定不能是一个固定的对象，而是类似于当前实例中，在组件内部通过方法{' '}
-                  <Tag>generateBroadcastChannelCtx</Tag> 动态生成剩下文。而分支线程，比如{' '}
-                  <Tag>Worker</Tag> 内部，每个线程单独一个上下文，无需动态创建
+                  需要注意的是，无论是 <Tag>BroadcastChannel</Tag> 实例，和 <Tag>Worker</Tag>{' '}
+                  实例一样，在同一个网页主线程下共享同一个线程，因此需要业务动态生成上下文。
                 </li>
                 <li>
                   <Tag>BroadcastChannel</Tag> 不支持 <Tag>transfer</Tag>，但没有屏蔽该属性，因为{' '}

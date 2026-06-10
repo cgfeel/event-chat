@@ -16,10 +16,6 @@ export const TARGET_TYPE_STRINGS = Object.freeze({
   DedicatedWorkerGlobalScope: '[object DedicatedWorkerGlobalScope]',
 })
 
-export interface FactoryOptions {
-  message?: boolean | AddEventListenerOptions
-}
-
 export interface RPCInstanceContextIns {
   brodcastScope?: <T>(data: RequestOptions<T>, options?: ScopeProps) => void
   mount?: (item: RPCItem, name?: string) => void

@@ -1,4 +1,5 @@
-import { FactoryOptions, ListenerType, MessageItem, ProxyPromise } from '../fields'
+import { FactoryOptions, ListenerType, MessageItem } from '../fields'
+import { ProxyPromise } from '../utils'
 import BaseTransport from './BaseTransport'
 
 // function isSafeBufferSource(data: unknown): data is ArrayBuffer | ArrayBufferView<ArrayBuffer> {

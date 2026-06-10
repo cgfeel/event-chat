@@ -1,4 +1,5 @@
-import { IframeSerializeOptions, ListenerType, MessageItem, ProxyPromise } from '../fields'
+import { IframeSerializeOptions, ListenerType, MessageItem } from '../fields'
+import { ProxyPromise } from '../utils'
 import BaseTransport from './BaseTransport'
 
 // 主线程给子线程发消息：Worker

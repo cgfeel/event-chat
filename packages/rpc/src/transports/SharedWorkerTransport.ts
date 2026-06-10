@@ -1,4 +1,5 @@
-import { IframeSerializeOptions, ListenerType, MessageItem, ProxyPromise } from '../fields'
+import { IframeSerializeOptions, ListenerType, MessageItem } from '../fields'
+import { ProxyPromise } from '../utils'
 import BaseTransport from './BaseTransport'
 
 // 主线程 → 共享 Worker，多页面共享一个 Worker 线程：SharedWorker

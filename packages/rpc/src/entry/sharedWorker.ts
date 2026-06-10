@@ -1,7 +1,7 @@
 import { ActionRecord } from '../core/RPCDecorator'
 import RPCDecorator from '../core/RPCDecorator'
+import { EntryOptions } from '../fields'
 import SharedWorkerTransport from '../transports/SharedWorkerTransport'
-import { EntryOptions } from '../transports/fields'
 
 export function createSharedWorkerRPC<EVENT extends ActionRecord, CONSUME extends ActionRecord>(
   target: SharedWorker,

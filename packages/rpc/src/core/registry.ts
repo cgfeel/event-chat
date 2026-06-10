@@ -1,6 +1,5 @@
-import { FactoryOptions, Transport } from '../fields'
+import { EntryOptions, FactoryOptions, Transport } from '../fields'
 import { TargetType } from '../transports/BaseTransport'
-import { EntryOptions } from '../transports/fields'
 import RPCDecorator, { ActionRecord } from './RPCDecorator'
 
 const cahceMap = new Map<string, ReturnType<TransportItem['load']>>()

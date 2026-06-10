@@ -4,16 +4,16 @@ import { type FC, type PropsWithChildren, useState } from 'react'
 import Button from '@/components/Button'
 import { ChatScroll } from '@/components/chatLine'
 import { receiptStore } from '@/components/chatLine/receiptStore'
-import ServiceIframe from './ServiceIframe'
-import ServiceWorkerItem from './ServiceWorkerItem'
 import {
   serviceScopeAction,
   serviceScopeApi,
   serviceScopeParent,
   serviceWorkerAction,
   serviceWorkerGroup,
-} from './uitls'
-import { panelStyles } from './windowUitls'
+} from '../uitls'
+import { panelStyles } from '../windowUitls'
+import ServiceIframe from './ServiceIframe'
+import ServiceWorkerItem from './ServiceWorkerItem'
 
 const { item, itemTitle, logs, panel, worker, wrap } = panelStyles()
 const itemList = [

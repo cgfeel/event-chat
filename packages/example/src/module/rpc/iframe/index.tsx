@@ -7,8 +7,8 @@ import { type FC, useRef, useState } from 'react'
 import { ChatLine, ChatScroll } from '@/components/chatLine'
 import CardSelect from '@/components/chatLine/CardSelect'
 import { receiptStore } from '@/components/chatLine/receiptStore'
-import { useRecipients } from './createRecipientsStore'
-import { allowedOrigins, chatName, iframeName } from './uitls'
+import { useRecipients } from '../createRecipientsStore'
+import { allowedOrigins, chatName, iframeName } from '../uitls'
 
 const group = 'root'
 

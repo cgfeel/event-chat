@@ -4,9 +4,9 @@ import { TARGET_TYPE_STRINGS, useRPC } from '@event-chat/rpc/react'
 import { createWindowRPC } from '@event-chat/rpc/window'
 import { type FC, useCallback } from 'react'
 import { receiptStore } from '@/components/chatLine/receiptStore'
-import ServiceWorkerItem from '../rpc/ServiceWorkerItem'
-import { allowedOrigins, serviceScopeApi, serviceWorkerGroup } from '../rpc/uitls'
-import type { SubIframeProps } from './SubIframe'
+import type { SubIframeProps } from '../iframe/SubIframe'
+import { allowedOrigins, serviceScopeApi, serviceWorkerGroup } from '../uitls'
+import ServiceWorkerItem from './ServiceWorkerItem'
 
 const SubServiceWorker: FC<SubServiceWorkerProps> = ({ group, scope = serviceScopeApi }) => {
   const { connected, rpc, brodcastScope } = useRPC({

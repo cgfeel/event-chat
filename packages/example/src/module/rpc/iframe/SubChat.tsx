@@ -3,8 +3,8 @@ import { useEventChat } from '@event-chat/core'
 import { useRPC } from '@event-chat/rpc/react'
 import { createWindowRPC } from '@event-chat/rpc/window'
 import { type FC, useContext, useEffect, useRef } from 'react'
-import { StoreContext } from '../rpc/createRecipientsStore'
-import { GroupProvider, allowedOrigins, chatItem } from '../rpc/uitls'
+import { StoreContext } from '../createRecipientsStore'
+import { GroupProvider, allowedOrigins, chatItem } from '../uitls'
 
 const eventName = 'sub-chat'
 

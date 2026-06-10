@@ -9,7 +9,7 @@ import { useRPC } from '@event-chat/rpc/react'
 import { createWindowRPC } from '@event-chat/rpc/window'
 import { type FC, useCallback, useRef } from 'react'
 import z from 'zod'
-import { allowedOrigins, serviceWorkerGroup } from './uitls'
+import { allowedOrigins, serviceWorkerGroup } from '../uitls'
 
 const ServiceIframe: FC<ServiceIframeProps> = ({ scope, sub }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null)

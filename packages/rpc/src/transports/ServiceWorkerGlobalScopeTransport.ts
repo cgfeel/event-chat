@@ -1,11 +1,5 @@
-import {
-  FactoryOptions,
-  IframeSerializeOptions,
-  ListenerType,
-  MessageItem,
-  ProxyPromise,
-} from '../fields'
-import BaseTransport from './BaseTransport'
+import { IframeSerializeOptions, ListenerType, MessageItem, ProxyPromise } from '../fields'
+import BaseTransport, { FactoryOptions } from './BaseTransport'
 
 declare const self: ServiceWorkerGlobalScope
 

@@ -1,4 +1,4 @@
-import { IframeSerializeOptions, MessageItem, Transport, getError } from '../fields'
+import { IframeSerializeOptions, MessageInfo, MessageItem, Transport, getError } from '../fields'
 import { isKey } from '../utils'
 import { receiptStore } from './receiptStore'
 
@@ -162,9 +162,7 @@ class RPCAction {
 
   // 这里收到的消息还要再考虑下，如果不是对象，比如 ArrayBuff
   private _messageHandler(
-    event: Pick<MessageEvent<MessageItem | undefined>, 'data' | 'origin' | 'ports' | 'source'> & {
-      wait?: () => void
-    }
+    event: Pick<MessageEvent<MessageItem | undefined>, 'data'> & Omit<MessageInfo, 'data'>
   ) {
     const { data, origin, ports, source, wait } = event
     const { __RPC__, broadcast, channel, error, heartbeat, kind, payload, requestId, sign, type } =
@@ -294,7 +292,7 @@ export type RPCOptionsType = Pick<MessageItem, 'channel'> & {
     brodcast: number
     data: MessageItem
     handlers: string[]
-    info: MessageInfo
+    info: MessageInfoType
     options: Omit<RPCOptionsType, 'debug' | 'onConnect' | 'onDisconnect'>
     pending: string[]
   }) => void
@@ -304,15 +302,15 @@ export type RPCOptionsType = Pick<MessageItem, 'channel'> & {
 
 // 需要限制参数最多只允许存在 1 个，但不能用 unknown，只有 any 才能推导
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type ActionFunType = (payload?: any, info?: MessageInfo) => any
+export type ActionFunType = (payload?: any, info?: MessageInfoType) => any
 
 // MessageItem 部分信息用于转发消息用于广播
 export type BrodcastItem = (
   value: unknown,
-  info?: MessageInfo & Pick<MessageItem, 'requestId' | 'sign'>
+  info?: MessageInfoType & Pick<MessageItem, 'requestId' | 'sign'>
 ) => void
 
-export type MessageInfo = Pick<MessageEvent, 'origin' | 'ports' | 'source'>
+export type MessageInfoType = Pick<MessageInfo, 'origin' | 'ports' | 'source'>
 
 export type RequestOptions<T = unknown> = IframeSerializeOptions &
   Pick<MessageItem, 'requestId' | 'sign'> & {

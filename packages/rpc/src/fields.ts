@@ -83,7 +83,7 @@ export interface Transport<ONLYBD extends boolean = false> {
   allow: (origin: string, current?: string[]) => boolean
   destroy: () => void
   getType: () => string
-  is: (source: MessageEventSource | null, message?: MessageItem) => boolean
+  is: (source: MessageInfo['source'], message?: MessageItem) => boolean
   observe: (close?: () => void) => void
   onmessage: (listener: ListenerType) => void
   onremove: (listener: ListenerType) => void
@@ -98,11 +98,11 @@ export type IframeSerializeOptions = StructuredSerializeOptions & {
   transmit?: () => Promise<readonly WindowClient[]>
 }
 
-export type ListenerType = (
-  ev: Pick<MessageEvent, 'data' | 'origin' | 'ports' | 'source'> & {
-    wait?: () => void
-  }
-) => void
+export type ListenerType = (ev: MessageInfo) => void
+export type MessageInfo = Pick<MessageEvent, 'data' | 'origin' | 'ports'> & {
+  source: MessageEventSource | Client | null
+  wait?: () => void
+}
 
 export type RPCItem = Pick<RPCAction, 'broadcast'> & Pick<RPCFactory, 'getType'>
 

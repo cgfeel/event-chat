@@ -1,4 +1,4 @@
-import { ActionRecord } from '../RPCDecorator'
+import { ActionRecord } from '../core/RPCDecorator'
 import RPCDecorator from '../core/RPCDecorator'
 import BroadcastChannelTransport from '../transports/BroadcastChannelTransport'
 import { EntryOptions } from '../transports/fields'

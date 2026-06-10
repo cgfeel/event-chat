@@ -8,4 +8,4 @@ export {
 export { default as useRPC } from './hooks'
 export { type DecoratorContext, default as RPCDecorator } from './core/RPCDecorator'
 export { default as RPCProvider } from './RPCProvider'
-export type { MessageInfo } from './core/RPCAction'
+export type { MessageInfoType as MessageInfo } from './core/RPCAction'

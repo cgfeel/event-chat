@@ -45,9 +45,15 @@ class ServiceWorkerGlobalScopeTransport extends BaseTransport<ServiceWorkerGloba
       this._source = event.source
       event.waitUntil(
         new Promise<void>((resove) => {
-          // eslint 不接受 any，允许 unknown
+          // eslint 不接受 any 允许 unknown，不要解构 event，以下属性不可枚举
           const data = event.data as unknown
-          listener({ origin: event.origin, ports: event.ports, source: null, wait: resove, data })
+          listener({
+            origin: event.origin,
+            ports: event.ports,
+            source: event.source,
+            wait: resove,
+            data,
+          })
         })
       )
     }

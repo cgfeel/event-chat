@@ -1,5 +1,5 @@
 import type { MessageItem } from '@event-chat/rpc'
-import { createService } from '@event-chat/rpc/react'
+import { createService } from '@event-chat/rpc'
 import type z from 'zod'
 import { type ResultType, generateFakePrint, requestSchema } from './baseSWService'
 

@@ -1,10 +1,5 @@
-import {
-  IframeSerializeOptions,
-  ListenerType,
-  MessageInfo,
-  MessageItem,
-  ProxyPromise,
-} from '../fields'
+import { IframeSerializeOptions, ListenerType, MessageInfo, MessageItem } from '../fields'
+import { ProxyPromise } from '../utils'
 import BaseTransport from './BaseTransport'
 
 // 主线程 → ServiceWorker，页面给 ServiceWorker 发消息：navigator.serviceWorker

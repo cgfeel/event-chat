@@ -1,4 +1,5 @@
-import { IframeSerializeOptions, ListenerType, MessageItem, ProxyPromise } from '../fields'
+import { IframeSerializeOptions, ListenerType, MessageItem } from '../fields'
+import { ProxyPromise } from '../utils'
 import BaseTransport from './BaseTransport'
 
 // 共享 Worker 内部，共享 Worker 收发所有页面消息：SharedWorkerGlobalScope

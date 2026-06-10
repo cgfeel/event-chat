@@ -1,4 +1,5 @@
 import {
+  FactoryOptions,
   IframeSerializeOptions,
   ListenerType,
   MessageInfo,
@@ -52,12 +53,6 @@ abstract class BaseTransport<
 }
 
 export default BaseTransport
-
-export interface FactoryOptions {
-  message?: boolean | AddEventListenerOptions
-  // 只有 window 和 webSocket 观察者用于监控
-  observer?: () => unknown
-}
 
 // WindowClient 和 Client 是 ServerWork 内部事件回调方法中的对象，暂且不用
 // ServiceWorkerContainer 没办法拿到当前的 active，这里采用 ServiceWorkerRegistration

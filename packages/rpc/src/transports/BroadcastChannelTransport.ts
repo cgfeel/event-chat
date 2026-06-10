@@ -1,4 +1,5 @@
-import { ListenerType, MessageItem, ProxyPromise } from '../fields'
+import { ListenerType, MessageItem } from '../fields'
+import { ProxyPromise } from '../utils'
 import BaseTransport from './BaseTransport'
 
 // 主线程，同源跨标签/窗口：BroadcastChannel

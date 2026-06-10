@@ -1,8 +1,6 @@
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import RPCDecorator, { ActionRecord, DecoratorContext } from '../core/RPCDecorator'
-import { Transport } from '../fields'
-import { FactoryOptions } from '../transports/BaseTransport'
-import { EntryOptions } from '../transports/fields'
+import { EntryOptions, FactoryOptions, Transport } from '../fields'
 import { isKey } from '../utils'
 import { RPCInstanceContext } from './fields'
 

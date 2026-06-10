@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.1.27](https://github.com/event-chat/event-chat/compare/rpc@v0.1.26...rpc@v0.1.27) (2026-06-10)
+
+
+### Bug Fixes
+
+* brodcastScope add fallback & sw add fetch client ([e598cff](https://github.com/event-chat/event-chat/commit/e598cff88a8b79505f623ab5ede5ccce290a36df))
+* brodcastScope add fallback & sw add fetch client ([a79ead9](https://github.com/event-chat/event-chat/commit/a79ead90b13cd1bec652c30bd918eae7392115fa))
+* update FactoryOptions type ([a0d5e47](https://github.com/event-chat/event-chat/commit/a0d5e47e6565c6040e08ddc67cac10ae238d7649))
+
 ## [0.1.26](https://github.com/event-chat/event-chat/compare/rpc@v0.1.25...rpc@v0.1.26) (2026-06-09)
 
 

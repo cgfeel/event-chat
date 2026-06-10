@@ -1,6 +1,6 @@
 import type { FC } from 'react'
-import { serviceScopeAction } from '../rpc/uitls'
-import type { SubIframeProps } from './SubIframe'
+import type { SubIframeProps } from '../iframe/SubIframe'
+import { serviceScopeAction } from '../uitls'
 import SubServiceWorker from './SubServiceWorker'
 
 const ActionServiceWorker: FC<SubIframeProps> = ({ group }) => (

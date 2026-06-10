@@ -1,5 +1,3 @@
-import { messageGroup } from '@/module/rpc/uitls'
-import { titleRange } from '@/module/rpc/windowUitls'
 import { generateFakePrint, transmitResult } from '@/services/baseSWService'
 import {
   type MessagePortCtx,
@@ -16,6 +14,8 @@ import { createWorkerRPC } from '@event-chat/rpc/worker'
 import type { InputProps } from 'antd'
 import { type FC, forwardRef, useCallback, useImperativeHandle, useMemo, useState } from 'react'
 import { ChatScroll, WorkerPanel } from '@/components/chatLine'
+import { messageGroup } from '../uitls'
+import { titleRange } from '../windowUitls'
 
 const useConnect = ({ rpc, scope, connect, emit }: ConnectInfoType) => {
   const [sending, setSending] = useState(false)
@@ -95,7 +95,7 @@ const ServiceWorkerRPC = forwardRef<MessagePortInstance, MessagePortItemProps>(
       event: mainCtx.actions,
       drive: createServiceWorkerRegistrationRPC,
       init: () =>
-        navigator.serviceWorker.register(new URL('../../rpc/worker/msw.ts', import.meta.url), {
+        navigator.serviceWorker.register(new URL('./sw.ts', import.meta.url), {
           scope,
         }),
     })
@@ -125,7 +125,7 @@ const WorkerRPC = forwardRef<MessagePortInstance, MessagePortItemProps>(
       event: mainCtx.actions,
       drive: createWorkerRPC,
       init: () =>
-        new Worker(new URL('../../rpc/worker/mworker.ts', import.meta.url), {
+        new Worker(new URL('./worker.ts', import.meta.url), {
           name: 'my-worker',
         }),
     })

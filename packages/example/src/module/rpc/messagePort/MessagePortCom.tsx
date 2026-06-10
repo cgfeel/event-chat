@@ -1,15 +1,15 @@
+import { iframeCtx, parentCtx } from '@/services/messagePortService'
+import { useRPC } from '@event-chat/rpc/react'
+import { createWindowRPC } from '@event-chat/rpc/window'
+import { type FC, useMemo, useRef } from 'react'
+import { isKey } from '@/utils/fields'
 import {
   allowedOrigins,
   messageGroup,
   messagePortService,
   messagePortWeb,
   messagePortWindow,
-} from '@/module/rpc/uitls'
-import { iframeCtx, parentCtx } from '@/services/messagePortService'
-import { useRPC } from '@event-chat/rpc/react'
-import { createWindowRPC } from '@event-chat/rpc/window'
-import { type FC, useMemo, useRef } from 'react'
-import { isKey } from '@/utils/fields'
+} from '../uitls'
 import { type MessagePortInstance, ServiceWorkerRPC, WindowRPC, WorkerRPC } from './PortItem'
 
 const RPCRecord = Object.freeze({

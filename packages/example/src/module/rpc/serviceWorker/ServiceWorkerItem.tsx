@@ -8,8 +8,8 @@ import z from 'zod'
 import { ChatScroll } from '@/components/chatLine'
 import { WorkerPanel } from '@/components/chatLine'
 import { receiptStore } from '@/components/chatLine/receiptStore'
-import { serviceWorkerGroup } from './uitls'
-import { titleRange } from './windowUitls'
+import { serviceWorkerGroup } from '../uitls'
+import { titleRange } from '../windowUitls'
 
 const ServiceWorkerItem: FC<ServiceWorkerItemProps> = ({
   disabled,
@@ -29,8 +29,7 @@ const ServiceWorkerItem: FC<ServiceWorkerItemProps> = ({
     consume: workerCtx.actions,
     event: mainCtx.actions,
     drive: createServiceWorkerRegistrationRPC,
-    init: () =>
-      navigator.serviceWorker.register(new URL('./worker/sw.ts', import.meta.url), { scope }),
+    init: () => navigator.serviceWorker.register(new URL('./sw.ts', import.meta.url), { scope }),
   })
 
   const allow = useMemo(

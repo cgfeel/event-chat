@@ -1,6 +1,6 @@
-import { GroupProvider, iframeName } from '@/module/rpc/uitls'
 import { type FC, type PropsWithChildren } from 'react'
 import { tv } from 'tailwind-variants'
+import { GroupProvider, iframeName } from '../uitls'
 import SubIframe, { type SubIframeProps } from './SubIframe'
 
 const styles = tv({

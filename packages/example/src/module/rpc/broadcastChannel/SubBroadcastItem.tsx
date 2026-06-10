@@ -1,5 +1,5 @@
-import { BroadcastItem } from '@/module/rpc/broadcastChannel'
 import { type FC } from 'react'
+import BroadcastItem from './BroadcastItem'
 
 const SubBroadcastItem: FC<SubBroadcastItemProps> = ({ group }) =>
   !group ? null : (

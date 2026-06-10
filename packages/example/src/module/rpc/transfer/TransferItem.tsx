@@ -1,11 +1,11 @@
-import { allowedOrigins, transferGroup } from '@/module/rpc/uitls'
 import { type TransferCtxType, name, parentCtx, transferCtx } from '@/services/transferService'
 import { useEventChat } from '@event-chat/core'
 import { useRPC } from '@event-chat/rpc/react'
 import { createWindowRPC } from '@event-chat/rpc/window'
 import { type FC, useCallback } from 'react'
 import { ChatScroll } from '@/components/chatLine'
-import { panelStyles } from '../rpc/windowUitls'
+import { allowedOrigins, transferGroup } from '../uitls'
+import { panelStyles } from '../windowUitls'
 
 const { logs } = panelStyles()
 

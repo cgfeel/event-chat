@@ -14,15 +14,15 @@ import {
 import { type FC, lazy, useMemo } from 'react'
 import { isKey } from '@/utils/fields'
 
-const BroadcastItem = lazy(() => import('@/module/iframe/messagePort/SubBroadcastItem'))
-const MessagePort = lazy(() => import('@/module/iframe/messagePort'))
+const BroadcastItem = lazy(() => import('@/module/rpc/broadcastChannel/SubBroadcastItem'))
+const MessagePort = lazy(() => import('@/module/rpc/messagePort/MessagePortCom'))
 
 const router = Object.freeze({
-  [chatName]: lazy(() => import('@/module/iframe/IframeExample')),
-  [iframeName]: lazy(() => import('@/module/iframe/IframeChat')),
-  [serviceWorkerAction]: lazy(() => import('@/module/iframe/ActionServiceWorker')),
-  [serviceWorkerGroup]: lazy(() => import('@/module/iframe/SubServiceWorker')),
-  [transferAction]: lazy(() => import('@/module/iframe/TransferItem')),
+  [chatName]: lazy(() => import('@/module/rpc/iframe/IframeExample')),
+  [iframeName]: lazy(() => import('@/module/rpc/iframe/IframeChat')),
+  [serviceWorkerAction]: lazy(() => import('@/module/rpc/serviceWorker/ActionServiceWorker')),
+  [serviceWorkerGroup]: lazy(() => import('@/module/rpc/serviceWorker/SubServiceWorker')),
+  [transferAction]: lazy(() => import('@/module/rpc/transfer/TransferItem')),
   [broadcastAction]: BroadcastItem,
   [broadcastApi]: BroadcastItem,
   [messagePortService]: MessagePort,

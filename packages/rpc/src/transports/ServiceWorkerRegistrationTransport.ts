@@ -1,4 +1,10 @@
-import { IframeSerializeOptions, ListenerType, MessageItem, ProxyPromise } from '../fields'
+import {
+  IframeSerializeOptions,
+  ListenerType,
+  MessageInfo,
+  MessageItem,
+  ProxyPromise,
+} from '../fields'
 import BaseTransport from './BaseTransport'
 
 // 主线程 → ServiceWorker，页面给 ServiceWorker 发消息：navigator.serviceWorker
@@ -8,7 +14,7 @@ class ServiceWorkerRegistrationTransport extends BaseTransport<ServiceWorkerRegi
     this._target.unregister().catch(() => {})
   }
 
-  is(source: MessageEventSource | null, message?: MessageItem) {
+  is(source: MessageInfo['source'], message?: MessageItem) {
     // 如果是被替换的情况下，会借助同 scope 激活的实例继续通信，因此这里将其视为相同
     return source instanceof ServiceWorker && message?.scope === this._target.scope
   }

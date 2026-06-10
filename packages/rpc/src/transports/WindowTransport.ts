@@ -1,4 +1,10 @@
-import { IframeSerializeOptions, ListenerType, MessageItem, ProxyPromise } from '../fields'
+import {
+  IframeSerializeOptions,
+  ListenerType,
+  MessageInfo,
+  MessageItem,
+  ProxyPromise,
+} from '../fields'
 import BaseTransport from './BaseTransport'
 
 const getOrigin = (url: string) =>
@@ -17,7 +23,7 @@ class WindowTransport extends BaseTransport<Window> {
   }
 
   // source 和 iframe.contentWidow 比
-  is(source: MessageEventSource | null) {
+  is(source: MessageInfo['source']) {
     return Object.is(this._target, source)
   }
 

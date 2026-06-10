@@ -86,9 +86,15 @@ const RPCDemo: FC = () => {
                   作为请求配置的方法，匹配一个或多个转发的 <Tag>WindowClient</Tag>
                 </li>
                 <li>
+                  由于 <Tag>ServiceWorkerGlobalScope</Tag> 有多种唤醒方式，而能够拿到具体{' '}
+                  <Tag>Client</Tag> 的只有事件：<Tag>fetch</Tag> 和 <Tag>message</Tag>
+                  ，其他事件无法拿到对应的 <Tag>client</Tag>，可以通过 <Tag>transmit</Tag>{' '}
+                  自行匹或配唤醒 <Tag>WindowClient</Tag>
+                </li>
+                <li>
                   由于采用了共享实例通信的方式，会尽可能保证 <Tag>Service Worker</Tag>{' '}
                   的生命周期，但由于 <Tag>Service Worker</Tag>{' '}
-                  自身特性，请勿相信永久保活，尤其是生产环境。于是 <Tag>useRPC</Tag>{' '}
+                  自身特性，请勿相信永久保活，尤其是生产环境。在 <Tag>useRPC</Tag>{' '}
                   的返回结果中，除了 <Tag>connected</Tag> 用于响应连接状态之外，还提供了{' '}
                   <Tag>start</Tag> 方法用于重启实例
                 </li>

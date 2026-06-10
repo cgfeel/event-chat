@@ -1,4 +1,10 @@
-import { IframeSerializeOptions, ListenerType, MessageItem, Transport } from '../fields'
+import {
+  IframeSerializeOptions,
+  ListenerType,
+  MessageInfo,
+  MessageItem,
+  Transport,
+} from '../fields'
 
 abstract class BaseTransport<
   T extends TargetType = TargetType,
@@ -19,7 +25,7 @@ abstract class BaseTransport<
     return `${Object.prototype.toString.call(this._target)}`
   }
 
-  is(source: MessageEventSource | null) {
+  is(source: MessageInfo['source']) {
     return !(source instanceof BaseTransport)
   }
 

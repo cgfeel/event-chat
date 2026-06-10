@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.28](https://github.com/event-chat/event-chat/compare/rpc@v0.1.27...rpc@v0.1.28) (2026-06-10)
+
+
+### Bug Fixes
+
+* update MessageInfo & service worker source add Client ([b1de023](https://github.com/event-chat/event-chat/commit/b1de023c49622af9d2b08bc4d1ca2f96edb1ba91))
+* update MessageInfo & service worker source add Client ([8de175b](https://github.com/event-chat/event-chat/commit/8de175b713363812dbb7f65dbadf1a99964924f1))
+
 ## [0.1.27](https://github.com/event-chat/event-chat/compare/rpc@v0.1.26...rpc@v0.1.27) (2026-06-10)
 
 

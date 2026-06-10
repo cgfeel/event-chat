@@ -31,6 +31,14 @@ const readBlobToBase64 = (blob: Blob) =>
     reader.readAsDataURL(blob)
   })
 
+const printArrayBuffer = (transfer: ArrayBuffer) => {
+  const uint8View = new Uint8Array(transfer)
+  uint8View[0] = 10
+  uint8View[1] = 20
+  uint8View[2] = 255
+  return Promise.resolve({ message: `Uint8Array: ${uint8View.toString()}` })
+}
+
 const printAudioData = async (transfer: AudioData) => {
   // 读取数据
   const data = new Float32Array(44100)
@@ -243,6 +251,9 @@ export const transferCtx = createCtx((ctx: Partial<TransferCtxType>) => ({
 
     list
       .map((item): [Transferable, Promise<ResultType>] | null => {
+        if (item instanceof ArrayBuffer) {
+          return [item, printArrayBuffer(item)]
+        }
         if (item instanceof AudioData) {
           return [item, printAudioData(item)]
         }

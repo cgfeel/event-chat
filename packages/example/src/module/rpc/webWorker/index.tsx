@@ -2,9 +2,9 @@ import { baseChatServer } from '@/services/baseService'
 import { useEventChat } from '@event-chat/core'
 import { type FC } from 'react'
 import { ChatLine, ChatScroll } from '@/components/chatLine'
+import { useRecipients } from '../createRecipientsStore'
+import { workerNameFilter } from '../uitls'
 import WorkerItem from './WorkerItem'
-import { useRecipients } from './createRecipientsStore'
-import { workerNameFilter } from './uitls'
 
 const channel = 'worker-panel'
 const items = ['item1', 'item2'] as const

@@ -10,6 +10,16 @@ import Button, { type ButtonProps } from '@/components/Button'
 import { toastOpen } from '@/utils/event'
 import { allowedOrigins, transferAction, transferGroup } from '../uitls'
 
+const ArrayBufferBtn: FC<PropsWithChildren<TransferItemProps>> = ({
+  children,
+  disabled,
+  onSubmit,
+}) => (
+  <Button disabled={disabled} onClick={() => onSubmit?.(new ArrayBuffer(16))}>
+    {children}
+  </Button>
+)
+
 const AudioDataBtn: FC<PropsWithChildren<TransferItemProps>> = ({
   children,
   disabled,
@@ -311,7 +321,9 @@ const TransferDemo: FC = () => {
         >
           RTCDataChannel
         </RTCDataChannelBtn>
-        <Button disabled={!connected}>ArrayBuffer</Button>
+        <ArrayBufferBtn disabled={!connected} onSubmit={onSubmit}>
+          ArrayBuffer
+        </ArrayBufferBtn>
       </div>
       <iframe className="h-56" ref={iframeRef} src={`/iframe?sub=${transferAction}`} />
     </div>

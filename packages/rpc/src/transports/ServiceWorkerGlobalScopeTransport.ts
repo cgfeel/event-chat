@@ -1,16 +1,37 @@
 import { IframeSerializeOptions, ListenerType, MessageItem, ProxyPromise } from '../fields'
-import BaseTransport from './BaseTransport'
+import BaseTransport, { FactoryOptions } from './BaseTransport'
 
 declare const self: ServiceWorkerGlobalScope
 
 // SW 内部全局对象：ServiceWorker 监听页面消息
 class ServiceWorkerGlobalScopeTransport extends BaseTransport<ServiceWorkerGlobalScope> {
+  private _fetch: ((event: FetchEvent) => void) | undefined
   private _onconnect: ((event: ExtendableMessageEvent) => void) | undefined
   private _source: ExtendableMessageEvent['source'] | undefined
+
+  constructor(
+    protected _target: ServiceWorkerGlobalScope,
+    protected _options: FactoryOptions = {}
+  ) {
+    super(_target, _options)
+    this._fetch = (event) => {
+      self.clients
+        .get(event.clientId)
+        .then((client) => {
+          if (client) this._source = client
+        })
+        .catch(() => {})
+    }
+
+    // 只有 fetch 和 message 能获取到 client，其他的事件发起通知给主线程，可以传入 transmit 进行匹配
+    this._target.addEventListener('fetch', this._fetch)
+  }
 
   // service worker 由浏览器统一回收处理，所以这里注销只将引用清空
   // 不需要主动监听 statechange 中的 statechange 状态，注销后线程将直接销毁
   destroy() {
+    if (this._fetch) this._target.removeEventListener('fetch', this._fetch)
+    this._fetch = undefined
     this._onconnect = undefined
   }
 
@@ -60,7 +81,6 @@ class ServiceWorkerGlobalScopeTransport extends BaseTransport<ServiceWorkerGloba
         )
       )
     } else {
-      // 没有接受消息前 source 发不出消息
       return ProxyPromise.try(() => this._source?.postMessage(msg, { transfer }))
     }
   }

@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.29](https://github.com/event-chat/event-chat/compare/rpc@v0.1.28...rpc@v0.1.29) (2026-06-10)
+
+
+### Bug Fixes
+
+* split fields type ([ab893df](https://github.com/event-chat/event-chat/commit/ab893df15564f14e879cab19cca4a3ccd00dd1cb))
+* split fields type ([767e952](https://github.com/event-chat/event-chat/commit/767e95256d55d643579f70dd020dad70e4c5f289))
+
 ## [0.1.28](https://github.com/event-chat/event-chat/compare/rpc@v0.1.27...rpc@v0.1.28) (2026-06-10)
 
 

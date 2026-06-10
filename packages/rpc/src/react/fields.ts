@@ -34,4 +34,5 @@ export type ScopeProps = {
   include?: Array<ValueOf<typeof TARGET_TYPE_STRINGS>>
   typein?: string[]
   typeout?: string[]
+  fallback?: (error: unknown) => void
 }

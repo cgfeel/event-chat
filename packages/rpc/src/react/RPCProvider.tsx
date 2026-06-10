@@ -13,7 +13,7 @@ import {
 const RPCProvider: FC<PropsWithChildren> = ({ children }) => {
   const list = useRef(new Map<RPCItem, string>())
   const brodcastScope = useCallback(<T,>(data: RequestOptions<T>, options?: ScopeProps) => {
-    const { exclude, include, typein, typeout } = options ?? {}
+    const { exclude, include, typein, typeout, fallback } = options ?? {}
     if (list.current.size > 0) {
       const scope = objectValues(TARGET_TYPE_STRINGS)
         .filter((item) => !exclude?.includes(item))
@@ -28,11 +28,14 @@ const RPCProvider: FC<PropsWithChildren> = ({ children }) => {
           !typeout?.includes(group) &&
           (!typein || typein.includes(group))
         ) {
-          result = item.broadcast({
-            ...data,
-            requestId: data.requestId ?? result.requestId,
-            sign: data.sign ?? result.sign,
-          })
+          result = item.broadcast(
+            {
+              ...data,
+              requestId: data.requestId ?? result.requestId,
+              sign: data.sign ?? result.sign,
+            },
+            fallback
+          )
         }
       })
     }

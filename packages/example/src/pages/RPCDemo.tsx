@@ -2,10 +2,10 @@ import { FooterTips } from '@/module/form'
 import Iframe from '@/module/rpc/Iframe'
 import RecipientsProvider from '@/module/rpc/RecipientsProvider'
 import ServiceWorkerDemo from '@/module/rpc/ServiceWorkerDemo'
-import WorkerDemo from '@/module/rpc/WorkerDemo'
 import { BroadcastChannelDemo } from '@/module/rpc/broadcastChannel'
 import { MessagePortDemo } from '@/module/rpc/messagePort'
 import TransferDemo from '@/module/rpc/transfer'
+import WorkerDemo from '@/module/rpc/webWorker'
 import { Tag } from 'antd'
 import type { FC } from 'react'
 import Card from '@/components/Card'
@@ -15,6 +15,33 @@ const RPCDemo: FC = () => {
     <div className="flex flex-col gap-16">
       <RecipientsProvider>
         <Card
+          footer={
+            <FooterTips>
+              <ul className="m-4 list-disc text-sm text-gray-400">
+                <li>
+                  <Tag>Window</Tag> 和 <Tag>iframe</Tag> 进行通行的时候，并不像 <Tag>Worker</Tag>{' '}
+                  那样是 1 对 1 的实例，为了保持消息准确送达，会比较 <Tag>event.source</Tag>{' '}
+                  和初始化时提供的 <Tag>target</Tag> 对象进行比较。
+                </li>
+                <li>
+                  但是在 <Tag>iframe</Tag> 中所有初始对象都是 <Tag>Window.parent</Tag>，当{' '}
+                  <Tag>Window.parent</Tag> 中存在多个相同上下文的实例时，就会引发重复请求；而{' '}
+                  <Tag>iframe</Tag> 会收到第一条消息后结束后续响应，因此造成了请求竞态。
+                </li>
+                <li>
+                  要解决竞态的方法之一就是使用不同的上下文（上下文提供的方法名不一样），但随着项目不断增加，很难确保每个上下文中的方法名唯一性。于是提供了更简单的方式，通过设置{' '}
+                  <Tag>channel</Tag> 区别不同的实例通信，不同 <Tag>channel</Tag>{' '}
+                  实例无法相互通信，但允许跨实例广播 <Tag>brodcastScope</Tag>。
+                </li>
+                <li>
+                  通过 <Tag>channel</Tag> 创建的实例，可以通过 <Tag>RPC</Tag> 实例方法{' '}
+                  <Tag>config</Tag> 重置，但为了便于开发和维护，不建议后期修改 <Tag>channel</Tag>
+                  ；如果要动态配置 <Tag>channel</Tag>，可以通过动态创建组件 或 <Tag>url</Tag>{' '}
+                  等方式，根据业务情况决定。
+                </li>
+              </ul>
+            </FooterTips>
+          }
           title={
             <>
               <Tag>iframe</Tag> 通信演示
@@ -149,6 +176,11 @@ const RPCDemo: FC = () => {
                   <Tag>generateBroadcastChannelCtx</Tag> 动态生成剩下文。而分支线程，比如{' '}
                   <Tag>Worker</Tag> 内部，每个线程单独一个上下文，无需动态创建
                 </li>
+                <li>
+                  <Tag>BroadcastChannel</Tag> 不支持 <Tag>transfer</Tag>，但没有屏蔽该属性，因为{' '}
+                  <Tag>brodcastScope</Tag> 会无差别转发当前线程下所有实例，包括{' '}
+                  <Tag>BroadcastChannel</Tag>
+                </li>
               </ul>
             </FooterTips>
           }
@@ -163,6 +195,40 @@ const RPCDemo: FC = () => {
       </RecipientsProvider>
       <RecipientsProvider>
         <Card
+          footer={
+            <FooterTips>
+              <ul className="m-4 list-disc text-sm text-gray-400">
+                <li>
+                  <Tag>RPC</Tag> 实例允许通过 <Tag>request</Tag> 和 <Tag>broadcast</Tag> 转移{' '}
+                  <Tag>transfer</Tag> 对象，由于 <Tag>broadcast</Tag> 属于广播，而{' '}
+                  <Tag>transfer</Tag> 只允许单一转移，因此不建议通过 <Tag>broadcast</Tag> 转移对象
+                </li>
+                <li>
+                  <Tag>RPC</Tag> 实例中保留了 <Tag>broadcast</Tag> 的 <Tag>transfer</Tag>{' '}
+                  属性，因为接受广播的数量由业务决定，在允许的情况下确实可以用于转移{' '}
+                  <Tag>transfer</Tag> 对象，但不建议这样使用。
+                </li>
+                <li>
+                  <Tag>transfer</Tag> 是数组类型，允许同时转移多个对象
+                </li>
+                <li>
+                  由于 <Tag>transfer</Tag> 只允许转移一次，一旦通过 <Tag>postMessage</Tag>{' '}
+                  成功转移，将不允许再次转移。因此配置了 <Tag>transfer</Tag> 对象，将无视请求配置{' '}
+                  <Tag>retry</Tag> 次数，如果需要可以通过 <Tag>retryTimeout</Tag> 延长请求过期时间。
+                </li>
+                <li>
+                  不同的 <Tag>transfer</Tag>{' '}
+                  对象，由于生命周期等问题，可能造成转移失败。对于转移失败的情况 <Tag>request</Tag>{' '}
+                  请求会通过 <Tag>Promise.reject</Tag> 抛出异常，<Tag>broadcast</Tag>{' '}
+                  接受一个参数方法 <Tag>fallback</Tag> 作为异常捕获的回调函数。
+                </li>
+                <li>
+                  除此之外，对于没有收到消息的请求，可以通过 <Tag>debug</Tag>{' '}
+                  作为配置方法，用于捕获收到的信息，自行判断问题。调试方法会将请求的数据，额外事件属性，配置属性，提供的上下文方请求名称，接受广播的数量等打印出来；开启调试方法后，可能接收到的信息会比较多，需要根据业务实际情况，自行添加筛选条件进行查找并做出判断。
+                </li>
+              </ul>
+            </FooterTips>
+          }
           title={
             <>
               <Tag>transfer</Tag> 转移对象

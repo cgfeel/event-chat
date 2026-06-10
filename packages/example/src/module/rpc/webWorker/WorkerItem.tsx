@@ -8,8 +8,8 @@ import { type FC, useCallback, useMemo, useRef, useState } from 'react'
 import { ChatScroll } from '@/components/chatLine'
 import { WorkerPanel } from '@/components/chatLine'
 import { receiptStore } from '@/components/chatLine/receiptStore'
-import { useRecipients } from './createRecipientsStore'
-import { workerNameFilter } from './uitls'
+import { useRecipients } from '../createRecipientsStore'
+import { workerNameFilter } from '../uitls'
 
 const title = 'worker'
 
@@ -44,7 +44,7 @@ const WorkerItem: FC<WorkerItemProps> = ({ channel, group, name, feedback }) => 
     name: channel,
     drive: createWorkerRPC,
     init: () =>
-      new Worker(new URL('./worker/worker.ts', import.meta.url), {
+      new Worker(new URL('./worker.ts', import.meta.url), {
         name: 'my-worker',
       }),
   })

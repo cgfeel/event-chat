@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.30](https://github.com/event-chat/event-chat/compare/rpc@v0.1.29...rpc@v0.1.30) (2026-06-12)
+
+
+### Bug Fixes
+
+* update createSharedWorkerGlobalScopeRPC to obseverShareWorkerGlo… ([18f9816](https://github.com/event-chat/event-chat/commit/18f9816e3e58623778e551ddbc4774da05f2a36d))
+* update createSharedWorkerGlobalScopeRPC to obseverShareWorkerGlobalScopeRPC ([f5e3849](https://github.com/event-chat/event-chat/commit/f5e3849dd15f0de2a979e7b2f2df99b8ee3ad07c))
+
 ## [0.1.29](https://github.com/event-chat/event-chat/compare/rpc@v0.1.28...rpc@v0.1.29) (2026-06-10)
 
 

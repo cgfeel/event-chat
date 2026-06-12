@@ -10,7 +10,7 @@ import { type FC, type ReactNode, useCallback, useMemo, useRef } from 'react'
 import z from 'zod'
 import { ChatScroll, WorkerPanel } from '@/components/chatLine'
 import { receiptStore } from '@/components/chatLine/receiptStore'
-import { WorkerGrid } from '../messagePort'
+import WorkerGrid from '../WorkerGrid'
 import { broadcastGroup } from '../uitls'
 import { titleRange } from '../windowUitls'
 

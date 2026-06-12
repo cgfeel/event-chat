@@ -82,6 +82,10 @@ class RPCAction {
     this._options = { ...this._options, ...options }
   }
 
+  connected() {
+    return this._isConnected
+  }
+
   on<T extends ActionFunType>(type: PropertyKey, handler: T) {
     this._handlers[type] = handler
   }

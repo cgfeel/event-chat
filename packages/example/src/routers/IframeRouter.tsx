@@ -9,6 +9,7 @@ import {
   messagePortWindow,
   serviceWorkerAction,
   serviceWorkerGroup,
+  sharedWorkerAction,
   transferAction,
 } from '@/module/rpc/uitls'
 import { type FC, lazy, useMemo } from 'react'
@@ -22,6 +23,7 @@ const router = Object.freeze({
   [iframeName]: lazy(() => import('@/module/rpc/iframe/IframeChat')),
   [serviceWorkerAction]: lazy(() => import('@/module/rpc/serviceWorker/ActionServiceWorker')),
   [serviceWorkerGroup]: lazy(() => import('@/module/rpc/serviceWorker/SubServiceWorker')),
+  [sharedWorkerAction]: lazy(() => import('@/module/rpc/sharedWorker/SharedIframe')),
   [transferAction]: lazy(() => import('@/module/rpc/transfer/TransferItem')),
   [broadcastAction]: BroadcastItem,
   [broadcastApi]: BroadcastItem,

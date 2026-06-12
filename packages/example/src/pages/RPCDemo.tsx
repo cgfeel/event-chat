@@ -2,8 +2,9 @@ import { FooterTips } from '@/module/form'
 import RecipientsProvider from '@/module/rpc/RecipientsProvider'
 import { BroadcastChannelDemo } from '@/module/rpc/broadcastChannel'
 import Iframe from '@/module/rpc/iframe'
-import { MessagePortDemo } from '@/module/rpc/messagePort'
+import MessagePortDemo from '@/module/rpc/messagePort'
 import ServiceWorkerDemo from '@/module/rpc/serviceWorker'
+import SharedWorkerDemo from '@/module/rpc/sharedWorker'
 import TransferDemo from '@/module/rpc/transfer'
 import WorkerDemo from '@/module/rpc/webWorker'
 import { Tag } from 'antd'
@@ -157,6 +158,17 @@ const RPCDemo: FC = () => {
           }
         >
           <MessagePortDemo />
+        </Card>
+      </RecipientsProvider>
+      <RecipientsProvider>
+        <Card
+          title={
+            <>
+              <Tag>SharedWorker</Tag> + <Tag>MessagePort</Tag> 通信
+            </>
+          }
+        >
+          <SharedWorkerDemo />
         </Card>
       </RecipientsProvider>
       <RecipientsProvider>

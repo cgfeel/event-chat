@@ -3,17 +3,8 @@ import { useEventChat } from '@event-chat/core'
 import { useRPC } from '@event-chat/rpc/react'
 import { createWindowRPC } from '@event-chat/rpc/window'
 import { type FC, useCallback } from 'react'
-import { ChatScroll } from '@/components/chatLine'
+import WorkerLogs from '../WorkerLogs'
 import { allowedOrigins, transferGroup } from '../uitls'
-import { panelStyles } from '../windowUitls'
-
-const { logs } = panelStyles()
-
-const WorkerLogs: FC = () => (
-  <div className={logs()}>
-    <ChatScroll direction="vertical" group={transferGroup} name={name} />
-  </div>
-)
 
 const TransferItem: FC = () => {
   const { emit } = useEventChat('', { group: transferGroup })
@@ -65,7 +56,7 @@ const TransferItem: FC = () => {
 
   return (
     <div className="flex h-full bg-gray-800">
-      <WorkerLogs />
+      <WorkerLogs group={transferGroup} name={name} />
     </div>
   )
 }

@@ -1,4 +1,4 @@
-import { FactoryOptions, ListenerType, MessageItem } from '../fields'
+import { ListenerType, MessageItem } from '../fields'
 import { ProxyPromise } from '../utils'
 import BaseTransport from './BaseTransport'
 
@@ -11,23 +11,6 @@ import BaseTransport from './BaseTransport'
 // 主线程：WebSocket client
 class WebSocketTransport extends BaseTransport<WebSocket> {
   private _onconnect = Promise.resolve(false)
-
-  constructor(
-    protected _target: WebSocket,
-    protected _options: FactoryOptions = {}
-  ) {
-    super(_target, _options)
-    this._onconnect = new Promise((resolve) => {
-      this._target.onopen = () => {
-        resolve(true)
-      }
-
-      this._target.onclose = () => {
-        resolve(false)
-      }
-    })
-  }
-
   destroy() {
     this._target.onclose = null
     this._target.onopen = null
@@ -43,6 +26,15 @@ class WebSocketTransport extends BaseTransport<WebSocket> {
 
   onmessage(listener: ListenerType): void {
     this._target.onmessage = listener
+    this._onconnect = new Promise((resolve) => {
+      this._target.onopen = () => {
+        resolve(true)
+      }
+
+      this._target.onclose = () => {
+        resolve(false)
+      }
+    })
   }
 
   onremove(): void {

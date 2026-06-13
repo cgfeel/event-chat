@@ -1,26 +1,57 @@
 import { transmitResult } from '@/services/baseSWService'
-import { type MessagePortCtx, generateMainCtx, workerConsume } from '@/services/sharedWorkerService'
-import { useEventChat } from '@event-chat/core'
+import {
+  type MessagePortCtx,
+  type ResultType,
+  generateMainCtx,
+  parentCtx,
+  workerConsume,
+} from '@/services/sharedWorkerService'
+import { useEventChat, useMemoFn } from '@event-chat/core'
 import { useRPC } from '@event-chat/rpc/react'
 import { createSharedWorkerRPC } from '@event-chat/rpc/sharedWorker'
+import { createWindowRPC } from '@event-chat/rpc/window'
 import { type FC, useCallback, useMemo, useRef, useState } from 'react'
 import { ChatScroll, WorkerPanel } from '@/components/chatLine'
 import { receiptStore } from '@/components/chatLine/receiptStore'
 import WorkerGrid from '../WorkerGrid'
-import { sharedGroup } from '../uitls'
+import { allowedOrigins, sharedGroup } from '../uitls'
 import { titleRange } from '../windowUitls'
+import { useBrodcastFn } from './utils'
 
-const SharedWorkerIframe: FC<Omit<ShardWorkerItemProps, 'iframe'>> = ({ scope }) => (
-  <iframe className="h-full w-full" src={`/iframe?sub=${scope}`} />
-)
+const SharedWorkerIframe: FC<Omit<ShardWorkerItemProps, 'iframe'>> = ({ scope }) => {
+  const iframeRef = useRef<HTMLIFrameElement>(null)
+  const { emit } = useEventChat('', { group: sharedGroup })
 
-const SharedWorkerItem: FC<ShardWorkerItemProps> = ({ iframe, scope }) => {
+  const { brodcastScope } = useRPC({
+    config: { channel: sharedGroup, allowedOrigins },
+    brodcast: parentCtx.brodcasts,
+    event: parentCtx.actions,
+    drive: createWindowRPC,
+    init: () => iframeRef.current,
+  })
+
+  const [brodcast] = useBrodcastFn(brodcastScope)
+  const print: MessagePortCtx['print'] = useCallback(
+    (data) => {
+      const detail = transmitResult({ ...data, scope: `iframe:${scope}` })
+      emit({ name: 'chat-message-port', detail: { ...detail, own: false } })
+    },
+    [scope, emit]
+  )
+
+  parentCtx.provider({ brodcast, print })
+  return <iframe className="h-full w-full" ref={iframeRef} src={`/iframe?sub=${scope}`} />
+}
+
+const SharedWorkerItem: FC<ShardWorkerItemProps> = ({ disabled, iframe, scope, push }) => {
   const [sending, setSending] = useState(false)
+  const pushHandle = useMemoFn(push)
   const broadRef = useRef('normal')
 
   const mainCtx = generateMainCtx()
   const { connected, rpc, brodcastScope } = useRPC({
     config: { channel: sharedGroup },
+    brodcast: mainCtx.brodcasts,
     consume: workerConsume.actions,
     event: mainCtx.actions,
     drive: createSharedWorkerRPC,
@@ -29,23 +60,27 @@ const SharedWorkerItem: FC<ShardWorkerItemProps> = ({ iframe, scope }) => {
 
   const name = useMemo(() => (iframe ? `iframe:${scope}` : scope), [iframe, scope])
   const allow = useMemo(
-    () => (sending ? 'Sending' : undefined) ?? (connected ? 'Connect' : 'Disconnect'),
-    [connected, sending]
+    () => (sending ? 'Sending' : undefined) ?? (connected && !disabled ? 'Connect' : 'Disconnect'),
+    [connected, disabled, sending]
   )
 
   const { emit } = useEventChat('', { group: sharedGroup })
   const print: MessagePortCtx['print'] = useCallback(
     (data) => {
-      const { receipt, scope: receivedScope } = data.result.receivedBody
+      const { receivedBody } = data.result
+      const { broadcast, receipt, scope: receivedScope } = receivedBody
+
+      const isSender = !iframe && receivedScope.includes(scope)
+      if (broadcast === 'normal' || isSender) pushHandle.current?.(data)
+
       const detail = transmitResult({ ...data, scope: name })
-
       if (receivedScope === name) receiptStore.increasing(receipt)
-      setSending(false)
+      if (isSender) emit({ name: 'chat-message-port', detail: { ...detail, own: false } })
 
-      emit({ name: 'chat-message-port', detail })
+      setSending(false)
       emit({ name: `chat-${scope}`, detail })
     },
-    [name, scope, emit]
+    [iframe, name, pushHandle, scope, emit]
   )
 
   mainCtx.provider({ print })
@@ -105,5 +140,7 @@ export default SharedWorkerItem
 
 interface ShardWorkerItemProps {
   scope: string
+  disabled?: boolean
   iframe?: boolean
+  push?: (info: ResultType) => void
 }

@@ -162,6 +162,54 @@ const RPCDemo: FC = () => {
       </RecipientsProvider>
       <RecipientsProvider>
         <Card
+          footer={
+            <FooterTips>
+              <ul className="m-4 list-disc text-sm text-gray-400">
+                <li>
+                  <Tag>SharedWorkerGlobalScope</Tag>{' '}
+                  作为共享线程，内部的通信全部共享一个线程（参考主线程），但是每个通信通过{' '}
+                  <Tag>MessagePort</Tag> 隔离通信。
+                </li>
+                <li>
+                  因此舍弃针对 <Tag>SharedWorkerGlobalScope</Tag> 建立 <Tag>RPC</Tag>{' '}
+                  对象进行监听。而是使用方法 <Tag>obseverShareWorkerGlobalScopeRPC</Tag>{' '}
+                  通过观察模式。
+                </li>
+                <li>
+                  <Tag>obseverShareWorkerGlobalScopeRPC</Tag> 允许提供{' '}
+                  <Tag>SharedWorkerGlobalScope</Tag> 对象，和配置方法作为参数，自动捕获每次{' '}
+                  <Tag>connect</Tag> 拿到的 <Tag>MessagePort</Tag> 分别建立 <Tag>RPC</Tag>{' '}
+                  对象，添加到观察集合中；并返回一个 <Tag>brodcastScope</Tag>{' '}
+                  方法，用于对所有收集且在线的 <Tag>RPC</Tag> 对象进行广播。
+                </li>
+                <li>
+                  配置参数包含 3 个属性：<Tag>destroy</Tag> 设为 <Tag>true</Tag>{' '}
+                  在心跳断开时，注销并从集合中删除 <Tag>RPC</Tag> 对象，默认 <Tag>undefined</Tag>{' '}
+                  离线不做处理；<Tag>context</Tag> 和其他实例配置类型一样，见示例；
+                  <Tag>provider</Tag> 用于提供上下文。
+                </li>
+                <li>
+                  由于是通过配置方法返回配置，因此可以为每个观察的 <Tag>RPC</Tag>{' '}
+                  集合动态创建独立的上下文。
+                </li>
+                <li>
+                  <Tag>SharedWorker</Tag> 允许在主线程创建连接时，提供 <Tag>name</Tag>{' '}
+                  属性，用于创立不同的共享线程。在 <Tag>SharedWorkerGlobalScope</Tag> 内部使用{' '}
+                  <Tag>brodcastScope</Tag> 广播，只能发送给同线程、同上下文，且在线的 <Tag>RPC</Tag>{' '}
+                  实例
+                </li>
+                <li>
+                  同线程共享情况下，要创建多个不同上下文的实例集合，可以配置 <Tag>RPC</Tag> 对象属性{' '}
+                  <Tag>channel</Tag>，只有相同 <Tag>channel</Tag> 的实例对象才能互通。
+                </li>
+                <li>
+                  <Tag>obseverShareWorkerGlobalScopeRPC</Tag> 是扩展自方法{' '}
+                  <Tag>observerMessagePortRPC</Tag>，对于其他线程下的 <Tag>MessagePort</Tag>{' '}
+                  可以在业务中使用相同的方法创建 <Tag>RPC</Tag> 观察集合。
+                </li>
+              </ul>
+            </FooterTips>
+          }
           title={
             <>
               <Tag>SharedWorker</Tag> + <Tag>MessagePort</Tag> 通信

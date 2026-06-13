@@ -6,6 +6,7 @@ import MessagePortDemo from '@/module/rpc/messagePort'
 import ServiceWorkerDemo from '@/module/rpc/serviceWorker'
 import SharedWorkerDemo from '@/module/rpc/sharedWorker'
 import TransferDemo from '@/module/rpc/transfer'
+import WebSocketDemo from '@/module/rpc/webSocket'
 import WorkerDemo from '@/module/rpc/webWorker'
 import { Tag } from 'antd'
 import type { FC } from 'react'
@@ -312,6 +313,45 @@ const RPCDemo: FC = () => {
           }
         >
           <TransferDemo />
+        </Card>
+      </RecipientsProvider>
+      <RecipientsProvider>
+        <Card
+          footer={
+            <FooterTips>
+              <ul className="m-4 list-disc text-sm text-gray-400">
+                <li>
+                  由于是客户端 <Tag>RPC</Tag> 本实例只演示了客户端 <Tag>webSocket</Tag>
+                  ，服务端部分待根据后续实际需求，再来评估是否需要完善。
+                </li>
+                <li>
+                  由于服务端来自第三方，怎么发送就怎么返回，因此只演示了心跳 <Tag>connect</Tag>
+                  ，以及广播 <Tag>broadcast</Tag>
+                </li>
+                <li>
+                  <Tag>broadcast</Tag> 向服务端发送的请求支持 3 个类型：<Tag>string</Tag>，
+                  <Tag>ArrayBuffer</Tag>，<Tag>Blob</Tag>，为了类型统一，目前全部将发送的数据通过{' '}
+                  <Tag>JSON.strify</Tag> 转换成 <Tag>string</Tag> 再发送到服务端。
+                </li>
+                <li>
+                  要发送 <Tag>ArrayBuffer</Tag>，<Tag>Blob</Tag>，请额外再声明一个{' '}
+                  <Tag>webSocket</Tag> 客户端，后续根据实际需求，再来评估是否需要完善。
+                </li>
+                <li>
+                  同理接受数据也只接受 <Tag>string</Tag> 类型，并试图转换成需要要求的{' '}
+                  <Tag>MessageInfo</Tag> 类型，转换失败或缺少必要属性，将将丢弃无法和 <Tag>RPC</Tag>{' '}
+                  实例通信。
+                </li>
+              </ul>
+            </FooterTips>
+          }
+          title={
+            <>
+              <Tag>webSocket</Tag> 客户端
+            </>
+          }
+        >
+          <WebSocketDemo />
         </Card>
       </RecipientsProvider>
     </div>

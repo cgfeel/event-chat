@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.31](https://github.com/event-chat/event-chat/compare/rpc@v0.1.30...rpc@v0.1.31) (2026-06-13)
+
+
+### Bug Fixes
+
+* success webSocket ([5eea9d7](https://github.com/event-chat/event-chat/commit/5eea9d70863287e9ca42facef73d4b08009d30a9))
+* success webSocket ([7519b09](https://github.com/event-chat/event-chat/commit/7519b096f98dec51269b51fac16a1848b2f4cab9))
+
 ## [0.1.30](https://github.com/event-chat/event-chat/compare/rpc@v0.1.29...rpc@v0.1.30) (2026-06-12)
 
 

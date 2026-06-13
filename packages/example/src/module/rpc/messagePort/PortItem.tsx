@@ -7,7 +7,7 @@ import {
   workerCtx,
 } from '@/services/messagePortService'
 import { useEventChat } from '@event-chat/core'
-import { RPCDecorator, type Transport } from '@event-chat/rpc'
+import { type RPCIns, type Transport } from '@event-chat/rpc'
 import { useRPC } from '@event-chat/rpc/react'
 import { createServiceWorkerRegistrationRPC } from '@event-chat/rpc/serviceWorkerRegistration'
 import { createWorkerRPC } from '@event-chat/rpc/worker'
@@ -172,12 +172,8 @@ interface MessagePortItemProps extends Pick<MessagePortCtx, 'connect'> {
   disabled?: boolean
 }
 
-type RPCInstance = ReturnType<
-  typeof RPCDecorator<Transport, typeof mainCtx.actions, typeof workerCtx.actions>
->[0]
-
 type ConnectInfoType = Pick<MessagePortItemProps, 'connect'> &
   Pick<MessagePortCtx, 'emit'> & {
     scope: string
-    rpc?: RPCInstance
+    rpc?: RPCIns<Transport, typeof mainCtx.actions, typeof workerCtx.actions>
   }

@@ -1,4 +1,4 @@
 export * from './createCtx'
-export { type MessageItem, type Transport } from './fields'
-export { default as RPCDecorator } from './core/RPCDecorator'
+export type { MessageItem, Transport } from './fields'
 export type { MessageInfoType as MessageInfo } from './core/RPCAction'
+export type { RPCIns } from './core/observerRPC'

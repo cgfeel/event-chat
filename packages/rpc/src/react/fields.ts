@@ -1,7 +1,6 @@
 import { createContext } from 'react'
-import RPCAction, { RequestOptions } from '../core/RPCAction'
-import { Transport, WINDOW_NAME } from '../fields'
-import { ValueOf } from '../utils'
+import { RPCIns, observerRPC } from '../core/observerRPC'
+import { WINDOW_NAME } from '../fields'
 
 export const RPCInstanceContext = createContext<RPCInstanceContextIns>({})
 export const TARGET_TYPE_STRINGS = Object.freeze({
@@ -16,19 +15,9 @@ export const TARGET_TYPE_STRINGS = Object.freeze({
   DedicatedWorkerGlobalScope: '[object DedicatedWorkerGlobalScope]',
 })
 
-export interface RPCInstanceContextIns {
-  brodcastScope?: <T>(data: RequestOptions<T>, options?: ScopeProps) => void
+export interface RPCInstanceContextIns extends BrodcastType {
   mount?: (item: RPCItem, name?: string) => void
 }
 
-export type RPCItem =
-  | (Pick<RPCAction, 'broadcast'> & Pick<Transport<boolean>, 'getType'>)
-  | Record<never, never>
-
-export type ScopeProps = {
-  exclude?: Array<ValueOf<typeof TARGET_TYPE_STRINGS>>
-  include?: Array<ValueOf<typeof TARGET_TYPE_STRINGS>>
-  typein?: string[]
-  typeout?: string[]
-  fallback?: (error: unknown) => void
-}
+type BrodcastType = Partial<Pick<ReturnType<typeof observerRPC>, 'brodcastScope'>>
+type RPCItem = RPCIns | Record<never, never>

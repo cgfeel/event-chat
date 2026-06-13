@@ -1,7 +1,7 @@
-import { RequestOptions } from '../core/RPCAction'
 import { ActionRecord } from '../core/RPCDecorator'
 import RPCDecorator from '../core/RPCDecorator'
-import { EntryOptions, MessageItem, Transport } from '../fields'
+import { observerRPC } from '../core/observerRPC'
+import { EntryOptions } from '../fields'
 import MessagePortTransport from '../transports/MessagePortTransport'
 
 export function createMessagePortRPC<EVENT extends ActionRecord, CONSUME extends ActionRecord>(
@@ -13,31 +13,12 @@ export function createMessagePortRPC<EVENT extends ActionRecord, CONSUME extends
 }
 
 export function observerMessagePortRPC() {
-  const ports = new Set<
-    ReturnType<typeof RPCDecorator<Transport<boolean>, ActionRecord, ActionRecord>>[0]
-  >()
-
-  const brodcastScope = <T>(data: RequestOptions<T>, fallback?: (error: unknown) => void) => {
-    let result: MessageItem = {}
-    ports.forEach((port) => {
-      if (port.connected()) {
-        result = port.broadcast(
-          {
-            ...data,
-            requestId: data.requestId ?? result.requestId,
-            sign: data.sign ?? result.sign,
-          },
-          fallback
-        )
-      }
-    })
-  }
-
+  const { add, brodcastScope, remove } = observerRPC()
   const push = <EVENT extends ActionRecord, CONSUME extends ActionRecord>(
     target: MessagePort,
     config?: EntryConfig<EVENT, CONSUME>
   ) => {
-    const { context, destroy, ...ops } = config ?? {}
+    const { context, destroy, name = '', ...ops } = config ?? {}
     const RPCIns = createMessagePortRPC(target, {
       ...ops,
       context: {
@@ -45,13 +26,13 @@ export function observerMessagePortRPC() {
         config: {
           ...context?.config,
           onConnect: () => {
-            ports.add(RPCIns[0])
+            add(RPCIns[0], name)
             context?.config?.onConnect?.()
           },
           onDisconnect: (dest) => {
             if (destroy) {
               RPCIns[1]()
-              ports.delete(RPCIns[0])
+              remove(RPCIns[0])
               context?.config?.onDisconnect?.(true)
             } else {
               context?.config?.onDisconnect?.(dest)
@@ -70,4 +51,5 @@ export type EntryConfig<EVENT extends ActionRecord, CONSUME extends ActionRecord
   CONSUME
 > & {
   destroy?: boolean
+  name?: string
 }

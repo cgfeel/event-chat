@@ -11,6 +11,7 @@ const { brodcastScope } = obseverShareWorkerGlobalScopeRPC(target, () => {
   return {
     context: {
       config: { channel: sharedGroup },
+      brodcast: workerCtx.brodcasts,
       consume: mainConsume.actions,
       event: workerCtx.actions,
     },
@@ -18,7 +19,7 @@ const { brodcastScope } = obseverShareWorkerGlobalScopeRPC(target, () => {
       const print: MessagePortCtx['print'] = (payload, req) => {
         const { broadcast } = req ?? {}
         if (broadcast === 'transmit') {
-          brodcastScope({ payload })
+          brodcastScope({ payload: req })
         } else {
           rpc.request('sendMessage', { payload }).catch(() => {})
         }

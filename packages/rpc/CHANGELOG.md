@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.1.32](https://github.com/event-chat/event-chat/compare/rpc@v0.1.31...rpc@v0.1.32) (2026-06-13)
+
+
+### Bug Fixes
+
+* format RPCProvider ([ffdf40c](https://github.com/event-chat/event-chat/commit/ffdf40c89f51598bb360d2bb0c2672a0ff700e52))
+* provider observerRPC ([258e78b](https://github.com/event-chat/event-chat/commit/258e78bf5e8b881c5e8127ee5e960a0103fbdcdc))
+* split broadcast ([b559170](https://github.com/event-chat/event-chat/commit/b55917063e6623d99b5049f3ef25cd666e9a9161))
+* split broadcast ([2c3fda4](https://github.com/event-chat/event-chat/commit/2c3fda4039984b06b5052c2337b5ea5dbbca6c1e))
+
 ## [0.1.31](https://github.com/event-chat/event-chat/compare/rpc@v0.1.30...rpc@v0.1.31) (2026-06-13)
 
 

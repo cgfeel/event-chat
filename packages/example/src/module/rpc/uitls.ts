@@ -30,5 +30,7 @@ export const sharedWorkerApi = 'shared-worker-api'
 export const transferAction = 'transfer-action'
 export const transferGroup = 'transfer-group'
 
+export const webSocketGroup = 'webSocket-gropup'
+
 // 避免 formily 对于 worker:item 这样匹配规则的问题
 export const workerNameFilter = (name: string) => name.replace(/:/g, '-')

@@ -4,7 +4,6 @@ import { RPCInstanceContext, RPCInstanceContextIns } from './fields'
 
 const RPCProvider: FC<PropsWithChildren> = ({ children }) => {
   const observer = useRef(observerRPC())
-
   const mount: NonNullable<RPCInstanceContextIns['mount']> = useCallback((item, name?: string) => {
     const { add, remove } = observer.current
     if (!('getType' in item)) return

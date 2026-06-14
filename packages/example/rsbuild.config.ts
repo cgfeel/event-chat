@@ -58,6 +58,7 @@ export default defineConfig({
   // 库模式配置（React 库开发）
   output: {
     // externals: ['react', 'react-dom', 'zod'],
+    assetPrefix: process.env.NODE_ENV === 'production' ? '/event-chat/' : '/',
     distPath: {
       root: 'dist',
     },

@@ -14,9 +14,9 @@ const RedirectHandler: FC = () => {
       urlParams.delete('redirect')
       const params = urlParams.toString()
       const newSearch = params ? `?${params}` : ''
-      Promise.resolve(() => navigate(`${redirectPath}${newSearch}`, { replace: true })).catch(
-        () => {}
-      )
+      Promise.resolve()
+        .then(() => navigate(`${redirectPath}${newSearch}`, { replace: true }))
+        .catch(() => {})
     }
   }, [navigate])
 

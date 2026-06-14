@@ -214,7 +214,7 @@ const VideoFrameBtn: FC<PropsWithChildren<TransferItemProps>> = ({
     disabled={disabled}
     onClick={() => {
       const video = document.createElement('video')
-      video.src = '/sample-320x240_new.mp4'
+      video.src = routerPath('/sample-320x240_new.mp4')
       video.muted = true
       video
         .play()

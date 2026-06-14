@@ -1,6 +1,7 @@
 /// <reference lib="webworker" />
 import { mainCtx, workerCtx } from '@/services/transferService'
 import { createDedicatedWorkerGlobalScopeRPC } from '@event-chat/rpc/dedicatedWorkerGlobalScope'
+import { routerPath } from '@/utils/fields'
 import { transferGroup } from '../uitls'
 
 declare const self: DedicatedWorkerGlobalScope
@@ -50,7 +51,7 @@ workerCtx.provider({
           mediaSource.endOfStream()
         })
 
-        fetch('/sample-320x240_new.mp4')
+        fetch(routerPath('/sample-320x240_new.mp4'))
           .then((response) => response.arrayBuffer())
           .then((buffer) => sourceBuffer.appendBuffer(buffer))
           .catch(() => {})

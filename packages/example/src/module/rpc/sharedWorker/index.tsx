@@ -18,7 +18,7 @@ const SharedWorkerDemo: FC = () => (
     </div>
     {itemList.map(({ iframe, scope }) =>
       iframe ? (
-        <SharedWorkerIframe key={scope} scope={scope} />
+        <SharedWorkerIframe key={`iframe:${scope}`} scope={scope} />
       ) : (
         <SharedWorkerItem key={scope} scope={scope} />
       )

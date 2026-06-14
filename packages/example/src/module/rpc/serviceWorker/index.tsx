@@ -3,6 +3,7 @@ import { Empty } from 'antd'
 import { type FC, type PropsWithChildren, useState } from 'react'
 import Button from '@/components/Button'
 import { receiptStore } from '@/components/chatLine/receiptStore'
+import { routerPath } from '@/utils/fields'
 import WorkerGrid from '../WorkerGrid'
 import WorkerLogs from '../WorkerLogs'
 import {
@@ -76,7 +77,7 @@ const ServiceWorkerDemo: FC = () => {
         const keyname = `${scope}-${sub}`
         return (
           <WorkerGridBtn key={keyname} scope={keyname}>
-            <ServiceIframe scope={scope} sub={sub} />
+            <ServiceIframe scope={routerPath(scope)} sub={sub} />
           </WorkerGridBtn>
         )
       })}

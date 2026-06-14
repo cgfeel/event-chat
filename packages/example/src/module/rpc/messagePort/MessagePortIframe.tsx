@@ -107,7 +107,7 @@ const MessagePortIframe: FC<MessagePortIframeProps> = ({ sub }) => {
     connect,
   })
 
-  return <iframe className="h-full w-full" ref={iframeRef} src={routerPath(`/iframe?sub=${sub}`)} />
+  return <iframe className="h-full w-full" ref={iframeRef} src={routerPath(`iframe?sub=${sub}`)} />
 }
 
 export default MessagePortIframe

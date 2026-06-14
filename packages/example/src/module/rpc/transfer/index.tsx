@@ -8,6 +8,7 @@ import { Tooltip } from 'antd'
 import { type FC, type PropsWithChildren, useCallback, useRef } from 'react'
 import Button, { type ButtonProps } from '@/components/Button'
 import { toastOpen } from '@/utils/event'
+import { routerPath } from '@/utils/fields'
 import { allowedOrigins, transferAction, transferGroup } from '../uitls'
 
 const ArrayBufferBtn: FC<PropsWithChildren<TransferItemProps>> = ({
@@ -325,7 +326,7 @@ const TransferDemo: FC = () => {
           ArrayBuffer
         </ArrayBufferBtn>
       </div>
-      <iframe className="h-56" ref={iframeRef} src={`/iframe?sub=${transferAction}`} />
+      <iframe className="h-56" ref={iframeRef} src={routerPath(`iframe?sub=${transferAction}`)} />
     </div>
   )
 }

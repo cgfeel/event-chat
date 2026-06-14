@@ -3,6 +3,7 @@ import { useEventChat } from '@event-chat/core'
 import { useRPC } from '@event-chat/rpc/react'
 import { createWindowRPC } from '@event-chat/rpc/window'
 import { type FC, useContext, useEffect, useRef } from 'react'
+import { routerPath } from '@/utils/fields'
 import { StoreContext } from '../createRecipientsStore'
 import { GroupProvider, allowedOrigins, chatItem } from '../uitls'
 
@@ -41,7 +42,7 @@ const SubChat: FC = () => {
 
   return (
     <div className="h-full bg-gray-800">
-      <iframe className="h-full w-full" ref={iframeRef} src={`/iframe?name=${group}`} />
+      <iframe className="h-full w-full" ref={iframeRef} src={routerPath(`iframe?name=${group}`)} />
     </div>
   )
 }

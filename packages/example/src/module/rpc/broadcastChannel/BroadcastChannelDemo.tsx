@@ -1,5 +1,6 @@
 import { type FC } from 'react'
 import Button from '@/components/Button'
+import { routerPath } from '@/utils/fields'
 import { broadcastAction, broadcastApi } from '../uitls'
 import { panelStyles } from '../windowUitls'
 import BroadcastItem, { BroadcastIframe } from './BroadcastItem'
@@ -27,7 +28,7 @@ const BroadcastChannelDemo: FC = () => {
                     const left = (screen.availWidth - width) / 2
                     const top = (screen.availHeight - height) / 2
                     window.open(
-                      `/iframe?sub=${broadcastApi}`,
+                      routerPath(`iframe?sub=${broadcastApi}`),
                       broadcastApi,
                       `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
                     )

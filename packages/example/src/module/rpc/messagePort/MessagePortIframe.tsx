@@ -13,6 +13,7 @@ import { createWindowRPC } from '@event-chat/rpc/window'
 import { type FC, useCallback, useContext, useMemo, useRef } from 'react'
 import z from 'zod'
 import { receiptStore } from '@/components/chatLine/receiptStore'
+import { routerPath } from '@/utils/fields'
 import { allowedOrigins, messageGroup } from '../uitls'
 
 const schema = z.enum(['broadcast', 'normal'])
@@ -106,7 +107,7 @@ const MessagePortIframe: FC<MessagePortIframeProps> = ({ sub }) => {
     connect,
   })
 
-  return <iframe className="h-full w-full" ref={iframeRef} src={`/iframe?sub=${sub}`} />
+  return <iframe className="h-full w-full" ref={iframeRef} src={routerPath(`iframe?sub=${sub}`)} />
 }
 
 export default MessagePortIframe

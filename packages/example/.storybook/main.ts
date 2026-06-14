@@ -1,17 +1,17 @@
-import path, { dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { resolve } from 'path';
-import type { StorybookConfig } from 'storybook-react-rsbuild';
+import path, { dirname } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { resolve } from 'path'
+import type { StorybookConfig } from 'storybook-react-rsbuild'
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 const getAbsolutePath = (value: string): any => {
   return path.resolve(
     fileURLToPath(new URL(import.meta.resolve(`${value}/package.json`, import.meta.url))),
     '..'
-  );
-};
+  )
+}
 
 const config: StorybookConfig = {
   stories: ['../src/**/*.mdx', '../src/**/*.stories.@(js|jsx|mjs|ts|tsx)'],
@@ -38,17 +38,17 @@ const config: StorybookConfig = {
     check: true,
   },
   async rsbuildFinal(config, { configType }) {
-    if (configType !== 'PRODUCTION') return config;
-    const { output = {} } = config;
+    if (configType !== 'PRODUCTION') return config
+    const { output = {} } = config
 
     return {
       ...config,
       output: {
         ...output,
-        assetPrefix: '/event-chat/',
+        assetPrefix: '/event-chat/storybook-static/',
       },
-    };
+    }
   },
   //   framework: 'storybook-react-rsbuild',
-};
-export default config;
+}
+export default config

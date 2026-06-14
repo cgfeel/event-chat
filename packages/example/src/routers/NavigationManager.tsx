@@ -1,6 +1,7 @@
 import { ConfigProvider, theme } from 'antd'
 import type { FC, PropsWithChildren } from 'react'
 import { useLocation, useNavigate } from 'react-router'
+import RedirectHandler from '@/components/RedirectHandler'
 import Tabs, { TabItem } from '@/components/Tabs'
 import Toast from '@/components/toast'
 
@@ -10,6 +11,7 @@ const NavigationManager: FC<PropsWithChildren> = ({ children }) => {
 
   return (
     <>
+      <RedirectHandler />
       <Toast />
       <div className="flex w-full items-center justify-center p-4">
         <Tabs

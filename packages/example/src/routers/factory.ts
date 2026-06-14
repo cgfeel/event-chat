@@ -1,7 +1,7 @@
 import { createBrowserRouter, createMemoryRouter } from 'react-router'
 import routes from './routes'
 
-const basename = '/'
+const basename = process.env.NODE_ENV === 'production' ? '/event-chat/' : '/'
 
 export default function createRouter({ strategy, initialPathname = '/' }: CreateRouterProps) {
   return strategy === 'browser'

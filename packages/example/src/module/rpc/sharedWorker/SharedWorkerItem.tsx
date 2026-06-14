@@ -13,6 +13,7 @@ import { createWindowRPC } from '@event-chat/rpc/window'
 import { type FC, useCallback, useMemo, useRef, useState } from 'react'
 import { ChatScroll, WorkerPanel } from '@/components/chatLine'
 import { receiptStore } from '@/components/chatLine/receiptStore'
+import { routerPath } from '@/utils/fields'
 import WorkerGrid from '../WorkerGrid'
 import { allowedOrigins, sharedGroup } from '../uitls'
 import { titleRange } from '../windowUitls'
@@ -40,7 +41,9 @@ const SharedWorkerIframe: FC<Omit<ShardWorkerItemProps, 'iframe'>> = ({ scope })
   )
 
   parentCtx.provider({ brodcast, print })
-  return <iframe className="h-full w-full" ref={iframeRef} src={`/iframe?sub=${scope}`} />
+  return (
+    <iframe className="h-full w-full" ref={iframeRef} src={routerPath(`iframe?sub=${scope}`)} />
+  )
 }
 
 const SharedWorkerItem: FC<ShardWorkerItemProps> = ({ disabled, iframe, scope, push }) => {

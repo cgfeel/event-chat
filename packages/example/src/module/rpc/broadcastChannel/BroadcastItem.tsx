@@ -10,6 +10,7 @@ import { type FC, type ReactNode, useCallback, useMemo, useRef } from 'react'
 import z from 'zod'
 import { ChatScroll, WorkerPanel } from '@/components/chatLine'
 import { receiptStore } from '@/components/chatLine/receiptStore'
+import { routerPath } from '@/utils/fields'
 import WorkerGrid from '../WorkerGrid'
 import { broadcastGroup } from '../uitls'
 import { titleRange } from '../windowUitls'
@@ -17,7 +18,9 @@ import { titleRange } from '../windowUitls'
 const schema = z.enum(['broadcast', 'transmit'])
 const BroadcastIframe: FC<Pick<BroadcastItemProps, 'scope'>> = ({ scope }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null)
-  return <iframe className="h-full w-full" ref={iframeRef} src={`/iframe?sub=${scope}`} />
+  return (
+    <iframe className="h-full w-full" ref={iframeRef} src={routerPath(`iframe?sub=${scope}`)} />
+  )
 }
 
 const BroadcastItem: FC<BroadcastItemProps> = ({ iframe, scope, title }) => {

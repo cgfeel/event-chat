@@ -9,6 +9,7 @@ import { useRPC } from '@event-chat/rpc/react'
 import { createWindowRPC } from '@event-chat/rpc/window'
 import { type FC, useCallback, useRef } from 'react'
 import z from 'zod'
+import { routerPath } from '@/utils/fields'
 import { allowedOrigins, serviceWorkerGroup } from '../uitls'
 
 const ServiceIframe: FC<ServiceIframeProps> = ({ scope, sub }) => {
@@ -49,7 +50,7 @@ const ServiceIframe: FC<ServiceIframeProps> = ({ scope, sub }) => {
 
   parentCtx.provider({ broadcat, emit, transmit })
 
-  return <iframe className="h-full w-full" ref={iframeRef} src={`/iframe?sub=${sub}`} />
+  return <iframe className="h-full w-full" ref={iframeRef} src={routerPath(`iframe?sub=${sub}`)} />
 }
 export default ServiceIframe
 

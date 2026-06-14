@@ -7,6 +7,7 @@ import { type FC, useRef, useState } from 'react'
 import { ChatLine, ChatScroll } from '@/components/chatLine'
 import CardSelect from '@/components/chatLine/CardSelect'
 import { receiptStore } from '@/components/chatLine/receiptStore'
+import { routerPath } from '@/utils/fields'
 import { useRecipients } from '../createRecipientsStore'
 import { allowedOrigins, chatName, iframeName } from '../uitls'
 
@@ -92,10 +93,18 @@ const Iframe: FC = () => {
         </ChatLine>
       </div>
       <div>
-        <iframe className="h-full w-full" ref={iframeRef1} src={`/iframe?sub=${iframeName}`} />
+        <iframe
+          className="h-full w-full"
+          ref={iframeRef1}
+          src={routerPath(`iframe?sub=${iframeName}`)}
+        />
       </div>
       <div>
-        <iframe className="h-full w-full" ref={iframeRef2} src={`/iframe?sub=${chatName}`} />
+        <iframe
+          className="h-full w-full"
+          ref={iframeRef2}
+          src={routerPath(`iframe?sub=${chatName}`)}
+        />
       </div>
     </div>
   )

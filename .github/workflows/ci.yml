@@ -274,7 +274,7 @@ jobs:
       - name: Upload Storybook Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: 'packages/example/storybook-static'
+          path: 'packages/example/dist'
 
       # 7. 部署到GitHub Pages（官方套件，无需额外指定目录）
       - id: deploy

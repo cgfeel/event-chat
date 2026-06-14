@@ -25,7 +25,7 @@
     "lint:fix": "eslint \"src/**/*.{ts,tsx,js,jsx}\" --fix",
     "preview": "rsbuild preview",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build -o dist/storybook-static"
   },
   "dependencies": {
     "@ant-design/icons": "~5.6.1",

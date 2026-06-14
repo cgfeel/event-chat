@@ -13,8 +13,10 @@ export const objectEntries = <T extends object, K = keyof T>(obj: T) =>
 
 export const objectKeys = <T extends object, K = keyof T>(obj: T) => Object.keys(obj) as K[]
 
-export const routerPath = (path = '') =>
-  process.env.NODE_ENV === 'production' ? `/event-chat/${path}` : `/${path}`
+export const routerPath = (path = '') => {
+  const name = path.replace(/^\/*/, '')
+  return process.env.NODE_ENV === 'production' ? `/event-chat/${name}` : `/${name}`
+}
 
 export const safetyParse = (value: string) => {
   try {

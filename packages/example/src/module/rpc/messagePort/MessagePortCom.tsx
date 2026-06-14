@@ -2,7 +2,7 @@ import { iframeCtx, parentCtx } from '@/services/messagePortService'
 import { useRPC } from '@event-chat/rpc/react'
 import { createWindowRPC } from '@event-chat/rpc/window'
 import { type FC, useMemo, useRef } from 'react'
-import { isKey } from '@/utils/fields'
+import { isKey, routerPath } from '@/utils/fields'
 import {
   allowedOrigins,
   messageGroup,
@@ -45,7 +45,7 @@ const MessagePortCom: FC<SubMessagePortProps> = ({ group }) => {
     <ComRPC
       disabled={!connected}
       ref={portRef}
-      scope={group}
+      scope={routerPath(group)}
       connect={({ port, text }) => {
         rpc.request('connect', { transfer: [port], payload: text }).catch(() => {})
       }}

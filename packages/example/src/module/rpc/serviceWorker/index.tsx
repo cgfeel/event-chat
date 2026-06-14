@@ -65,7 +65,7 @@ const ServiceWorkerDemo: FC = () => {
       <WorkerGridBtn scope={serviceScopeAction}>
         <ServiceWorkerItem
           group={serviceWorkerGroup}
-          scope={serviceScopeAction}
+          scope={routerPath(serviceScopeAction)}
           publish={(detail) => {
             const { receipt } = detail
             emit({ detail: { ...detail, own: false }, name: `chat-${serviceScopeParent}` })

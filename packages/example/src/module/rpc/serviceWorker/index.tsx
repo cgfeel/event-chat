@@ -77,7 +77,7 @@ const ServiceWorkerDemo: FC = () => {
         const keyname = `${routerPath(scope)}-${sub}`
         return (
           <WorkerGridBtn key={keyname} scope={keyname}>
-            <ServiceIframe scope={routerPath(keyname)} sub={sub} />
+            <ServiceIframe scope={keyname} sub={sub} />
           </WorkerGridBtn>
         )
       })}

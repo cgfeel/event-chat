@@ -62,7 +62,7 @@ const ServiceWorkerDemo: FC = () => {
       <div className={panel()}>
         <WorkerLogs group={serviceWorkerGroup} name={`chat-${serviceScopeParent}`} />
       </div>
-      <WorkerGridBtn scope={serviceScopeAction}>
+      <WorkerGridBtn scope={routerPath(serviceScopeAction)}>
         <ServiceWorkerItem
           group={serviceWorkerGroup}
           scope={routerPath(serviceScopeAction)}

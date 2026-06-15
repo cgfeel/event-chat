@@ -52,7 +52,7 @@ const mainCtx = createCtx((ctx: Partial<ParentCtxType>) => ({
     if (scope) {
       const detail = transmitResult({
         message: 'success',
-        scope: scope.split('-').pop() ?? '',
+        scope: scope.split('-').slice(1).join('-') ?? '',
         result: {
           ...result,
           receivedBody: !result.receivedBody

@@ -83,7 +83,7 @@ const LogoSvg = () => (
 )
 
 const SideBar: FC<PropsWithChildren> = ({ children }) => {
-  const [open, setOpen] = useState(true)
+  const [open, setOpen] = useState(false)
   const { link, list, logo, main, menu, side, sidebar, tag, toggle, toolbar, warp } = styles({
     open,
   })

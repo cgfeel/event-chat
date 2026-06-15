@@ -1,7 +1,7 @@
 import {
   type ParentCtxType,
+  generateParentCtx,
   iframeCtx,
-  parentCtx,
   resultSchema,
 } from '@/services/serviceWorkerService'
 import { useEventChat } from '@event-chat/core'
@@ -14,6 +14,8 @@ import { allowedOrigins, serviceWorkerGroup } from '../uitls'
 
 const ServiceIframe: FC<ServiceIframeProps> = ({ scope, sub }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null)
+  const parentCtx = generateParentCtx()
+
   const { rpc, brodcastScope } = useRPC({
     config: {
       channel: serviceWorkerGroup,
@@ -26,7 +28,7 @@ const ServiceIframe: FC<ServiceIframeProps> = ({ scope, sub }) => {
     init: () => iframeRef.current,
   })
 
-  const { emit } = useEventChat(`item-${scope}-${sub}`, {
+  const { emit } = useEventChat(`item-${scope}`, {
     group: serviceWorkerGroup,
     schema: z.string(),
     callback: ({ detail }) => {

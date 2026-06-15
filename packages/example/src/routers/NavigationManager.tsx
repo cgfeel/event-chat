@@ -13,7 +13,7 @@ const NavigationManager: FC<PropsWithChildren> = ({ children }) => {
       <SideBar>
         <Menu />
         <div className="p-2 text-center">
-          EventChat 并非专门为聊天而做的库，Demo 为了方便演示采用了对话示例。
+          EventChat 是专门为客户端通信而设计的库，Demo 为了方便演示采用了对话示例。
         </div>
         <ConfigProvider
           theme={{

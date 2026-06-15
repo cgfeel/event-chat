@@ -70,6 +70,23 @@ const mainCtx = createCtx((ctx: Partial<ParentCtxType>) => ({
   },
 }))
 
+const generateParentCtx = () =>
+  createCtx(
+    (ctx: Partial<ParentCtxType>) => ({
+      sendMessage: (detail: z.infer<typeof itemSchema>) => {
+        ctx.emit?.({
+          name: `chat-${serviceScopeParent}`,
+          detail: { ...detail, own: false, user: `iframe:${detail.user}` },
+        })
+      },
+    }),
+    (ctx: Partial<ParentCtxType>) => ({
+      brodcast: (detail: unknown, info?: BroadcatInfo) => {
+        ctx.broadcat?.(detail, info)
+      },
+    })
+  )
+
 const parentCtx = createCtx(
   (ctx: Partial<ParentCtxType>) => ({
     sendMessage: (detail: z.infer<typeof itemSchema>) => {
@@ -105,7 +122,7 @@ const workerCtx = createCtx(
   brodcastScope
 )
 
-export { iframeCtx, mainCtx, parentCtx, resultSchema, workerCtx }
+export { iframeCtx, mainCtx, parentCtx, resultSchema, workerCtx, generateParentCtx }
 
 export type ParentCtxType = Pick<ReturnType<typeof useEventChat>, 'emit'> & {
   scope: string

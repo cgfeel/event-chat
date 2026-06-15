@@ -74,10 +74,10 @@ const ServiceWorkerDemo: FC = () => {
         />
       </WorkerGridBtn>
       {itemList.map(({ scope, sub }) => {
-        const keyname = `${scope}-${sub}`
+        const keyname = `${routerPath(scope)}-${sub}`
         return (
-          <WorkerGridBtn key={keyname} scope={routerPath(serviceScopeAction)}>
-            <ServiceIframe scope={routerPath(scope)} sub={sub} />
+          <WorkerGridBtn key={keyname} scope={keyname}>
+            <ServiceIframe scope={routerPath(keyname)} sub={sub} />
           </WorkerGridBtn>
         )
       })}

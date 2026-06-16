@@ -16,6 +16,8 @@ const preview: Preview = {
         order: [
           'Document',
           ['EventChat', 'AntdItem', 'NamePath', 'DebugAndError'],
+          'RPC',
+          ['Demo'],
           'Example',
           ['Toast', 'Tabs', 'Formily'],
         ],

@@ -18,7 +18,7 @@ const styles = tv({
     logo: 'fill-white',
     link: 'flex cursor-pointer justify-between rounded-md p-2 hover:bg-slate-700 [&>a]:flex [&>a]:items-center [&>a]:gap-2 [&>a]:transition-all [&>a]:duration-300 [&>a]:ease-in-out',
     list: 'flex flex-col gap-4 px-2',
-    main: 'flex-1 shrink basis-auto',
+    main: 'flex-1 shrink basis-auto overflow-auto',
     menu: 'absolute top-0 flex w-full flex-col gap-6 px-2 py-4',
     side: 'transition-basis relative flex-0 shrink-0 bg-slate-900 duration-300 ease-in-out',
     sidebar: 'transition-width fixed top-0 bottom-0 left-0 duration-300 ease-in-out',

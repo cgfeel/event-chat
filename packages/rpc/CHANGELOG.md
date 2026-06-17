@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.33](https://github.com/event-chat/event-chat/compare/rpc@v0.1.32...rpc@v0.1.33) (2026-06-17)
+
+
+### Bug Fixes
+
+* update rpc add custom fn ([6d0b0de](https://github.com/event-chat/event-chat/commit/6d0b0de9163269f23836fc46aa8ca5e00b5d18c7))
+* update rpc add custom fn ([6810f2d](https://github.com/event-chat/event-chat/commit/6810f2d0f135d9eb6b10022c4c6f274364be5851))
+
 ## [0.1.32](https://github.com/event-chat/event-chat/compare/rpc@v0.1.31...rpc@v0.1.32) (2026-06-13)
 
 

@@ -78,7 +78,7 @@ class RPCAction {
     return info
   }
 
-  config(options: Omit<RPCOptionsType, 'onConnect' | 'onDisconnect'>) {
+  config(options: Omit<RPCOptionsType, 'debug' | 'onConnect' | 'onDisconnect'>) {
     this._options = { ...this._options, ...options }
   }
 

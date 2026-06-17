@@ -17,6 +17,15 @@
   padding-bottom: 22px;
 }
 
+ol {
+  list-style: auto;
+}
+
+.list-dist {
+  list-style: disc;
+  padding-left: 12px;
+}
+
 .floating-list ul {
   margin: 0;
 }

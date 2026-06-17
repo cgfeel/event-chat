@@ -45,13 +45,6 @@ registerTransport({
 })
 
 registerTransport({
-  name: 'SharedWorkerGlobalScope',
-  in: () => typeof SharedWorkerGlobalScope !== 'undefined',
-  match: (t): t is SharedWorkerGlobalScope => t instanceof SharedWorkerGlobalScope,
-  load: () => import('../transports/SharedWorkerGlobalScopeTransport'),
-})
-
-registerTransport({
   name: 'webSocket',
   in: () => typeof WebSocket !== 'undefined',
   match: (t): t is WebSocket => t instanceof WebSocket,
@@ -73,3 +66,11 @@ registerTransport({
 })
 
 export { createRPC } from '../core/registry'
+
+// SharedWorkerGlobalScope 内部通过 MessagePort 进行通信，监听全局对象无用
+// registerTransport({
+//   name: 'SharedWorkerGlobalScope',
+//   in: () => typeof SharedWorkerGlobalScope !== 'undefined',
+//   match: (t): t is SharedWorkerGlobalScope => t instanceof SharedWorkerGlobalScope,
+//   load: () => import('../transports/SharedWorkerGlobalScopeTransport'),
+// })

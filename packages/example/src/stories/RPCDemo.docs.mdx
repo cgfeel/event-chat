@@ -1,7 +1,16 @@
 import { Canvas, Meta } from '@storybook/addon-docs/blocks'
 import Table, { TBody, Td, Th, Thead, Tr } from '@/components/TableVirtual'
 import RPCDemo from './RPCDemo'
-import RPCDemoStories, { Iframe, WebWorker } from './RPCDemo.stories'
+import RPCDemoStories, {
+  BroadcastChannel,
+  Iframe,
+  MessagePort,
+  ServiceWorker,
+  SharedWorker,
+  Transfer,
+  WebSocket,
+  WebWorker,
+} from './RPCDemo.stories'
 import './assets/story-styles.css'
 import Footer from './components/Footer'
 import Header from './components/Header'
@@ -535,6 +544,8 @@ interface DemoCtxType {
 }
 ```
 
+更多上下文示例见 `Github` [[仓库源码](https://github.com/event-chat/event-chat/tree/main/packages/example/src/services)]
+
 **返回的上下文对象：**
 
 创建上下文将会返回一个对象，提供给 <Tag>RPC</Tag> 实例使用，包含以下属性：
@@ -706,13 +717,35 @@ type upset = (options: FactoryOptions) => void
 `rpc.broadcast` 匹配多个实例广播的情况：
 
 - `BroadcastChannel`：对象本身就是为了向不同的标签页、`window` 对象相互通信
-- `ServiceWorkerRegistration`：同连接同 `scope` 下的 `sw` 只允许存在一个 `active` 实例，为了保活每个实例，因此会借助 `active` 实例对象，为每个同 `scope` 的实例通信
+- `ServiceWorkerRegistration`：同链接同 `scope` 下的 `sw` 只允许存在一个 `active` 实例，为了保活每个实例，因此会借助 `active` 实例对象，为每个同 `scope` 的实例通信
 
 为了避免广播不受控制，可以通过 `channel` 的方式限制广播范围
 
 **广播转发：**
 
-当转发广播时，有可能会出现消息回环的情况，导致无限循环。为了避免这个情况，允许广播时携带：`requestId` 和 `sign`，内部会存储发送的签名进行匹配，已记录的签名的广播将无法在同一个实例下再次转发
+当转发广播时，有可能因消息回环导致无限循环。为避免这个情况，允许广播时携带：`requestId` 和 `sign`，内部会存储发送的签名进行匹配，已记录签名的广播不会在同一个实例重复接收
+
+**`brodcastScope` 筛选实例广播**
+
+在范围向所有挂载的实例发送广播时，提供的参数中有 4 个配置可筛选符合要求的实例发送广播
+
+- `exclude`: 类型集合，不在集合范围的实例能够发起广播
+- `include`: 类型集合，必须是集合范围的实例能够发起广播
+- `scopein`: 名称集合，只有名称存在集合的实例能够发起广播
+- `scopeout`:名称集合，名称不在集合的实例能够发起广播
+
+集合类型为 `string[]`，实例的类型可以通过 `TARGET_TYPE_STRINGS` 获取；使用 `RPCProvider` 时，默认会在每个实例初始化后，自动挂载空字符作为实例的匿名名称，如果需要修改挂载的实例的名称，可以通过 `useRPC` 返回的函数 `mount`
+
+### 实例的启动和注销
+
+默认情况下实例初始化后会自动发起心跳，无论是否连接成功，都会保持心跳检测；同时会在 `hooks` 所在的组件注销前，注销实例，因此通常情况下不需要手动 `start` 或 `destroy`。但是 `service worker` 线程并非持久连接，会随浏览器空闲时临时关闭线程，对于这种情况：
+
+- 通常由心跳唤醒 `service worker` 实例，一般不需要手动处理
+- 但如果因为某些情况强制关闭了线程，例如调试工具强制卸载
+- 这样的情况在 `onDisconnect` 回调函数中，提供参数 `destroy` 给业务判断当前实例是否已注销
+- 对于已注销的实例可以调用 `start` 手动重新发起新的实例连接
+
+其他情况不建议手动 `start` 或 `destroy`，除非你对实例生命周期非常了解
 
 ### 调试方法
 
@@ -827,9 +860,31 @@ type upset = (options: FactoryOptions) => void
   }) => void
 ```
 
+### 非 `React` 环境下使用
+
+可以直接将需要通信的对象，提供给驱动方法初始化实例。下面提供原生 `JS` 初始化实例的方法
+
+```typescript
+const iframeList = document.getElementsByTagName('iframe')
+if (iframeList.length) {
+  createWindowRPC(iframeList[0], {
+    context: {
+      config: { channel: 'origin-group' },
+      brodcast: parentCtx.brodcasts,
+      consume: iframeCtx.actions,
+      event: parentCtx.actions,
+    },
+  })
+}
+```
+
+也可以将其封装在函数中返回实例，或自行封装在 `Vue` 等框架下使用；关于通过驱动方法初始化实例，下面会在线程内部发起通信继续补充。
+
 ## `worker` 线程发起通信
 
-### 主线程和 `web worker` 通信
+### `web worker` 通信
+
+线程内部和主线程进行通信，没有办法像主线程那样通过 `React Hooks`，只能通过驱动方法初始化 `RPC` 实例，下面将通过 `web worker` 和 `service worker` 分别演示。
 
 <Canvas
   additionalActions={[
@@ -837,7 +892,7 @@ type upset = (options: FactoryOptions) => void
       title: 'Code in GitHub',
       onClick: () => {
         window.open(
-          'https://github.com/event-chat/event-chat/tree/main/packages/example/src/module/rpc/iframe',
+          'https://github.com/event-chat/event-chat/tree/main/packages/example/src/module/rpc/webWorker',
           '_blank'
         )
       },
@@ -847,18 +902,257 @@ type upset = (options: FactoryOptions) => void
   sourceState="none"
 />
 
+初始化实例的方法和 `hooks` 基本一致，第 1 个参数为 `RPC` 实例化的对象，第 2 个为配置参数，如下：
+
+```typescript
+const [rpc] = createDedicatedWorkerGlobalScopeRPC(target, {
+  context: {
+    brodcast: workerChatCtx.brodcasts,
+    config: { channel: 'worker' },
+    consume: mainCtx.actions,
+    event: workerChatCtx.actions,
+  },
+})
+```
+
+配置的参数将 `options` 单独拆分出来，其余保持不变放在 `context` 中
+
+```typescript
+export interface EntryOptions<EVENT extends ActionRecord, CONSUME extends ActionRecord> {
+  options?: FactoryOptions
+  context?: DecoratorContext<EVENT, CONSUME>
+}
+```
+
+其余线程使用方法和上述文档一致，包括 `MessagePort` 手动通信，不再重复说明
+
+### `service worker` 通信
+
+<Canvas
+  additionalActions={[
+    {
+      title: 'Code in GitHub',
+      onClick: () => {
+        window.open(
+          'https://github.com/event-chat/event-chat/tree/main/packages/example/src/module/rpc/serviceWorker',
+          '_blank'
+        )
+      },
+    },
+  ]}
+  of={ServiceWorker}
+  sourceState="none"
+/>
+
+初始化实例的方式和 `web worker` 一致，但 `service worker` 有几个独有特性
+
+#### 共享 `active` 实例
+
+由于浏览器限制，同链接同 `scope` 共享 `active` 实例，因此：
+
+- 发起广播时通过消息签名避免消息回环
+- `request` 发送消息时，会将 `requestId` 挂载 `pending` 集合中，最终响应会匹配到正确的实例
+
+#### 转发消息
+
+发送请求时可以通过 `transmit` 返回多个 `clients` 用于转发消息给多个实例，如下：
+
+```typescript
+rpc
+  .request('sendMessage', {
+    payload: 'msg...',
+    transmit: () =>
+      self.clients.matchAll({
+        type: 'window',
+        includeUncontrolled: true,
+      }),
+  })
+  .catch(() => {})
+```
+
+#### 慢请求
+
+当 `service worker` 内部需要完成耗时的请求时，为了避免浏览器空闲时注销 `service worker` 线程，导致通信失败；实例内部通过 `waitUntil` 的方式等待请求完成，因此在 `sw` 内部上下文中，可以使用异步方法的 `await`，如下：
+
+```typescript
+const workerCtx = createCtx(() => ({
+  sendMessage: async () => {
+    const result = await fetch('...').then((res) => res.json())
+    return result as ResultType
+  },
+}))
+```
+
+#### 唤起 `service worker`
+
+`service worker` 除了通过 `message` 唤起线程外，还可以拦截 `fetch` 并唤起线程；在 `RPC` 实例内部，对这两种方式都做了监听，可以在拦截 `fetch` 的同时向主线程发起通信，如下：
+
+```typescript
+self.addEventListener('fetch', (event) => {
+  if (event.request.url.includes('/api/hello')) {
+    rpc.request('sendMessage', { payload: 'request start' }).catch(() => {})
+  }
+})
+```
+
+上述提到在主线程中 `service worker` 存在多个实例共享 `active` 通信的，在拦截 `fetch` 情况下向主线程发送消息，有可能多个实例都会响应。由于主线程此时是接收方，不存在和请求对应的 `pending`，不能明确接收对象，只能通过以下方式来区分：
+
+- 每个实例的上下文采用不同的请求方法
+- 由业务的消息自行决定如何处理
+- 通过 `channel` 划分接收对象
+
+**其他唤醒方式：**
+
+除了 `fetch` 和 `message` 之外，`service worker` 还有诸如：`notice`、`sync` 等这样唤起方式；但只有 `fetch` 和 `message` 能够拿到明确的 `client`，其他唤起方式可以在发送请求时通过 `transmit` 匹配对应的 `clients`。
+
 ## 其他案例及补充说明
 
-### 主线程和 `service worker` 通信
+### `MessagePort` 通信
 
-### 主线程和 `MessagePort` 通信
+<Canvas
+  additionalActions={[
+    {
+      title: 'Code in GitHub',
+      onClick: () => {
+        window.open(
+          'https://github.com/event-chat/event-chat/tree/main/packages/example/src/module/rpc/messagePort',
+          '_blank'
+        )
+      },
+    },
+  ]}
+  of={MessagePort}
+  sourceState="none"
+/>
 
-### 主线程和 `SharedWorker` 通信
+- `MessagePort` 是手动通信，需要借助其他通信方式将 `port` 通过 `transfer` 转移对象后，手动发起通信
+- 通过这种方式发起的通信受限于所在的环境，例如在 `service worker` 中，不要试图通过 `MessagePort` 保持长久通信
+- 虽然使用 `MessagePort` 实例化的 `RPC` 同样支持 `start`，但是通信一旦断开只能通过 `MessageChannel` 创建新的对象
 
-### 使用 `BroadcastChannel` 广播
+由此得出通过 `transfer` 转移 `MessagePort` 手动创建的 `RPC` 连接不适合持久对话，如果需要使用 `MessagePort` 保持持久通信，可以尝试 `SharedWorker`
+
+### `SharedWorker` 通信
+
+<Canvas
+  additionalActions={[
+    {
+      title: 'Code in GitHub',
+      onClick: () => {
+        window.open(
+          'https://github.com/event-chat/event-chat/tree/main/packages/example/src/module/rpc/sharedWorker',
+          '_blank'
+        )
+      },
+    },
+  ]}
+  of={SharedWorker}
+  sourceState="none"
+/>
+
+`SharedWorkerGlobalScope` 作为共享线程，内部的通信全部共享一个线程（参考主线程），每个通信通过 `MessagePort` 隔离通信。因此舍弃针对 `SharedWorkerGlobalScope` 建立 `RPC` 实例监听。而是使用方法 `obseverShareWorkerGlobalScopeRPC` 通过观察模式发起通信，如下：
+
+```typrscript
+const { brodcastScope } = obseverShareWorkerGlobalScopeRPC(target, () => {
+  const workerCtx = generateWorkerCtx()
+  return {
+    context: {
+      config: { channel: sharedGroup },
+      brodcast: workerCtx.brodcasts,
+      consume: mainConsume.actions,
+      event: workerCtx.actions,
+    },
+    provider: ([rpc]) => {
+    },
+  }
+})
+```
+
+观察方法配置的参数和驱动方法一致，第 2 个配置参数增加了 3 个可选属性：
+
+- `destroy`：布尔型，设为 `true` 会在 `RPC` 断开后直接注销，并从观察队列中删除
+- `name`：字符型，给观察的实例集合起个名字，广播时筛选用
+- `provider`：为上下文提供需要的对象
+
+内置 `provider` 的原因是 `SharedWorkerGlobalScope` 通过 `connect` 根据连接的情况，动态创建的 `MessagePort`。无法通过具体对象初始化实例，因此通过回调的方式，从观察方法中获取 `RPC` 实例，以便作为上下文所需的方法再次发起请求。
+
+观察方法会返回一个 `brodcastScope` 方法，其用法和 `useRPC` 提供的同名方法一样。
+
+#### 上下文
+
+在 `SharedWorkerGlobalScope` 中由于多个主线程共享 1 个 `worker`，因此需要通过函数调用的方式隔离每个实例的上下文，如下：
+
+```typescript
+const messagePortEvent = createService<MessagePortCtx>()
+export const generateWorkerCtx = () =>
+  messagePortEvent(
+    (ctx) => ({
+      sendMessage: (data: RequestType) => {
+        ctx.print?.(generateFakePrint(data, 'sharedWorker'), data)
+      },
+    }),
+    (ctx) => ({
+      brodcast: (info) => {
+        const { data, success } = requestSchema.safeParse(info)
+        if (success) ctx.print?.(generateFakePrint(data, 'sharedWorker-transmit'))
+      },
+    })
+  )
+```
+
+在同一个 `sharedWorker` 中，由于共享一个线程，创建了多个 `RPC` 实例情况下，如果上下文的方法同名，可能会造成竞态请求；对此可以通过 `channel` 区分不同的实例。
+
+### `BroadcastChannel` 广播
+
+<Canvas
+  additionalActions={[
+    {
+      title: 'Code in GitHub',
+      onClick: () => {
+        window.open(
+          'https://github.com/event-chat/event-chat/tree/main/packages/example/src/module/rpc/broadcastChannel',
+          '_blank'
+        )
+      },
+    },
+  ]}
+  of={BroadcastChannel}
+  sourceState="none"
+/>
 
 ### 使用 `Transfer` 转移对象
 
+<Canvas
+  additionalActions={[
+    {
+      title: 'Code in GitHub',
+      onClick: () => {
+        window.open(
+          'https://github.com/event-chat/event-chat/tree/main/packages/example/src/module/rpc/transfer',
+          '_blank'
+        )
+      },
+    },
+  ]}
+  of={Transfer}
+  sourceState="none"
+/>
+
 ### `WebSocket` 通信
+
+<Canvas
+  additionalActions={[
+    {
+      title: 'Code in GitHub',
+      onClick: () => {
+        window.open(
+          'https://github.com/event-chat/event-chat/tree/main/packages/example/src/module/rpc/webSocket',
+          '_blank'
+        )
+      },
+    },
+  ]}
+  of={WebSocket}
+  sourceState="none"
+/>
 
 <Footer />

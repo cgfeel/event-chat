@@ -26,7 +26,9 @@ import Tag from './components/Tag'
 
 ## 介绍
 
-`@event-chat/rpc` 存在最大的意义在于，抹平了通信方式，让开发者从不同类型对象的收发消息中释放出来；转而只需要编写 `service` 上下文中来，更关注实际业务本身。
+`@event-chat/rpc` 存在最大的意义在于，抹平了通信方式，让开发者从不同类型对象的收发消息中释放出来；转而只需要编写 `service` 上下文，从而更关注实际业务本身。
+
+**特性：**
 
 - 纯浏览器客户端 `RPC` 库，支持：`iframe`、`web worker`、`service worker`、`messagePort`、`shared worker`、`webSocket` (client)
 - 提供心跳检测、消息发送、广播、多播，跨域、跨 `Window`、跨线程通信
@@ -170,7 +172,12 @@ const IframeCom: FC = () => {
 <TableList
   data={[
     {
-      desc: '驱动函数（必须提供），目前内置 9 个驱动方法，见下方说明；允许自行补充。',
+      desc: (
+        <>
+          驱动函数（必须提供），目前内置 9 个驱动方法，见下方说明 [<a href="#rpc-驱动函数">查看</a>
+          ]；允许自行补充。
+        </>
+      ),
       keyname: (
         <span>
           drive <strong className="text-red-500">*</strong>
@@ -436,7 +443,7 @@ const IframeCom: FC = () => {
   </TBody>
 </Table>
 
-由于 `SharedWorkerGlobalScope` 内部通过 `MessagePort` 进行通信，所以没有专门的驱动函数，但提供了观察方法，见下方补充说明。
+由于 `SharedWorkerGlobalScope` 内部通过 `MessagePort` 进行通信，所以没有专门的驱动函数，但提供了观察方法，见下方补充说明 [[查看](#观察共享实例)]。
 
 ### 自定义驱动函数
 
@@ -486,7 +493,11 @@ const IframeCom: FC = () => {
       type: ['number'],
     },
     {
-      desc: '调试方法',
+      desc: (
+        <>
+          调试方法 [<a href="#调试方法">查看</a>]
+        </>
+      ),
       keyname: 'debug',
       type: ['下方补充'],
     },
@@ -1074,8 +1085,7 @@ const { brodcastScope } = obseverShareWorkerGlobalScopeRPC(target, () => {
       consume: mainConsume.actions,
       event: workerCtx.actions,
     },
-    provider: ([rpc]) => {
-    },
+    provider: ([rpc]) => {},
   }
 })
 ```

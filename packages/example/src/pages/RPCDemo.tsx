@@ -329,9 +329,9 @@ const RPCDemo: FC = () => {
                   ，以及广播 <Tag>broadcast</Tag>
                 </li>
                 <li>
-                  <Tag>broadcast</Tag> 向服务端发送的请求支持 3 个类型：<Tag>string</Tag>，
-                  <Tag>ArrayBuffer</Tag>，<Tag>Blob</Tag>，为了类型统一，目前全部将发送的数据通过{' '}
-                  <Tag>JSON.strify</Tag> 转换成 <Tag>string</Tag> 再发送到服务端。
+                  向服务端发送的请求支持 3 个类型：<Tag>string</Tag>，<Tag>ArrayBuffer</Tag>，
+                  <Tag>Blob</Tag>，为了类型统一，目前全部将发送的数据通过 <Tag>JSON.strify</Tag>{' '}
+                  转换成 <Tag>string</Tag> 再发送到服务端。
                 </li>
                 <li>
                   要发送 <Tag>ArrayBuffer</Tag>，<Tag>Blob</Tag>，请额外再声明一个{' '}

@@ -22,9 +22,11 @@ import Tag from './components/Tag'
 
 <Header />
 
-# `RPC` 演示及文档
+# `RPC` 文档和演示
 
 ## 介绍
+
+`@event-chat/rpc` 存在最大的意义在于，抹平了通信方式，让开发者从不同类型对象的收发消息中释放出来；转而只需要编写 `service` 上下文中来，更关注实际业务本身。
 
 - 纯浏览器客户端 `RPC` 库，支持：`iframe`、`web worker`、`service worker`、`messagePort`、`shared worker`、`webSocket` (client)
 - 提供心跳检测、消息发送、广播、多播，跨域、跨 `Window`、跨线程通信
@@ -677,6 +679,16 @@ type RequestOptions<T = unknown> = IframeSerializeOptions &
 type upset = (options: FactoryOptions) => void
 ```
 
+### 发起请求
+
+实例通过 `request` 方法发起请求，请求的名称、所需的参数以及响应的类型，会根据提供的 `consume` 上下文自动推导，例如：
+
+```typescript
+rpc.request('connectWritableStream', { transfer: [payload], payload }).catch(() => {})
+```
+
+> 当提供 `consume` 上下文时，而通信的对象 `event` 没有绑定，发起请求不会得到响应，也不会报错
+
 ### 发起广播
 
 有两个方法发起广播
@@ -766,11 +778,10 @@ type upset = (options: FactoryOptions) => void
         <Tag>catch</Tag>
       </Td>
       <Td>
-        <Tag>RPC</Tag> 实例的 <Tag>request</Tag> 请求方法返回一个 <Tag>Promise</Tag> 对象，通过{' '}
-        <Tag>catch</Tag> 捕获请求异常。
+        <Tag>RPC</Tag> 实例的 <Tag>request</Tag> 是异步方法
       </Td>
       <Td>
-        发送消息遇到异常抛出错误时，将其作为 <Tag>catch</Tag> 的回调函数
+        通过 <Tag>catch</Tag> 捕获请求方法中的异常
       </Td>
       <Td className="w-16">可以</Td>
     </Tr>
@@ -1049,6 +1060,8 @@ self.addEventListener('fetch', (event) => {
   sourceState="none"
 />
 
+#### 观察共享实例
+
 `SharedWorkerGlobalScope` 作为共享线程，内部的通信全部共享一个线程（参考主线程），每个通信通过 `MessagePort` 隔离通信。因此舍弃针对 `SharedWorkerGlobalScope` 建立 `RPC` 实例监听。而是使用方法 `obseverShareWorkerGlobalScopeRPC` 通过观察模式发起通信，如下：
 
 ```typrscript
@@ -1101,6 +1114,83 @@ export const generateWorkerCtx = () =>
 
 在同一个 `sharedWorker` 中，由于共享一个线程，创建了多个 `RPC` 实例情况下，如果上下文的方法同名，可能会造成竞态请求；对此可以通过 `channel` 区分不同的实例。
 
+#### 观察其他类型实例
+
+`obseverShareWorkerGlobalScopeRPC` 是基于 `observerMessagePortRPC` 实现的，通过这个方法可以手动创建基于 `MessagePort` 的 `RPC` 实例，并将其添加到观察集合，如下：
+
+```typescript
+const { brodcastScope, push } = observerMessagePortRPC()
+push(port, () => ({
+  context: {},
+  destroy: true,
+  provider: ([rpc]) => {},
+}))
+```
+
+`observerMessagePortRPC` 返回 2 个方法：
+
+- `brodcastScope`：向观察的集合中，每个已连接的实例发送广播
+- `push`：手动添加实例到观察集合
+
+> 和 `obseverShareWorkerGlobalScopeRPC` 不同的是，手动添加实例可以针对单个实例去设置 `name`，用于筛选实例名称进行广播
+
+无论是 `observerMessagePortRPC` 还是 `React` 中的 `PRCProvider` 都是基于 `observerRPC` 实现多实例广播，对于非 `MessagePort` 类型的 `RPC` 实例，可以自行手动添加观察集合，如下：
+
+```typescript
+const { brodcastScope, clear, push } = observerRPC()
+push(port, {
+  context: {},
+  provider: ([rpc]) => {},
+})
+```
+
+`observerRPC` 返回 4 个方法：
+
+- `add`: 手动添加实例到观察集合
+- `brodcastScope`: 向观察的集合中，每个已连接的实例发送广播
+- `remove`: 手动删除观察集合中的实例
+- `clear`：清空集合中的实例
+
+相比较 `observerMessagePortRPC`，观察方法 `observerRPC` 更自由配置监控集合，因此没有扩展配置方法，需要初始化实例后自行添加到集合，如下：
+
+```typescript
+const { add, brodcastScope } = observerRPC()
+const [RPCIns] = createMessagePortRPC(target, {
+  context: {
+    config: {
+      onConnect: () => {
+        add(RPCIns, 'custom-name')
+      },
+    },
+  },
+})
+```
+
+每调用一次观察方法将创建 1 个集合，通过 `brodcastScope` 发起广播时，会向集合中每个已连接的实例发送广播；可以根据业务创建不同的集合进行广播；可以将不同类型的实例添加到集合中，例如：`worker`、`Window`、`MessagePort`，也可以借助观察方法，扩展到诸如 `Vue` 这样的框架中。
+
+#### 主线程中添加观察实例
+
+在 `PRCProvider` 内的子组件中使用 `useRPC` 创建的实例，会在初始化后自动添加到观察集合中。而 `MessagePort` 需要手动创建实例，即便是在主线程中，是不会添加到 `RPCProvider` 的观察集合中，可以手动通过 `hooks` 返回的方法 `mount` 挂载实例。如下：
+
+```typescript
+const DemoCom: FC = () => {
+  const { mount } = useContext(RPCInstanceContext);
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        const [rpc] = createMessagePortRPC(port);
+        mount(rpc, "custom-port");
+      }}
+    >
+      Add port
+    </button>
+  );
+};
+```
+
+`mount` 方法也可以通过 `useRPC` 获取，从集合中删除实例只需空缺第二个参数即可，如：`mount(rpc);`，对于非 `React` 环境的情况，例如原生 `JS`，可以调用 `observerRPC` 将实例添加到观察集合中，上述已说明不再重复描述。
+
 ### `BroadcastChannel` 广播
 
 <Canvas
@@ -1118,6 +1208,100 @@ export const generateWorkerCtx = () =>
   of={BroadcastChannel}
   sourceState="none"
 />
+
+`BroadcastChannel` 的存在目的就是为了不同的标签页、Window 之间广播，因此当通过 `BroadcastChannel` 创建 `RPC` 实例时，不支持通过 `request` 指定通信对象发起请求。
+
+广播和请求不同在于 `request` 请求，不会等待响应结果，只要符合广播范围的实例都会发起通信，可以通过 `channel` 等方式限制范围：
+
+<Table className={{ wrap: 'sb-unstyled' }}>
+  <Thead>
+    <Tr>
+      <Th className="w-20" sticky>
+        实例类型
+      </Th>
+      <Th className="w-20">
+        <Tag>RPC</Tag> 限制
+      </Th>
+      <Th>对象限制</Th>
+    </Tr>
+  </Thead>
+  <TBody>
+    <Tr>
+      <Td className="w-20" sticky>
+        <Tag>BroadcastChannel</Tag>
+      </Td>
+      <Td className="w-20">
+        <Tag>channel</Tag>
+      </Td>
+      <Td>
+        <Tag>name</Tag> 构造函数的第一个参数
+      </Td>
+    </Tr>
+    <Tr>
+      <Td className="w-20" sticky>
+        <Tag>MessagePort</Tag>
+      </Td>
+      <Td className="w-20">
+        <Tag>channel</Tag>
+      </Td>
+      <Td>只允许已连接的实例双方通信</Td>
+    </Tr>
+    <Tr>
+      <Td className="w-20" sticky>
+        <Tag>service worker</Tag>
+      </Td>
+      <Td className="w-20">
+        <Tag>channel</Tag>
+      </Td>
+      <Td>
+        <Tag>scope</Tag>、<Tag>url</Tag>，由于是共享 <Tag>active</Tag> 实例通信，所以同连接同{' '}
+        <Tag>scope</Tag> 都能和同一个 <Tag>worker</Tag> 线程通信
+      </Td>
+    </Tr>
+    <Tr>
+      <Td className="w-20" sticky>
+        <Tag>shared worker</Tag>
+      </Td>
+      <Td className="w-20">
+        <Tag>channel</Tag>
+      </Td>
+      <Td>
+        <Tag>name</Tag>，同名称实例共享一个 <Tag>worker</Tag> 线程
+      </Td>
+    </Tr>
+    <Tr>
+      <Td className="w-20" sticky>
+        <Tag>web socket</Tag>
+      </Td>
+      <Td className="w-20">
+        <Tag>channel</Tag>
+      </Td>
+      <Td>不限制</Td>
+    </Tr>
+    <Tr>
+      <Td className="w-20" sticky>
+        <Tag>web worker</Tag>
+      </Td>
+      <Td className="w-20">
+        <Tag>channel</Tag>
+      </Td>
+      <Td>受线程本身限制，只允许已连接的实例双方通信</Td>
+    </Tr>
+    <Tr>
+      <Td className="w-30" sticky>
+        <Tag>Window</Tag>
+      </Td>
+      <Td className="w-20">
+        <Tag>channel</Tag>
+      </Td>
+      <Td>
+        <Tag>source</Tag>
+      </Td>
+    </Tr>
+  </TBody>
+</Table>
+
+以上主要针对主线程进行描述，`worker` 线程基本由主线程发起连接，通信限制也和主线程保持一致，只有 `shared worker` 的内部 `SharedWorkerGlobalScope` 是通过 `MessagePort` 进行通信，所以限制的方式也和 `MessagePort` 一样。
 
 ### 使用 `Transfer` 转移对象
 
@@ -1137,6 +1321,45 @@ export const generateWorkerCtx = () =>
   sourceState="none"
 />
 
+#### 发起转移
+
+通过 `request` 或 `broadcast` 发起转移，转移的方式和 `postMessage` 一致
+
+- `payload`：作为通信的信息，用于存放转移的对象，但 `MessagePort` 只能放在 `transfer` 中转移
+- `transfer`：作为转移对象的集合，一次可以转移多个对象
+
+```typescript
+const messageChannel = new MessageChannel()
+const payload = new ArrayBuffer(16)
+
+rpc.request('sendMessage', { transfer: [messageChannel.port2, payload], payload }).catch(() => {})
+```
+
+由于 `transfer` 只允许转移一次，一旦成功转移对象将不允许再次转移，除非接收 `transfer` 的实例再次转发。因此配置了 `transfer` 对象，将无视请求配置 `retry` 次数，如果需要可以通过 `retryTimeout` 延长请求过期时间。
+
+#### 接收转移
+
+在上下文中获取转移的对象：
+
+- `MessagePort` 在上下文的方法中第二个参数，获取对象属性 `ports` 进行筛选筛选
+- 其他类型转移的对象可以直接定义在接收的消息类型中
+
+```typescript
+const workerCtx = createCtx(() => ({
+  sendMessage: (buff: ArrayBuff, info) => {
+    const { ports } = info ?? {}
+    ports.filter((item) => item instanceof MessagePort)
+  },
+}))
+```
+
+不同的 `transfer` 对象，可能由于转移对象生命周期等问题，造成转移失败。对于这种情况：
+
+- `request` 请求会通过 `Promise.reject` 抛出异常
+- `broadcast` 接受一个参数方法 `fallback` 作为异常捕获的回调函数。
+
+虽然对象只能转移一次，而作为广播可能会向多个实例进行通信，但仍旧保留了 `broadcast` 通过 `transfer` 转移对象的能力；因为接受广播的数量由业务决定，在允许的情况下确实可以用于转移对象，但不建议这样使用。
+
 ### `WebSocket` 通信
 
 <Canvas
@@ -1154,5 +1377,30 @@ export const generateWorkerCtx = () =>
   of={WebSocket}
   sourceState="none"
 />
+
+由于目前 `RPC` 实例托管的对象全部来自客户端，所以目前 `WebSocket` 也只提供了客户端支持；服务端部分待根据后续实际需求，再来评估如何完善。
+
+向服务端发送的请求支持 3 个类型：`string`，`ArrayBuffer`，`Blob`，为了类型统一消息类型，目前将数据通过 `JSON.strify` 转换成 `string` 再发送到服务端，也会将收到的服务端数据通过 `JSON.parse` 转换成对象。也就是说暂且不支持收发 `ArrayBuffer` 和 `Blob` 类型的消息，如果需要可以通过上下文的方式手动发送
+
+```typescript
+const socket = new WebSocket('...')
+useRPC({
+  event: webSocketCtx.action,
+  drive: createWebSocketRPC,
+  init: () => socket,
+})
+
+// 手动发送 ArrayBuff
+webSocketCtx.provider({ print: (buff: ArrayBuff) => socket.send(buff) })
+
+// 手动监听消息
+socket.onmessage((event) => {
+  if (event.data instanceof ArrayBuff) {
+    new Uint8Array(event.data)
+  }
+})
+```
+
+`rpc` 实例内部监听消息为了和外部做区分，通过消息中是否携带 `__RPC__` 属性值做判断
 
 <Footer />

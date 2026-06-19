@@ -45,6 +45,7 @@ export default defineConfig({
     }),
   ],
   html: {
+    title: 'EventChat',
     tags: (tags, { entryName }) => tags.concat([
       {
         tag: 'html',

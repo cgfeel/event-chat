@@ -1,7 +1,9 @@
 import { Canvas, Controls, Meta } from '@storybook/addon-docs/blocks'
+import { Tabs } from 'antd'
 import EventChat from './EventChat'
 import EventChatStories, { Default, Group, Schema, Token } from './EventChat.stories'
 import './assets/story-styles.css'
+import Alert from './components/Alert'
 import Footer from './components/Footer'
 import Header from './components/Header'
 import ListObserver from './components/ListObserver'
@@ -29,22 +31,48 @@ import Tag from './components/Tag'
 
 ## 介绍
 
-- 提供名字和回调方法，`Hooks` 会返回一个 `emit`
-- 用 `emit` 可以向指定名称发送消息，也可以给事件名提供 `callback` 用于接收消息
-- 无论是否是父子层级都能相互通信，不会引发不必要的 `rerender`
+提供一个事件名和回调方法用于接收消息，同时返回一个 `emit` 用于向其事件名传递消息，无论组件层级都能传递信息，不会引发不必要的 `rerender`。
 
 ## 安装
 
-```shell
-# npm
-npm install @event-chat/core
-
-# yarn
-yarn add @event-chat/core
-
-# pnpm
-pnpm add @event-chat/core
-```
+<Tabs
+  defaultActiveKey="npm"
+  items={[
+    {
+      key: 'npm',
+      label: 'npm',
+      children: (
+        <Alert>
+          <span>
+            <span className="text-red-700">npm</span> install @event-chat/core
+          </span>
+        </Alert>
+      ),
+    },
+    {
+      key: 'yarn',
+      label: 'yarn',
+      children: (
+        <Alert>
+          <span>
+            <span className="text-red-700">yarn</span> install @event-chat/core
+          </span>
+        </Alert>
+      ),
+    },
+    {
+      key: 'pnpm',
+      label: 'pnpm',
+      children: (
+        <Alert>
+          <span>
+            <span className="text-red-700">pnpm</span> install @event-chat/core
+          </span>
+        </Alert>
+      ),
+    },
+  ]}
+/>
 
 ## 目录
 
@@ -96,16 +124,16 @@ pnpm add @event-chat/core
         </>
       ),
       keyname: 'detail',
-      type: ['Schema', 'unknown'],
+      type: ['Schema'],
     },
     {
       desc: (
         <>
-          收到的消息是否发有发送到公屏，来自 <Tag>emit</Tag>
+          收到的消息是否发同时发送到公屏，来自 <Tag>emit</Tag>
         </>
       ),
       keyname: 'global',
-      type: ['boolean', 'undefined'],
+      type: ['boolean'],
     },
     {
       desc: (
@@ -114,7 +142,7 @@ pnpm add @event-chat/core
         </>
       ),
       keyname: 'group',
-      type: ['Group', 'undefined'],
+      type: ['Group'],
     },
     { desc: '内部生成的唯一字符', keyname: 'id', type: ['string'] },
     {
@@ -135,10 +163,10 @@ pnpm add @event-chat/core
         </>
       ),
       keyname: 'token',
-      type: ['string', 'undefined'],
+      type: ['string'],
     },
     {
-      desc: '事件促发事件',
+      desc: '事件促发时间',
       keyname: 'time',
       type: ['Date'],
     },
@@ -149,7 +177,7 @@ pnpm add @event-chat/core
         </>
       ),
       keyname: 'type',
-      type: ['Type', 'undefined'],
+      type: ['Type'],
     },
   ]}
 />
@@ -163,7 +191,7 @@ pnpm add @event-chat/core
 
 ### `debug`：调试方法
 
-接收的参数来自 `zod` 校验失败后的对象
+接收的消息分别来自：初始化、发送消息、发送失败、收到消息校验失败，可根据回调参数中的 `status` 进行判断
 
 ```typescript
 type ResultType<Schema = unknown> = Omit<z.ZodSafeParseError<Schema>, 'data'> & {
@@ -174,57 +202,64 @@ type ResultType<Schema = unknown> = Omit<z.ZodSafeParseError<Schema>, 'data'> & 
 
 ### `emit`：发送消息的方法
 
-送消息方法的参数类型如下：
+方法的参数为一个对象，属性如下：
 
 <TableList
   data={[
     {
-      desc: '发送的消息内容，可以是任意值，这里作为泛型进行收集。只有接收方匹配才能收到消息',
-      keyname: 'detail',
-      type: ['Detail', 'undefined'],
-    },
-    {
-      desc: '用于群组成员是否发送消息到公屏',
-      keyname: 'global',
-      type: ['boolean', 'undefined'],
-    },
-    {
       desc: '接收消息的事件名',
-      keyname: 'name',
+      keyname: (
+        <>
+          name <font color="red">*</font>
+        </>
+      ),
       type: ['NamepathType'],
     },
     {
-      desc: '接收事件消息的密钥',
+      desc: '发送的消息内容，泛型可以是任意值。只有类型匹配的接收方才能收到消息',
+      keyname: 'detail',
+      type: ['Detail'],
+    },
+    {
+      desc: '群组成员发送消息允许公屏接收',
+      keyname: 'global',
+      type: ['boolean'],
+    },
+    {
+      desc: '私信的密钥',
       keyname: 'token',
-      type: ['string', 'undefined'],
+      type: ['string'],
     },
   ]}
 />
 
-额外说明：
+当 `canllback` 收到信息时除了发送的消息还会看到：
 
-- `group`、`token` 仅用于接收方比对，接收方最终根据自身配置，透传给 `callback` 作为参数
+- `group`、`token` 仅用于接收方比对，接收方最终根据自身配置作为回调，不会暴露发送是的值
 - `id`、`time` 为内部生成
-- `origin`、`type` 将根据 `useEventChat` 配置自动添加
+- `origin`、`type` 将根据 `useEventChat` 配置展示在回调信息中
 
 ### `NamepathType`：事件名
 
-类型如下，可以接受字符、数值、以及字符和数值的元祖：
+类型如下，可以接受字符、数值、以及字符和数值的元祖、字符和数值的数组：
 
 ```ts
 type NamepathType = number | string | Array<string | number> | Readonly<Array<string | number>>
 ```
 
-- 可以定义为字符名称：`pub-mox`（推荐，简单直接推导）
-- 可以定义为通过 `.` 划分的 `namepath`：`pub.mox`（例如 `formily` 的路径结构）
-- 可以定义为数组划分的 `namepath`：`['pub', 0, 'mox']`（例如 `antd` 的路径结构）
-- 当定义为元祖的时候会丢失原有的可读性，于是允许传递 `readonly` 的元祖维持可读性
+可以定义为以下类型
 
-> 当设置字符类型的 `namepath` 时，事件名和元祖类型可能不相等。例如：`['pub.mox', 0, 'name']` 和 `pub.mox.0.name` 得到的事件名不相等。
+- 字符：`pub-mox`
+- `formily` 风格的 `namepath`，通过 `.` 划分结构：`pub.mox`
+- `antd` 风格的 `namepath`，以数组划分结构：`['pub', 0, 'mox']`
+
+当路径定义为数组类型时，会丢失原有的可读性，使用 `readonly` 作为元祖，可保持路径可读性。
+
+> 字符类型的 `namepath` 和元祖类型可能不相等。例如：`['pub.mox', 0, 'name']` 和 `pub.mox.0.name` 得到的事件名不相等，前者会转换成 `pub.mox[0].name`
 
 ## `schema`：指定消息类型
 
-通过 `Zod` 来实现，提供一个 `schema` 后只有类型匹配的消息才会被接收。
+通过 `Zod` 的 `schema` 校验类型，只有类型匹配的消息才会被接收。
 
 <Canvas
   additionalActions={[
@@ -260,11 +295,11 @@ type NamepathType = number | string | Array<string | number> | Readonly<Array<st
   sourceState="none"
 />
 
-提供 `schema` 后回调函数 `callback` 的参数对象中的属性 `detail`，会根据 `schema` 模型定义的规则推断数据类型。只有类型校验通过的数据才会被接收。所以无论消息怎么发，最终接收的一定是约定好的类型。
+提供 `schema` 后 `callback` 回调参数对象中的属性 `detail`，会根据 `schema` 模型定义的规则推断数据类型。无论消息怎么发，最终收到的一定是约定好的类型。
 
 ### 异步消息
 
-`Zod` 是允许异步校验的，这里通过 `async` 来实现，例如：
+`Zod` 允许通过 `refine` 自定义校验规则，支持异步校验和同步校验异，当需要异步校验时，需配置入参对象的属性 `async` 为 `true`，例如：
 
 ```typescript
 const { emit } = useEventChat('pub-mox', {
@@ -279,8 +314,6 @@ const { emit } = useEventChat('pub-mox', {
   },
 })
 ```
-
-通过 `Zod` 的 `refine` 可以实现异步或同步的自定义校验规则，例如 `return type === 'customType'`
 
 ## `group`：群组消息
 
@@ -313,12 +346,12 @@ const { emit } = useEventChat('pub-mox', {
 
 ### “公屏“喊话
 
-对于组内的成员，如果需要在 “公屏” 喊话，调用 `emit` 时可以提供一个 `global`，这样发送到群组内部的同时会将信息发送到“公屏“同名事件中，例如：
+组内的成员需要在 “公屏” 喊话，调用 `emit` 时设置属性 `global` 为 `true`，这样发送到群组内部的消息，同时会发送到“公屏“同名事件中，例如：
 
 ```typescript
 useEventChat('pub-mox', {
   callback: (record) => {
-    // receive undefined
+    // receive.group is undefined
     console.log('a----pub-mox', record.group)
   },
 })
@@ -329,9 +362,9 @@ const { emit } = useEventChat('sub-mox', {
 emit({ global: true, name: 'pub-mox' })
 ```
 
-由于“公屏“同名事件并没有提供 `group`，所以在回调函数的参数中属性 `group` 将得到 `undefined`，除非将其设为组内成员，否则无法拿到 `group` 具体值。
+由于“公屏“同名事件并没有提供 `group`，所以在回调参数的对象属性 `group` 为 `undefined`；除非将其设为组内成员，否则无法拿到 `group` 具体值。
 
-> 发送到“公屏“时，同名非同组的组内事件无法收到消息，组内消息只能组内传递，或通过 `global` 同步发送给非组内的“公屏“同名事件。同理非组内成员除非通过 `group` 设为组内成员，否则无法向组内发送消息。
+> 不同组的同名事件无法通信，即便传递的消息设置 `group` 也不行；组内消息只能组内传递，或通过 `global` 同步发送给非组内的同名事件。
 
 ### 群组成员屏蔽“公屏“
 
@@ -350,18 +383,8 @@ useEventChat('pub-mox', {
 
 ### 同组件同事件名多群组
 
-方式 1：一个组件中可以声明多个 `hooks` 来实现多个群组
-
-考虑过让 `group` 支持类型包含：`string | string[] | undefined`，但这就有两个问题：
-
-- `emit` 时自动附带配置的 `group`，当发送消息时是否希望所有群组都收到相同消息，应由业务决定
-- `emit` 也可以发送自定义 `group`，但这样会存在一个问题，`emit` 时添加了自身以外的群组，是直接报错或忽略当前 `detail`？显然业务来决定更合适（这两种方案都不能在接收方通过 `debug` 收集错误，增加了调试复杂度）
-
-> 因此目前来看，如果一个组件要加入多个群组，在同一个业务组件里同时声明多个 `hooks` 更合适。
-
-方式 2：通过 `schema` 做区分
-
-分组过多同组件同事件名，声明不同 `group` 可能会造成业务复杂度上升，通过 `schema` 做区分会更合适，全部示例：
+- 方式 1：一个组件中可以声明多个 `hooks` 来实现多个群组
+- 方式 2：通过 `schema` 做区分
 
 ```typescript
 useEventChat('multiple-event', {
@@ -402,7 +425,7 @@ useEventChat('multiple-event', {
 
 ## `token`：私信
 
-配置参数 `token: true` 后，将只接受 `emit` 带有对应的 `token` 发送的消息。
+调用 `useEventChat` 返回的对象属性中，包含一个 `token` 字符；当接收事件参数配置 `token` 为 `true`，将只接受 `emit` 时携带 `token` 字符和接收事件一致的消息。
 
 <Canvas
   additionalActions={[
@@ -429,28 +452,12 @@ useEventChat('multiple-event', {
   sourceState="none"
 />
 
-每次创建会话时 `token` 会连同 `emit` 一起返回，将拿到的 `token` 提供给发送方（例如：`props`、`context`...），通过 `emit` 发送消息时携带 `token` 即可发送私信
+通过 `useEventChat` 拿到的 `token` 可以通过例如：`props`、`context` 等方式转移给指定组件，用于触发私信。
 
-> 私信发送允许和 `group` 一样，通过 `group` 同时发送到 “公屏“，操作流程见 `group`
+> 私信发送允许和 `group` 一样通过 `global` 同时发送到 “公屏“，操作流程见 `group`
 
-### 携带 `token` 发送消息
+**携带 `token` 发送消息**
 
-和接收消息同理，当 `emit` 发送消息携带了 `token` 但没有设置 `global` 的情况下，只能向指定 `token` 对应的接收方发送消息，其他同名事件无法获取到消息。
-
-> `emit` 发送消息时 `group` 和 `token` 一样，不同的是 `group` 按照配置自动携带，而 `token` 需要手动配置
-
-## `debug`：调试
-
-和 `callback` 一样，提供一个 `debug` 回调函数，将收集所有通过 `emit` 发送的同名事件，但未能匹配接收消息的规则，而触发的消息，例如：
-
-```typescript
-useEventChat('pub-mox', {
-  group: 'form-detail-edit',
-  callback: (record) => console.log('a----pub-mox', record),
-  debug: (result) => console.log('a----pub-log', result),
-})
-```
-
-调试方法中的参数 `result` 来自 `z.safeParse` 得到的错误结果，包含了 `emit` 发送的信息，以及错误原因等情况
+当 `emit` 发送消息携带了 `token` 但没有设置 `global` 的情况下，只能向 `token` 一致的事件发送消息。
 
 <Footer />

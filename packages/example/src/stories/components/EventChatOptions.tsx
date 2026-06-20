@@ -42,11 +42,11 @@ export interface EventChatOptionsProps<
    */
   type?: Type
   /**
-   * 消息回调函数，接受的参数类型将包含和指定的 `schema` 类型一致的 `detail`，详细见下方说明
+   * 消息回调函数，详细见下方说明
    */
   callback?: (target: DetailType<Name, Schema, Group, Type, Token>) => void
   /**
-   * 调试函数，收集不满足条件收信要求的消息
+   * 调试函数，详细查看 `DebugAndError` 章节
    */
   debug?: (result?: ResultType) => void
 }

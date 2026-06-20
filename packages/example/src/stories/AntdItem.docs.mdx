@@ -1,4 +1,5 @@
 import { Canvas, Controls, Meta } from '@storybook/addon-docs/blocks'
+import { Tabs } from 'antd'
 import Table, { TBody, Td, Th, Thead, Tr } from '@/components/TableVirtual'
 import AntdItem from './AntdItem'
 import AntdItemStories, {
@@ -11,6 +12,7 @@ import AntdItemStories, {
   FormUpdateFields,
 } from './AntdItem.stories'
 import './assets/story-styles.css'
+import Alert from './components/Alert'
 import Footer from './components/Footer'
 import Header from './components/Header'
 import ListObserver from './components/ListObserver'
@@ -25,36 +27,88 @@ import Tag from './components/Tag'
 
 ## 介绍
 
-这是一个用 `@event-chat/core` 扩展 `Antd Form` 组件的库。
+用 `@event-chat/core` 扩展 `Antd` 的表单组件，使其拥有 `zod` 的 `schema` 能力，`Formily` 的 `NamePath` 能力。
 
-是否遇到过这样的场景：
+场景：
 
-- 当更新字段 `A` 的时候，字段 `B` 需要根据 `A` 的结果做出反应
-- 一个字段的值要在不同业务交互下，根据配置做出相应反应
-- 不同的业务需要经过不同的逻辑交付相同类型的字段
+- 字段 `B` 依赖字段 `A` 的响应结果做出反应
+- 字段值要在不同业务交互下，调整配置的 `schema` 做出相应反馈
+- 表单需要在不同的业务下，经过各自逻辑交付预期类型的数据
 
 现有的 `antd` 有这么几个问题：
 
-- 受控能力有限，不能对每次设置做出精准的反应
-- 不同的业务场景下，需要写多套逻辑，且不能复用
+- 受控能力有限，不能对 `setFieldValue` 手动设置的值做出依赖监听
+- 不同的业务场景下，一个组件需要写多套逻辑且不能复用
 - 表单交互逻辑无法解耦，多个无关的 `state` 堆砌在一个组件中
 
-`@event-chat/antd-item` 目的就是为抽离这块逻辑，能够解耦表单交互，让组件最小到字段去单独处理逻辑
+`@event-chat/antd-item` 抽离表单的交互逻辑，解耦交互，让组件最小到字段去单独处理业务逻辑
 
 ## 安装
 
-`@event-chat/antd-item` 允许单独安装，建议搭配 `zod` 和 `@event-chat/core`，因为 `zod` 可以提供字段接受的类型，而 `@event-chat/core` 允许在封装之外更灵活的自定义表单交互 [[查看](/docs/document-eventchat--docs)]。
+`@event-chat/antd-item` 允许单独安装，建议搭配 `zod` 和 `@event-chat/core`。
 
-```shell
-# npm
-npm install @event-chat/item
-
-# yarn
-yarn add @event-chat/item
-
-# pnpm
-pnpm add @event-chat/item
-```
+<Tabs
+  defaultActiveKey="npm"
+  items={[
+    {
+      key: 'npm',
+      label: 'npm',
+      children: (
+        <Alert>
+          <span>
+            <span className="text-red-700">npm</span> install zod{' '}
+            <span className="text-slate-400"># 可选</span>
+          </span>
+          <span>
+            <span className="text-red-700">npm</span> install @event-chat/core{' '}
+            <span className="text-slate-400"># 可选</span>
+          </span>
+          <span>
+            <span className="text-red-700">npm</span> install @event-chat/item
+          </span>
+        </Alert>
+      ),
+    },
+    {
+      key: 'yarn',
+      label: 'yarn',
+      children: (
+        <Alert>
+          <span>
+            <span className="text-red-700">yarn</span> install zod{' '}
+            <span className="text-slate-400"># 可选</span>
+          </span>
+          <span>
+            <span className="text-red-700">yarn</span> install @event-chat/core{' '}
+            <span className="text-slate-400"># 可选</span>
+          </span>
+          <span>
+            <span className="text-red-700">yarn</span> install @event-chat/core
+          </span>
+        </Alert>
+      ),
+    },
+    {
+      key: 'pnpm',
+      label: 'pnpm',
+      children: (
+        <Alert>
+          <span>
+            <span className="text-red-700">pnpm</span> install zod{' '}
+            <span className="text-slate-400"># 可选</span>
+          </span>
+          <span>
+            <span className="text-red-700">pnpm</span> install @event-chat/core{' '}
+            <span className="text-slate-400"># 可选</span>
+          </span>
+          <span>
+            <span className="text-red-700">pnpm</span> install @event-chat/core
+          </span>
+        </Alert>
+      ),
+    },
+  ]}
+/>
 
 ## 目录
 
@@ -79,16 +133,18 @@ pnpm add @event-chat/item
   sourceState="none"
 />
 
-`antd` 的 `setFieldValue` 将作为手动更新，不会被 `dependencies` 监听，而通过 `formEvent` 向受控字段通过 `emit` 触发更新，指定字段会通过 `onChange` 模拟自然更新从而被精准捕获到更新。
+在 `Antd` 中通过 `setFieldValue` 更新字段视为手动更新，不会被 `dependencies` 监听；而通过 `formEvent` 向受控字段通过 `emit` 触发更新，指定字段会通过 `onChange` 模拟表单组件 `onChange` 从而被依赖字段精准捕获到更新。
 
-`emit` 的方法见 `@event-chat/core` [[查看](#tag1)]，`@event-chat/antd-item` 会收集：
+> `emit` 的方法见 `@event-chat/core` [[查看](/docs/document-eventchat--docs#emit发送消息的方法)]
+
+`@event-chat/antd-item` 会收集：
 
 - 表单每个字段名作为事件名，用于收集传递的信息
 - `Form` 组件的 `name` 作为表单以及表单字段的 `group`，用于区别同时存在的多个表单
 
 ## API 参数
 
-扩展了 `antd Form` 组件，大致如下：
+扩展 `Antd` 表单如下：
 
 - 扩展子组件：`Item`、`List`
 - 扩展方法：`useForm`、`useFormInstance`
@@ -97,57 +153,59 @@ pnpm add @event-chat/item
 
 ### `Form`
 
-沿用 `Form` 组件原有的属性，通过透传的方式赋予表单的能力。除此之外做了以下补充：
+沿用 `Form` 组件原有的属性，通过透传的方式保持表单原有的能力。除此之外做了以下补充：
 
 <TableList
   data={[
     {
       desc: (
         <>
-          扩展 <Tag>Antd Form</Tag> 原有的实例 <Tag>FormInstance</Tag>，见下方说明 [<a>查看</a>
-          ]，接收提供未扩展的 <Tag>FormInstance</Tag> 实例，会在内部补充实例属性
+          扩展表单原有的 <Tag>FormInstance</Tag>，见下方说明 [
+          <a href="#formuseforminstance">查看</a>
+          ]，接受 <Tag>FormInstance</Tag>{' '}
+          实例后，会在内部判断是否需要扩充，并最终在上下文中使用扩展后的实例。
         </>
       ),
       keyname: 'form',
-      type: ['FormEventInstance<Name, Group>', 'undefined'],
+      type: ['FormEventInstance<Name, Group>'],
     },
     {
       desc: '用于区别多个表单的情况',
       keyname: 'global',
-      type: ['string', 'undefined'],
+      type: ['string'],
     },
     {
       desc: (
         <>
-          沿用 <Tag>Antd Form</Tag> 现有的属性 <Tag>name</Tag>，用于向表单下任意字段发起更新。
+          沿用 <Tag>Form</Tag> 组件 <Tag>name</Tag> 属性，用于向表单下任意字段发起更新。
         </>
       ),
       keyname: 'name',
-      type: ['string', 'undefined'],
+      type: ['string'],
     },
   ]}
 />
 
 ### `Form.Item`
 
-沿用 `Form.Item` 组件原有的属性，通过透传的方式赋予表单项的能力。除此之外做了以下补充：
+沿用 `Form.Item` 组件原有的属性，通过透传的方式保持表单原有的能力。除此之外做了以下补充：
 
 <TableList
   data={[
     {
       desc: (
         <>
-          当表单字段接收类型受异步 <Tag>schema</Tag> 约束时需要一同配置
+          当字段 <Tag>schema</Tag> 存在异步校验时需要一同配置
         </>
       ),
       keyname: 'async',
-      type: ['boolean', 'undefined'],
+      type: ['boolean'],
     },
     {
       desc: (
         <>
-          表单字段名，同时也用于接收事件。对于 <Tag>Form.List</Tag> 下的 <Tag>Form.Item</Tag>
-          ，会自动补全字段名。字段名的类型在扩展时做了约束，见下方说明。
+          使用字段名接收事件。对于 <Tag>Form.List</Tag> 下的 <Tag>Form.Item</Tag>
+          ，会自动补全字段名。
         </>
       ),
       keyname: 'name',
@@ -156,44 +214,41 @@ pnpm add @event-chat/item
     {
       desc: (
         <>
-          表单字段接收的数据类型，不提供时接收的数据类型为 <Tag>unknown</Tag>。自然输入时配置{' '}
-          <Tag>schema</Tag> 将会默认补充一条 <Tag>Rule</Tag> 作为字段校验的规则
+          设置字段的数据类型，用于触发更新比对数据，以及表单校验时作为 <Tag>Rule</Tag> 判断。
         </>
       ),
       keyname: 'schema',
-      type: ['ZodType', 'undefined'],
+      type: ['ZodType'],
     },
     {
       desc: (
         <>
-          透传至 <Tag>useEventChat</Tag> 的选项属性 <Tag>callback</Tag>，用于响应字段更新
-          。除此之外，回调函数中会追加字段的 <Tag>emit</Tag> 作为第二个参数，便于继续受控后操作。
+          透传给 <Tag>useEventChat</Tag> 作为 <Tag>callback</Tag>
+          ，用于响应字段更新。回调函数中追加当前字段名下的 <Tag>emit</Tag>{' '}
+          作为第二个参数，便于受控后继续操作。
         </>
       ),
       keyname: 'callback',
-      type: ['Function', 'undefined'],
+      type: ['Function'],
     },
     {
       desc: (
         <>
-          透传至 <Tag>useEventChat</Tag> 的选项属性 <Tag>debug</Tag>
-          。调试时用于收集所有未匹配字段规则的消息
+          透传至 <Tag>useEventChat</Tag> 作为 <Tag>debug</Tag>，用于当前字段调试用。
         </>
       ),
       keyname: 'debug',
-      type: ['Function', 'undefined'],
+      type: ['Function'],
     },
     {
       desc: (
         <>
-          和 <Tag>callback</Tag> 一样用于响应字段更新。
-          <Tag>onChange</Tag> 按照 <Tag>Antd</Tag> 表单规则，会透传到字段内部表单组件中，将{' '}
-          <Tag>callback</Tag> 回调中的 <Tag>detail</Tag> 作为参数更新字段，同样也提供第二个参数{' '}
-          <Tag>emit</Tag>
+          和 <Tag>callback</Tag> 一样用于响应字段更新，不同在于 <Tag>onChange</Tag>{' '}
+          拿到的第一个参数是字段具体值。
         </>
       ),
       keyname: 'onChange',
-      type: ['Function', 'undefined'],
+      type: ['Function'],
     },
     {
       desc: (
@@ -208,7 +263,7 @@ pnpm add @event-chat/item
   ]}
 />
 
-`NamepathType` 类型：
+`NamepathType` 类型和 `@event-chat/core` 保持一致 [[查看](/docs/document-eventchat--docs#namepathtype事件名)]：
 
 ```typescript
 type NamepathType = number | string | Array<string | number> | Readonly<Array<string | number>>
@@ -225,138 +280,77 @@ onChange?: (
   ) => void;
 ```
 
-> 原来的 `Form.Item` 的子组件如果是一个函数时，会将 `FormInstance` 作为回调函数。由于扩展了实例 `FormInstance`，回调函数中 `form` 实例将包含：`name`、`group`、`emit` [[查看](tag2)]。
+> 原来的 `Form.Item` 的子组件如果是一个函数时，会将 `FormInstance` 作为回调函数。由于扩展了实例 `FormInstance`，回调函数中 `form` 实例将包含：`name`、`group`、`emit` [[查看](#formuseforminstance)]。
 
-扩展的 `Form.Item` 包含 2 个 `onChange`，一个是 `Antd` 表单组件本身自带的 `onChange`，一个是通过 `@event-chat/core` 扩展 `Form.Item` 后补充的 `onChange`，两者差异：
+扩展的 `Form.Item` 包含 2 个 `onChange`，一个是表单组件本身自带的 `onChange`，一个是扩展 `Form.Item` 后补充的属性 `onChange`，两者差异：
 
-<Table className={{ wrap: 'sb-unstyled' }}>
-  <Thead>
-    <Tr>
-      <Th className="w-30" sticky>
-        更新场景
-      </Th>
-      <Th>
-        <Tag type="info">Form.Item</Tag> 扩展属性
-      </Th>
-      <Th>表单组件属性</Th>
-    </Tr>
-  </Thead>
-  <TBody>
-    <Tr>
-      <Td className="w-30" sticky>
-        所属组件
-      </Td>
-      <Td>
-        <Tag>Form.Item</Tag>
-      </Td>
-      <Td>
-        表单组件，例如：<Tag>Input</Tag>
-      </Td>
-    </Tr>
-    <Tr>
-      <Td className="w-30" sticky>
-        ①自然输入
-      </Td>
-      <Td>
-        不会触发扩展的 <Tag>onChange</Tag> 回调，但会将 <Tag>schema</Tag> 转换成一条 <Tag>Rule</Tag>
-        ，用于自然输入后校验，更新的数据不一定符合预期
-      </Td>
-      <Td>
-        触发表单组件 <Tag>onChange</Tag>，更新数据后通过 <Tag>rule</Tag>{' '}
-        校验，更新的值不一定符合预期
-      </Td>
-    </Tr>
-    <Tr>
-      <Td className="w-30" sticky>
-        ②通过 <Tag>emit</Tag> 手动更新
-      </Td>
-      <Td>
-        触发扩展的 <Tag>onChange</Tag>，若配置了 <Tag>schema</Tag>{' '}
-        将在数据更新前完成校验，更新的数据一定符合预定类型；否则需要配置 <Tag>rule</Tag>{' '}
-        在数据更新后进行校验，更新的数据不一定符合预期。建议使用 <Tag>schema</Tag> 代替{' '}
-        <Tag>rule</Tag>，否则一起使用会在最终提交表单时，重复校验。
-      </Td>
-      <Td>不支持手动更新</Td>
-    </Tr>
-  </TBody>
-</Table>
+- 字段的 `onChange` 不响应自然输入的更新，和 `callback` 一样用于 `emit` 触发后响应
 
-`Form.Item` 扩展的 `onChange` 和表单组件的 `onChange` 一样的地方：
-
-- 通过 `setFieldValue` 手动设置的值都不响应
-- 都会响应后更新字段数据，并触发相应操作，如：`getValueFromEvent`
-- 提交表单时，更新的数据都会再次校验，不符合要求的情况会被拦截操作
-
-> 由于触发的场景不一样，校验逻辑也不一样，为了避免混淆没有合并 `onChange` 回调方法。
-
-由于以上特性，因此建议：
-
-- 多个字段间存在主控和受控关系时，使用 `emit` 代替 `setFieldValue` 等默认的手动设置方法
+> 需要多个字段间存在主控和受控关系时，建议使用 `emit` 代替 `setFieldValue`
 
 ### `Form.List`
 
-沿用 `Form.List` 组件原有的属性，通过透传的方式赋予表单列表项的能力。
+沿用 `Form.List` 组件原有的属性，通过透传的方式保持表单原有的能力。除此之外做了以下补充：
 
-列表项扩展的属性和上述的 `Form.Item` 一致。它们的内部都是通过增加一个同字段名的 `Form.Item` 来捕获并触发更新。
+- `List` 下使用 `Item` 时，内部会自动根据上下文，计算并补全路径，用于收发消息
+- 可以通过 `emit` 触发整个列表更新，响应结果允许触发依赖字段刷新
+- 为表单列表提供 `schema` 的能力，用于 `Rule` 校验和 `emit` 更新判断
 
 ### `Form.useForm`
 
-沿用 `useForm` 原本的能力，返回的 `FormInstance` 补充以下属性：
+`useForm` 用于返回 `FormInstance` 实例，通过组件属性 `form` 提供给 `Form` 组件使用。扩展沿用 `useForm` 原本的能力，补充以下属性：
 
 <TableList
   data={[
     {
       desc: '表单所属群组',
       keyname: 'group',
-      type: ['string', 'undefined'],
+      type: ['string'],
     },
     {
       desc: '用于向表单下任意字段发起更新',
       keyname: 'name',
-      type: ['string', 'undefined'],
+      type: ['string'],
     },
     {
       desc: (
         <>
-          用于向表单字段发起更新的方法，详细见 <Tag>@event-chat/core</Tag> [<a>查看</a>]
+          触发字段更新，见 <Tag>@event-chat/core</Tag> [
+          <a href="/docs/document-eventchat--docs#emit发送消息的方法">查看</a>]
         </>
       ),
       keyname: 'emit',
-      type: ['Function', 'undefined'],
+      type: ['Function'],
     },
   ]}
 />
 
-`Form.useForm` 和 `Antd` 现有的方法一样，允许在创建表单组件之前，声明一个 `FormInstance`，通过属性 `form` 提供给 `Form` 组件，以便在外层对表单进行操作。
-
-补充的属性和方法见 `@event-chat/core` [[查看](#tag1)]
-
-参数：
+扩展后的参数：
 
 <TableList
   data={[
     {
       desc: (
         <>
-          配置项，允许提供 <Tag>group</Tag> 或 <Tag>name</Tag>
+          可选配置 <Tag>group</Tag> 或 <Tag>name</Tag>
         </>
       ),
       keyname: 'options',
-      type: ['FormOptions<Name, Group>', 'undefined'],
+      type: ['FormOptions<Name, Group>'],
     },
     {
       desc: (
         <>
-          可以提供一个 <Tag>FormInstance</Tag>，将其转变为 <Tag>FormEvent</Tag> 可用的实例
+          提供一个 <Tag>FormInstance</Tag>，内部会对其判断或操作得到 <Tag>FormEvent</Tag> 可用的实例
         </>
       ),
       keyname: 'formInit',
-      type: ['FormEventInstance<Name, Group>', 'undefined'],
+      type: ['FormEventInstance<Name, Group>'],
     },
   ]}
 />
 
-`FormOptions` 会根据提供的配置，扩充返回的 `FormInstance` 实例，类型如下：
+扩充返回的 `FormInstance` 实例类型如下：
 
 ```typescript
 type FormOptions<Name extends NamepathType, Group extends string | undefined = undefined> = {
@@ -372,38 +366,14 @@ type FormOptions<Name extends NamepathType, Group extends string | undefined = u
 
 `Form.useForm` 和 `Form` 组件，都允许提供 `name` 和 `group` 扩充 `FormInstance`，优先级如下：
 
-- `name`：优先 `Form` 提供的属性，因为这是 `antd` 自身的属性
-- `group`：优先 `Form.useForm` 提供的属性
+- `name`：`Form` 组件优先，因为这是 `Antd` 表单组件原有的属性
+- `group`：`Form.useForm` 优先，这是扩充的属性
 
 ### `Form.useFormInstance`
 
-沿用 `useFormInstance` 原本的能力，允许在表单下的子组件中，返回 `FormInstance` 并补充以下属性：
+沿用 `useFormInstance` 原本的能力，允许在表单下的子组件中，返回已扩充的 `FormInstance` 实例。
 
-<TableList
-  data={[
-    {
-      desc: '表单所属群组',
-      keyname: 'group',
-      type: ['string', 'undefined'],
-    },
-    {
-      desc: '用于向表单下任意字段发起更新',
-      keyname: 'name',
-      type: ['string', 'undefined'],
-    },
-    {
-      desc: (
-        <>
-          用于向表单字段发起更新的方法，详细见 <Tag>@event-chat/core</Tag> [<a>查看</a>]
-        </>
-      ),
-      keyname: 'emit',
-      type: ['Function', 'undefined'],
-    },
-  ]}
-/>
-
-需要说明的是 `Form.useFormInstance` 扩展的属性全部为可选值，因为是通过上下文获取，如果没有在 `FormEvent` 内部使用，的确可能拿到的是 `undefined`。使用的时候需要通过 `?.` 来调用，例如：`form?.emit`。
+> 需要说明的是 `Form.useFormInstance` 扩展的属性全部为可选值，因为是通过上下文获取，如果没有在 `FormEvent` 内部使用，的确可能拿到的是 `undefined`。使用的时候需要通过 `?.` 来调用，例如：`form?.emit({ ... })`。
 
 ### `FormInstance`
 
@@ -411,7 +381,7 @@ type FormOptions<Name extends NamepathType, Group extends string | undefined = u
 
 ### `observer`
 
-补充的一个方法，用于对齐 `antd` 在业务和库之间的上下文，例如：主题、配色等。通常情况上下文应该是一个，但由的情况，例如：`monorepo` 各个包下依赖的环境不一样的时，导致上下文不一致，于是提供一个全局方法，用法如下：
+补充的一个方法，用于对齐 `Antd` 在业务和库之间的上下文，如：主题、配色等。通常情况上下文应该是一个，但由的情况，例如：`monorepo` 各个包下依赖的环境不一样的时，导致上下文不一致，于是提供一个全局方法，用法如下：
 
 ```typescript
 // root component
@@ -421,7 +391,7 @@ import { Form } from 'antd'
 FormEvent.observer(Form)
 ```
 
-这样所有子组件引入的 `Form` 全部来自业务提供的 `Form`。原本作为组件库要打通组件上下文，通常是将 `antd` 从库内部引入再统一提供给外部，但这次扩展只针对 `Form` 组件，于是做了一个中间层
+这样所有子组件引入的 `Form` 全部来自业务提供的 `Form`。原本作为组件库要打通组件上下文，通常是内部引入再统一导出提供给业务，但这次扩展只针对 `Form` 组件，于是做了一个中间层：
 
 ```typescript
 import { Form } from 'antd'
@@ -439,9 +409,7 @@ const useFormCom = (): FormBaseInstance => {
 }
 ```
 
-所有扩展的组件内部通过 `useFormCom` 根据配置，获取最终的组件。
-
-> `@event-chat/antd-item` 允许和 `antd` 结合搭配一起用，可以在需要触发受控的字段 `emit`，在受控字段使用 `Antd` 原本的表单组件。扩展的目的是为了更好的完成业务，并非 `antd` 的能力补充。
+在扩展组件的内部通过 `useFormCom` 获取提供的 `Form` 组件，统一上下文。
 
 ## 监听表单数据更新
 
@@ -470,9 +438,7 @@ const useFormCom = (): FormBaseInstance => {
 
 `emit` 允许被 `onFieldsChange` 和 `onValuesChange` 监听到，但同样会将官方提出的问题暴露给业务方：
 
-- 在 `change` 内部需要避免循环更新，尤其是循环嵌套触发的更新
-- 这个问题业务可以在代码层面去做调整修复，而不会因为底层的限制需要调整业务逻辑
-- 优点是能够精准触发，监听更新的具体字段
+- 在 `change` 内部需要避免循环更新，尤其是循环嵌套触发的更新，这个问题建议在业务代码层面去做检测和调整
 
 ## 通过表单向指定字段发起更新
 
@@ -492,9 +458,11 @@ const useFormCom = (): FormBaseInstance => {
   sourceState="none"
 />
 
-`Antd` 原有的 `form.setFieldsValue` 只能主动更新指定值，字段不能被动更新。在表单项子组件中通过 `emit` 向表单发起字段更新会被受控字段监听到。
+原有的 `form.setFieldsValue` 只能手动更新字段值，字段更新的结果不能联动。在字段组件中通过 `emit` 向表单发起字段更新，可以被受控字段监听到。
 
 ## 追踪列表项更新
+
+设置列表项的具体值，并希望追踪更新的值做出相应的反应。
 
 <Canvas
   additionalActions={[
@@ -512,14 +480,14 @@ const useFormCom = (): FormBaseInstance => {
   sourceState="none"
 />
 
-设置列表项的具体值，并希望追踪更新的值做出相应的反应。`Antd` 原有的能力需要根据业务逻辑挨个赋值，而 `emit` 允许将赋值和受控分离开，当指定表单项更新后受控字段再做出反应。
+原有的能力需要根据业务逻辑挨个赋值，而 `emit` 允许赋值同时受控，当指定表单项更新后受控字段再做出反应。
 
-> 在 `Form.List` 下的 `Form.Item` 会自动收集列表的 `name`，将自动合并列表项自身的 `name`。`emit` 触发更新时，需要完整填写 `namePath`。
+> 在 `Form.List` 下的 `Form.Item` 会自动收集列表的 `name`，将自动合并列表项自身的 `name`。`emit` 触发更新时，需要完整填写 `NamePath`，或是通过相对路径触发更新 [[查看](/docs/document-namepath--docs)]。
 
 在上面的演示案例中，分别展示了：
 
-- 通过 `Form.useForm` 申明一个扩展的表单实例，触发 `emit` 更新
-- 通过 `For.useFormInstance` 从上下文中拿到扩展的表单实例，向表单触发 `emit` 更新字段
+- 通过 `Form.useForm` 获取扩展实例触发 `emit` 更新
+- 通过 `For.useFormInstance` 从上下文中拿到扩展实例，触发 `emit` 更新字段
 - 在受控字段中通过 `onChange` 回调拿到 `emit` 触发更新
 
 下面会对 `@event-chat/antd-item` 扩展特性进行演示
@@ -546,13 +514,13 @@ const useFormCom = (): FormBaseInstance => {
   sourceState="none"
 />
 
-这样 `Antd` 表单字段实现了按照指定类型受控，一个字段可以在不同的业务场景下复用，而最终的交付结果一定是按照最初定义的 `Schema` 相匹配。
+通过 `schema` 表单字段将按照指定类型受控，一个字段可以在不同的业务场景下复用，而最终的交付结果一定是按照最初定义的类型交付。
 
 > 比如有个字段叫 `userLevel`，类型为：`{ type: string; power: number; }`，那么这个字段在用户录入的表单里是这个类型，在新增管理员的表单里也一定是这个类型。
 
 ### 转换字段数据进行渲染
 
-根据上方 `schema` 演示，可以将字段让字段赋值变得更加简单，而渲染更加复杂。
+使用 `schema` 也可以让字段赋值变得更加简单，而渲染效果更复杂。
 
 <Canvas
   additionalActions={[
@@ -573,22 +541,22 @@ const useFormCom = (): FormBaseInstance => {
 提供了 5 种方法用于数据类型转换，按照生命周期划分分别如下：
 
 - `ZodType.transform`：校验数据成功后转换数据，将结果通过 `onChange` 发起更新
-- `getValueFromEvent`：`Antd` 现有的属性，用于接收 `onChange` 的值更新字段
+- `getValueFromEvent`：表单现有的属性，用于接收 `onChange` 的值更新字段
 - `normalize`：同 `getValueFromEvent`
 - `FormItem.transform`：补充方法，仅用于通过 `schema` 校验表单数据前转换用，不会改变字段值
-- `getValueProps`：`Antd` 现有的属性，用于将更新的数据转换成符合回显要求的数据
+- `getValueProps`：表单现有的属性，用于将更新的数据转换成用于回显需要的数据
 
 根据自己的业务选择适合的方式，这里提供了 2 个演示：
 
 - 前提：不同的业务场景下，同类型字段组件，`emit` 触发更新都是数字，不改组件，不改配置规则；
-- 第 1 个演示：怎么收集数据，怎么提交，但会把收集的数据重新转换成渲染匹配的数据；
-- 第 2 个演示：拿到数值，转换成渲染一致的格式提交；
+- 第 1 个演示：收集到的数据类型和提交保持一致，仅渲染时会转换表单值；
+- 第 2 个演示：拿到数值，转成成符合渲染要求的数据，最终提交的也是转换后的数据；
 
-> 需要注意的是：`Form.List` 除了 `ZodType.transform` 以外都不支持，为了减少业务的复杂度，不建议对 `Array` 这样的字段类型做数据转换，可以对 `List` 下的 `Item` 做数据转换
+> `Form.List` 除了 `ZodType.transform` 以外都不支持，为了减少业务的复杂度，不建议对 `Array` 这样的字段集合做数据转换，可以对 `List` 下的字段值做转换
 
 ### 分段 + 异步验证自身字段
 
-当提供 `schema` 后，会自动将其作为一项字段校验的 `Rule` 添加到字段中。
+当提供 `schema` 后，会将其作为字段校验的 `Rule` 添加到校验中。
 
 <Canvas
   additionalActions={[
@@ -606,25 +574,23 @@ const useFormCom = (): FormBaseInstance => {
   sourceState="none"
 />
 
-当前示例分别演示了：
+当前示例演示了：
 
 - `pipe`：通过管道分段校验，中途错误将不再继续
 - `async`：异步校验，当需要做异步校验时，字段的状态可以在 `refine` 中定义
 
 ## 类型对齐
 
-`@event-chat/core` 作为 `Antd Form` 的 `@event-chat/core` 的扩展，自然要对齐这二者的类型。
-
 ### 摒弃部分泛型
 
-在 `@event-chat/core` 中将不必要的参数做了简化：
+为了对齐 `@event-chat/core` 和 `Antd` 的表单组件做了如下改动：
 
-- 摒弃了部分配置：表单字段由 `Form` 分配 `group`，不能够自定义配置
-- 泛型推导只保留了：`schema` 和 `name`，表单 `Form` 组件保留了 `Group`，其他全部给到默认值
+- 摒弃了部分配置：只能通过 `Form` 分配表单上下文的 `group`
+- 泛型推导只保留了：`schema` 和 `name`，表单 `Form` 组件保留了 `Group`
 
 ### 对内简化 `Form` 类型
 
-为了扩展并且跨版本支持 `Antd Form`，在内部按照扩展必要用到的属性做了一个通用的简化的 `Form` 类型
+为了扩展并跨版本支持 `Antd` 表单组件，保留扩展必要用到的属性，简化为通用的 `Form` 类型
 
 ```typescript
 type FormType<ValueType = unknown> = (
@@ -650,7 +616,7 @@ type FormInsType<ValueType = unknown> = Omit<
 }
 ```
 
-只能符合基本要求的类型，都视为有效的 `Form` 组件。同时为了跨版本支持， 去除了 `Antd v6` 实例 `FormInstance` 中的 `focusField` 改为可选属性，由业务决定属性是否存在。
+只要符合基本要求的类型，都视为有效的 `Form` 组件。为了跨版本支持，修改了 `Antd v6` 实例 `FormInstance` 中的 `focusField` 改为可选属性，由业务决定属性是否存在。
 
 ### 扩展 `Antd` 的泛型
 

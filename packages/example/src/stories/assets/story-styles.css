@@ -1,3 +1,7 @@
+ol {
+  list-style: auto;
+}
+
 .category-item > a:first-child {
   float: none;
   left: -18px;
@@ -15,10 +19,6 @@
 .docs-story > div:first-child {
   padding: 0;
   padding-bottom: 22px;
-}
-
-ol {
-  list-style: auto;
 }
 
 .list-dist {

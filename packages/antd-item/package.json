@@ -1,6 +1,6 @@
 {
   "name": "@event-chat/antd-item",
-  "version": "0.3.26",
+  "version": "0.3.27",
   "description": "扩展 Antd 的表单组件，使其拥 zod 和 @formily/path 能力",
   "type": "module",
   "main": "./dist/index.js",

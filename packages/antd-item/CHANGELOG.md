@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.27](https://github.com/event-chat/event-chat/compare/antd-item@v0.3.26...antd-item@v0.3.27) (2026-06-21)
+
+
+### Bug Fixes
+
+* update item ([b607f38](https://github.com/event-chat/event-chat/commit/b607f38f1ecc7f4f544a0af0ffff775723119027))
+* update item ([59fdeae](https://github.com/event-chat/event-chat/commit/59fdeaebe88ba9cb2ed576faf5da3cb5e17ea4b7))
+
 ## [0.3.26](https://github.com/event-chat/event-chat/compare/antd-item@v0.3.25...antd-item@v0.3.26) (2026-06-21)
 
 

@@ -1,4 +1,5 @@
 import { Canvas, Meta } from '@storybook/addon-docs/blocks'
+import { Tabs } from 'antd'
 import Table, { TBody, Td, Th, Thead, Tr } from '@/components/TableVirtual'
 import RPCDemo from './RPCDemo'
 import RPCDemoStories, {
@@ -12,6 +13,7 @@ import RPCDemoStories, {
   WebWorker,
 } from './RPCDemo.stories'
 import './assets/story-styles.css'
+import Alert from './components/Alert'
 import Footer from './components/Footer'
 import Header from './components/Header'
 import ListObserver from './components/ListObserver'
@@ -37,16 +39,44 @@ import Tag from './components/Tag'
 
 ## 安装
 
-```shell
-# npm
-npm install @event-chat/rpc
-
-# yarn
-yarn add @event-chat/rpc
-
-# pnpm
-pnpm add @event-chat/rpc
-```
+<Tabs
+  defaultActiveKey="npm"
+  items={[
+    {
+      key: 'npm',
+      label: 'npm',
+      children: (
+        <Alert>
+          <span>
+            <span className="text-red-700">npm</span> install @event-chat/rpc
+          </span>
+        </Alert>
+      ),
+    },
+    {
+      key: 'yarn',
+      label: 'yarn',
+      children: (
+        <Alert>
+          <span>
+            <span className="text-red-700">yarn</span> install @event-chat/rpc
+          </span>
+        </Alert>
+      ),
+    },
+    {
+      key: 'pnpm',
+      label: 'pnpm',
+      children: (
+        <Alert>
+          <span>
+            <span className="text-red-700">pnpm</span> install @event-chat/rpc
+          </span>
+        </Alert>
+      ),
+    },
+  ]}
+/>
 
 ## 目录
 
@@ -71,7 +101,7 @@ const iframeCtx = createCtx(() => ({
 }))
 ```
 
-`Window` 父级绑定自身和消费方上下文、驱动函数、通信对象（和 `iframe` 通信还需要提供允许的 `origin`）
+`Window` 父级绑定通信双方上下文、驱动函数、通信对象（跨域通信还需要提供允许的 `origin`）
 
 ```typescript
 const ParentCom: FC = () => {
@@ -102,7 +132,7 @@ const ParentCom: FC = () => {
 };
 ```
 
-`iframe` 绑定自身和消费方上下文、驱动函数、通信对象
+`iframe` 通信双方上下文、驱动函数、通信对象
 
 ```typescript
 const IframeCom: FC = () => {
@@ -167,14 +197,14 @@ const IframeCom: FC = () => {
 
 ### `useRPC`
 
-在 `React` 中主线程通信都封装在 `useRPC` 这个 `hooks` 中，只有一个参数 `options` 配置如下：
+在 `React` 中主线程通信封装在 `useRPC` 中，只有一个参数 `options` 配置如下：
 
 <TableList
   data={[
     {
       desc: (
         <>
-          驱动函数（必须提供），目前内置 9 个驱动方法，见下方说明 [<a href="#rpc-驱动函数">查看</a>
+          驱动函数，目前内置 9 个驱动方法，见下方说明 [<a href="#rpc-驱动函数">查看</a>
           ]；允许自行补充。
         </>
       ),
@@ -186,7 +216,7 @@ const IframeCom: FC = () => {
       type: ['下方补充'],
     },
     {
-      desc: '返回通信对象的方法（必须提供），通信对象由业务决定，见演示源码',
+      desc: '返回通信对象的方法，通信对象由业务决定，见演示源码',
       keyname: (
         <span>
           init <strong className="text-red-500">*</strong>
@@ -206,7 +236,7 @@ const IframeCom: FC = () => {
     {
       desc: (
         <>
-          为 <Tag>RPC</Tag> 实例通信提供配置，见下方说明
+          为 <Tag>RPC</Tag> 实例通信提供配置，见下方说明 [<a href="#rpc-实例配置-config">查看</a>]
         </>
       ),
       keyname: 'config',
@@ -242,7 +272,7 @@ const IframeCom: FC = () => {
     {
       desc: (
         <>
-          初始化 <Tag>Transports</Tag> 对象的配置，用于监听 <Tag>message</Tag> 时，提供的第三个参数
+          初始化 <Tag>Transports</Tag> 对象的配置，用于监听 <Tag>message</Tag> 时，提供的第 3 个参数
         </>
       ),
       keyname: 'options',
@@ -294,8 +324,8 @@ const IframeCom: FC = () => {
     {
       desc: (
         <>
-          注销 <Tag>RPC</Tag> 实例，默认情况下会在组件注销时自动注销 <Tag>RPC</Tag> 实例，如果不是对{' '}
-          <Tag>hooks</Tag> 生命周期很了解，不建议手动注销实例
+          注销 <Tag>RPC</Tag> 实例，默认情况下会在组件注销时自动注销 <Tag>RPC</Tag> 实例，如果对{' '}
+          <Tag>rpc</Tag> 生命周期不了解，不建议手动注销实例
         </>
       ),
       keyname: 'destroy',
@@ -486,7 +516,7 @@ const IframeCom: FC = () => {
     {
       desc: (
         <>
-          请求超时次数，默认：2次；配置 <Tag>transfer</Tag> 后将无效
+          超时最大重试次数，默认：2；配置 <Tag>transfer</Tag> 后将无效
         </>
       ),
       keyname: 'retryTimes',
@@ -513,7 +543,7 @@ const IframeCom: FC = () => {
     {
       desc: (
         <>
-          <Tag>RPC</Tag> 实例断开连接后触发，接收参数 <Tag>destroy</Tag> 表示实例是否已注销
+          心跳、请求超时后，以及注销后触发，参数 <Tag>destroy</Tag> 表示实例是否已注销
         </>
       ),
       keyname: 'onDisconnect',
@@ -563,15 +593,15 @@ interface DemoCtxType {
 
 创建上下文将会返回一个对象，提供给 <Tag>RPC</Tag> 实例使用，包含以下属性：
 
-- `action`：作为 `event` 则作为当前实例的接收请求的方法，作为 `consume` 则作为实例发起请求的方法
-- `brodcast`: 作为当前实例接收广播的方法
+- `action`：用于 `event` 则作为当前实例接收请求的方法，用于 `consume` 则作为实例发起请求的类型范围以及返回的响应类型
+- `brodcasts`: 作为当前实例接收广播的方法
 - `provider`: 为当前作用域上下文提供指定类型的对象
 
 当提供 `action` 作为实例请求方法时，通过 `request` 发起的请求将自动匹配：方法名、所需参数、返回结果；以上可根据业务进行配置，不需要可忽略
 
 **上下文作用域：**
 
-由于主线程所有上下文共享一个作用域，因此在组件中存在不同的 <Tag>RPC</Tag> 实例时，需要生成不同的上下文作为当前实例方法：
+由于主线程所有上下文共享一个作用域，因此在相同组件内使用同一套上下文，提供给不同的 <Tag>RPC</Tag> 实例时，需要生成不同的上下文对象作为当前实例的 `event` 和 `brodcasts`：
 
 ```typescript
 const messageEvent = createService<DemoCtxType>()
@@ -598,6 +628,8 @@ const DemoCom: FC = () => {
   return null
 }
 
+const App: FC = () => Array.from({ length: 5 }, (_, i) => <DemoCom key={`demo:${i}`} />)
+
 interface DemoCtxType {
   print: (msg: string) => void
 }
@@ -605,8 +637,8 @@ interface DemoCtxType {
 
 补充：
 
-- 独立的 `worker` 线程内部可以直接使用上下文；不同实例之间如果使用相同请求方法，而上下文需要不一样时，也可以动态创建上下文；
-- 由于 `consume` 仅作为实例请求方法的类型推断，因此不需要考虑上下文作用域；
+- 独立的 `worker` 线程内部上下文本身是独立的，不建议不同实例共用上下文，如果需要可以通过 `channel` 隔离不同的实例；
+- 由于 `consume` 仅作为实例请求方法的类型推断，因此不需要考虑动态创建上下文；
 
 ### `RPC` 实例方法
 
@@ -624,8 +656,8 @@ type broadcast = <T>(
 ```
 
 - 参数 `options` 类型和 `request` 一致，但不支持失败重发
-- 广播是同步函数，和 `request` 不同，不会将响应结果通过 `Promise` 返回
-- 返回 `MessageItem` 类型的消息，用于获取 `requestId` 和 `sign` 转发广播
+- 广播是同步函数，发起广播后会将发送的消息同步返回，用于获取 `requestId` 和 `sign` 后转发广播
+- 发送广播不能拿到响应结果，但允许通过 `fallback` 捕获发送异常
 
 #### `config`
 
@@ -653,7 +685,7 @@ type getType = () => string
 
 #### `request`
 
-请求方法根据提供的上下文，自动推断请求和响应的类型；使用 `BroadcastChannel` 创建的实例不支持 `request` 方法
+请求方法将根据提供的上下文，自动推断请求和响应的类型；使用 `BroadcastChannel` 创建的实例不支持 `request` 方法
 
 ```typescript
 type request = <T = unknown>(type: PropertyKey, options?: RequestOptions<T>) => Promise<unknown>
@@ -675,7 +707,7 @@ type RequestOptions<T = unknown> = IframeSerializeOptions &
 ```
 
 - `requestId`：请求 `id` 主要用于广播去重，`request` 会丢弃
-- `sign`：请求的签名，和 `requestId` 一样
+- `sign`：请求的签名，作用和 `requestId` 一样
 - `payload`：发送的消息，根据上下文推导类型
 - `retry`：当前重复的次数
 - `targetOrigin`: 匹配的源，仅用于跨域通信，默认为 `self?.location.origin`
@@ -744,13 +776,26 @@ rpc.request('connectWritableStream', { transfer: [payload], payload }).catch(() 
 
 为了避免广播不受控制，可以通过 `channel` 的方式限制广播范围
 
+**广播中的上下文：**
+
+配置上下文中的第二个参数，通过函数返回一个方法集合提供给实例；配置广播的上下文和 `request` 一样，不同在于当发送一条广播后，广播上下文中的每个请求方法都会分别响应。因此广播上下文的方法更多是作为语义上的行为区分，而不是方法隔离。
+
+```tsx
+const parentCtx = createCtx(
+  () => ({}),
+  () => ({
+    brodcast: () => {}, // 广播
+  })
+)
+```
+
 **广播转发：**
 
 当转发广播时，有可能因消息回环导致无限循环。为避免这个情况，允许广播时携带：`requestId` 和 `sign`，内部会存储发送的签名进行匹配，已记录签名的广播不会在同一个实例重复接收
 
 **`brodcastScope` 筛选实例广播**
 
-在范围向所有挂载的实例发送广播时，提供的参数中有 4 个配置可筛选符合要求的实例发送广播
+在范围内向所有挂载的实例发送广播时，提供的参数中有 4 个配置可筛选符合要求的实例发送广播
 
 - `exclude`: 类型集合，不在集合范围的实例能够发起广播
 - `include`: 类型集合，必须是集合范围的实例能够发起广播
@@ -759,9 +804,11 @@ rpc.request('connectWritableStream', { transfer: [payload], payload }).catch(() 
 
 集合类型为 `string[]`，实例的类型可以通过 `TARGET_TYPE_STRINGS` 获取；使用 `RPCProvider` 时，默认会在每个实例初始化后，自动挂载空字符作为实例的匿名名称，如果需要修改挂载的实例的名称，可以通过 `useRPC` 返回的函数 `mount`
 
+> 除了上述 4 个配置外，还允许提供一个 `fallback` 作为发送广播时的异常捕获
+
 ### 实例的启动和注销
 
-默认情况下实例初始化后会自动发起心跳，无论是否连接成功，都会保持心跳检测；同时会在 `hooks` 所在的组件注销前，注销实例，因此通常情况下不需要手动 `start` 或 `destroy`。但是 `service worker` 线程并非持久连接，会随浏览器空闲时临时关闭线程，对于这种情况：
+默认情况下实例初始化后会自动发起心跳，无论是否连接成功，都会保持心跳检测；同时会在 `hooks` 所在的组件注销前注销实例，因此通常情况下不需要手动 `start` 或 `destroy`。但是 `service worker` 线程并非持久连接，会随浏览器空闲时临时关闭线程，对于这种情况：
 
 - 通常由心跳唤醒 `service worker` 实例，一般不需要手动处理
 - 但如果因为某些情况强制关闭了线程，例如调试工具强制卸载
@@ -769,6 +816,56 @@ rpc.request('connectWritableStream', { transfer: [payload], payload }).catch(() 
 - 对于已注销的实例可以调用 `start` 手动重新发起新的实例连接
 
 其他情况不建议手动 `start` 或 `destroy`，除非你对实例生命周期非常了解
+
+### `RPCProvider` 挂载实例
+
+`RPCProvider` 是 `React` 上下文，用于包裹在所有实例所在的组件最外层。挂载实例的目的在于能够通过 `brodcastScope` 向范围内每个已连接的实例发起广播，提供了 2 个方法提供给子组件
+
+- `mount`：挂载和卸载，以及改名实例
+- `brodcastScope`：向当前范围内，每个已连接的实例发起广播
+
+在 `RPCProvider` 下的组件内使用 `useRPC` 可以直接拿到同名方法，使用方法如下：
+
+```tsx
+const CustomCom: FC<{ send: (port: MessagePort) => void }> = ({ port }) => {
+  const { mount } = useContext(RPCInstanceContext)
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        const channel = new MessageChannel()
+        const rpc = createMessagePortRPC(channel, {})
+
+        mount(rpc)
+        send(channel.port2)
+      }}
+    >
+      add port
+    </button>
+  )
+}
+
+const DemoCom: FC = () => {
+  const { brodcastScope, rpc } = useRPC({
+    // 配置省略
+  })
+
+  return (
+    <>
+      <button type="button" onClick={() => brodcastScope({ payload: 'brodcast' })}>
+        brodcast
+      </button>
+      <CustomCom />
+    </>
+  )
+}
+
+const App: FC = () => (
+  <RPCProvider>
+    <DemoCom />
+  </RPCProvider>
+)
+```
 
 ### 调试方法
 
@@ -804,8 +901,7 @@ rpc.request('connectWritableStream', { transfer: [payload], payload }).catch(() 
         初始化时在 <Tag>config</Tag> 中配置
       </Td>
       <Td>
-        收集当前 <Tag>RPC</Tag> 实例收到的，符合 <Tag>RPC</Tag>{' '}
-        规范的所有消息，将其信息以及实例配置，作为回调函数的参数。
+        获取当前 <Tag>RPC</Tag> 实例收到的，符合 <Tag>RPC</Tag> 规范的所有消息。
       </Td>
       <Td className="w-16">仅调试用</Td>
     </Tr>
@@ -814,11 +910,10 @@ rpc.request('connectWritableStream', { transfer: [payload], payload }).catch(() 
         <Tag>faild</Tag>
       </Td>
       <Td>
-        仅用于 <Tag>useRPC</Tag> 的参数属性，用于初始化 <Tag>RPC</Tag> 实例失败时触发，例如：
-        <Tag>worker</Tag> 异常
+        仅用于 <Tag>useRPC</Tag> 的参数属性
       </Td>
       <Td>
-        发送消息遇到异常抛出错误时，将其作为 <Tag>catch</Tag> 的回调函数
+        实例初始化失败时触发，例如：<Tag>worker</Tag> 异常，将其作为 <Tag>catch</Tag> 的回调函数
       </Td>
       <Td className="w-16">可以</Td>
     </Tr>
@@ -836,9 +931,7 @@ rpc.request('connectWritableStream', { transfer: [payload], payload }).catch(() 
           </li>
         </ul>
       </Td>
-      <Td>
-        发送消息遇到异常抛出错误时，将其作为 <Tag>catch</Tag> 的回调函数
-      </Td>
+      <Td>捕获发送广播遇到的异常问题</Td>
       <Td className="w-16">可以</Td>
     </Tr>
     <Tr>
@@ -861,8 +954,8 @@ rpc.request('connectWritableStream', { transfer: [payload], payload }).catch(() 
         初始化时在 <Tag>config</Tag> 中配置
       </Td>
       <Td>
-        <Tag>RPC</Tag> 实例一旦连接断开就触发，随连接状态响应，若回调函数的参数 <Tag>destroy</Tag>{' '}
-        为 <Tag>true</Tag> 时，表示实例已注销，除非手动 <Tag>start</Tag>，否则永远不会触发。
+        <Tag>RPC</Tag> 实例一旦连接断开就触发，若回调函数的参数 <Tag>destroy</Tag> 为{' '}
+        <Tag>true</Tag> 时，表示实例已注销，除非手动 <Tag>start</Tag>，否则永远不会触发。
       </Td>
       <Td className="w-16">可以</Td>
     </Tr>
@@ -1007,20 +1100,44 @@ const workerCtx = createCtx(() => ({
 
 #### 唤起 `service worker`
 
-`service worker` 除了通过 `message` 唤起线程外，还可以拦截 `fetch` 并唤起线程；在 `RPC` 实例内部，对这两种方式都做了监听，可以在拦截 `fetch` 的同时向主线程发起通信，如下：
+`service worker` 除了通过 `message` 唤起线程外，还可以拦截 `fetch` 并唤起主线程；在 `RPC` 实例内部，对这两种方式都做了监听，可以在拦截 `fetch` 的同时向主线程发起通信，如下：
 
 ```typescript
+const queue: Array<() => void> = []
+const [rpc] = createServiceWorkerGlobalScopeRPC(self, {
+  context: {
+    config: {
+      onConnect: () => {
+        request()
+      },
+    },
+  },
+})
+
+const request = (action?: () => void) => {
+  if (!rpc.connected()) {
+    if (action) queue.push(action)
+    return
+  }
+
+  if (action) {
+    action()
+  } else {
+    queue.forEach((actionItem) => actionItem())
+  }
+}
+
 self.addEventListener('fetch', (event) => {
   if (event.request.url.includes('/api/hello')) {
-    rpc.request('sendMessage', { payload: 'request start' }).catch(() => {})
+    request(() => rpc.request('sendMessage', { payload: 'request start' }).catch(() => {}))
   }
 })
 ```
 
-上述提到在主线程中 `service worker` 存在多个实例共享 `active` 通信的，在拦截 `fetch` 情况下向主线程发送消息，有可能多个实例都会响应。由于主线程此时是接收方，不存在和请求对应的 `pending`，不能明确接收对象，只能通过以下方式来区分：
+上述提到在主线程中 `service worker` 存在多个实例共享 `active` 通信，在拦截 `fetch` 情况下向主线程发送消息，有可能多个实例都会响应。由于主线程此时是接收方，不存在和请求对应的 `pending`，不能明确接收对象，只能通过以下方式来区分：
 
 - 每个实例的上下文采用不同的请求方法
-- 由业务的消息自行决定如何处理
+- 由业务的消息决定如何处理，例如：用 `type` 区分 `{ type: 'sending' }`
 - 通过 `channel` 划分接收对象
 
 **其他唤醒方式：**
@@ -1075,7 +1192,7 @@ self.addEventListener('fetch', (event) => {
 
 `SharedWorkerGlobalScope` 作为共享线程，内部的通信全部共享一个线程（参考主线程），每个通信通过 `MessagePort` 隔离通信。因此舍弃针对 `SharedWorkerGlobalScope` 建立 `RPC` 实例监听。而是使用方法 `obseverShareWorkerGlobalScopeRPC` 通过观察模式发起通信，如下：
 
-```typrscript
+```typescript
 const { brodcastScope } = obseverShareWorkerGlobalScopeRPC(target, () => {
   const workerCtx = generateWorkerCtx()
   return {
@@ -1092,11 +1209,11 @@ const { brodcastScope } = obseverShareWorkerGlobalScopeRPC(target, () => {
 
 观察方法配置的参数和驱动方法一致，第 2 个配置参数增加了 3 个可选属性：
 
-- `destroy`：布尔型，设为 `true` 会在 `RPC` 断开后直接注销，并从观察队列中删除
-- `name`：字符型，给观察的实例集合起个名字，广播时筛选用
+- `destroy`：布尔型，设为 `true` 会在 `RPC` 断开后注销实例，并从观察队列中删除；默认是 `undefined`
+- `name`：字符型，给观察的实例集合起个名字，广播时筛选用，默认空字符
 - `provider`：为上下文提供需要的对象
 
-内置 `provider` 的原因是 `SharedWorkerGlobalScope` 通过 `connect` 根据连接的情况，动态创建的 `MessagePort`。无法通过具体对象初始化实例，因此通过回调的方式，从观察方法中获取 `RPC` 实例，以便作为上下文所需的方法再次发起请求。
+`SharedWorkerGlobalScope` 通过 `connect` 根据连接的情况动态创建 `MessagePort`。无法通过具体对象初始化实例，因此通过回调的方式将实例作为参数提供给回调方法 `provider`，以便为上下文再次发起请求。
 
 观察方法会返回一个 `brodcastScope` 方法，其用法和 `useRPC` 提供的同名方法一样。
 
@@ -1147,10 +1264,15 @@ push(port, () => ({
 无论是 `observerMessagePortRPC` 还是 `React` 中的 `PRCProvider` 都是基于 `observerRPC` 实现多实例广播，对于非 `MessagePort` 类型的 `RPC` 实例，可以自行手动添加观察集合，如下：
 
 ```typescript
-const { brodcastScope, clear, push } = observerRPC()
-push(port, {
-  context: {},
-  provider: ([rpc]) => {},
+const { add, brodcastScope } = observerRPC()
+const [rpc] = createDedicatedWorkerGlobalScopeRPC(self, {
+  context: {
+    config: {
+      onConnect: () => {
+        add(rpc, 'custom-name')
+      },
+    },
+  },
 })
 ```
 
@@ -1161,26 +1283,13 @@ push(port, {
 - `remove`: 手动删除观察集合中的实例
 - `clear`：清空集合中的实例
 
-相比较 `observerMessagePortRPC`，观察方法 `observerRPC` 更自由配置监控集合，因此没有扩展配置方法，需要初始化实例后自行添加到集合，如下：
+> 相比较 `observerMessagePortRPC`，观察方法 `observerRPC` 更自由配置监控集合，因此没有扩展配置方法，需要初始化实例后自行添加到集合
 
-```typescript
-const { add, brodcastScope } = observerRPC()
-const [RPCIns] = createMessagePortRPC(target, {
-  context: {
-    config: {
-      onConnect: () => {
-        add(RPCIns, 'custom-name')
-      },
-    },
-  },
-})
-```
-
-每调用一次观察方法将创建 1 个集合，通过 `brodcastScope` 发起广播时，会向集合中每个已连接的实例发送广播；可以根据业务创建不同的集合进行广播；可以将不同类型的实例添加到集合中，例如：`worker`、`Window`、`MessagePort`，也可以借助观察方法，扩展到诸如 `Vue` 这样的框架中。
+每调用一次观察方法将创建 1 个集合，通过 `brodcastScope` 发起广播时，会向集合中每个已连接的实例发送广播；可以根据业务创建不同的集合进行广播；每个集合允许添加不同类型的实例，例如：`worker`、`Window`、`MessagePort`，也可以借助观察方法，扩展到诸如 `Vue` 这样的框架中。
 
 #### 主线程中添加观察实例
 
-在 `PRCProvider` 内的子组件中使用 `useRPC` 创建的实例，会在初始化后自动添加到观察集合中。而 `MessagePort` 需要手动创建实例，即便是在主线程中，是不会添加到 `RPCProvider` 的观察集合中，可以手动通过 `hooks` 返回的方法 `mount` 挂载实例。如下：
+在 `PRCProvider` 内的子组件中使用 `useRPC` 创建的实例，会在初始化后自动添加到观察集合中。而 `MessagePort` 需要手动创建实例，即便是在主线程中，需要手动通过 `hooks` 返回的方法 `mount` 挂载实例。如下：
 
 ```typescript
 const DemoCom: FC = () => {
@@ -1199,7 +1308,7 @@ const DemoCom: FC = () => {
 };
 ```
 
-`mount` 方法也可以通过 `useRPC` 获取，从集合中删除实例只需空缺第二个参数即可，如：`mount(rpc);`，对于非 `React` 环境的情况，例如原生 `JS`，可以调用 `observerRPC` 将实例添加到观察集合中，上述已说明不再重复描述。
+从集合中删除实例只需空缺第二个参数即可，如：`mount(rpc);`，对于非 `React` 环境的情况，例如原生 `JS`，可以调用 `observerRPC` 将实例添加到观察集合中，上述已说明不再重复描述。
 
 ### `BroadcastChannel` 广播
 
@@ -1219,7 +1328,7 @@ const DemoCom: FC = () => {
   sourceState="none"
 />
 
-`BroadcastChannel` 的存在目的就是为了不同的标签页、Window 之间广播，因此当通过 `BroadcastChannel` 创建 `RPC` 实例时，不支持通过 `request` 指定通信对象发起请求。
+`BroadcastChannel` 存在目的就是为了不同的标签页、Window 之间广播，因此当通过 `BroadcastChannel` 创建 `RPC` 实例时，不支持通过 `request` 指定通信对象发起请求。
 
 广播和请求不同在于 `request` 请求，不会等待响应结果，只要符合广播范围的实例都会发起通信，可以通过 `channel` 等方式限制范围：
 
@@ -1336,7 +1445,7 @@ const DemoCom: FC = () => {
 通过 `request` 或 `broadcast` 发起转移，转移的方式和 `postMessage` 一致
 
 - `payload`：作为通信的信息，用于存放转移的对象，但 `MessagePort` 只能放在 `transfer` 中转移
-- `transfer`：作为转移对象的集合，一次可以转移多个对象
+- `transfer`：作为转移对象的集合，所有要转移的对象都要写入集合，一次可以转移多个对象
 
 ```typescript
 const messageChannel = new MessageChannel()
@@ -1368,7 +1477,7 @@ const workerCtx = createCtx(() => ({
 - `request` 请求会通过 `Promise.reject` 抛出异常
 - `broadcast` 接受一个参数方法 `fallback` 作为异常捕获的回调函数。
 
-虽然对象只能转移一次，而作为广播可能会向多个实例进行通信，但仍旧保留了 `broadcast` 通过 `transfer` 转移对象的能力；因为接受广播的数量由业务决定，在允许的情况下确实可以用于转移对象，但不建议这样使用。
+虽然对象只能转移一次，而广播可能会向多个实例进行通信，但仍旧保留了 `broadcast` 通过 `transfer` 转移对象的能力；因为接受广播的数量由业务决定，在允许的情况下确实可以用于转移对象，但不建议这样使用。
 
 ### `WebSocket` 通信
 
@@ -1411,6 +1520,6 @@ socket.onmessage((event) => {
 })
 ```
 
-`rpc` 实例内部监听消息为了和外部做区分，通过消息中是否携带 `__RPC__` 属性值做判断
+`RPC` 实例内部监听消息为了和外部做区分，通过消息中是否携带 `__RPC__` 属性值做判断
 
 <Footer />

@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.2.27](https://github.com/event-chat/event-chat/compare/core@v0.2.26...core@v0.2.27) (2026-06-21)
+
+
+### Bug Fixes
+
+* add install ([43bc7cf](https://github.com/event-chat/event-chat/commit/43bc7cf8031f5eef403b9d6c5b73ceb8d1be57f8))
+* remove install tips ([24f8286](https://github.com/event-chat/event-chat/commit/24f82860f6932e74e7466fc0dd43f09af60d8303))
+* update core readme ([67e208b](https://github.com/event-chat/event-chat/commit/67e208bb85ec6d806633f06e7f5c65c3aba54416))
+
 ## [0.2.26](https://github.com/event-chat/event-chat/compare/core@v0.2.25...core@v0.2.26) (2026-05-03)
 
 

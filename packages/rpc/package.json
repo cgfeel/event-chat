@@ -1,6 +1,6 @@
 {
   "name": "@event-chat/rpc",
-  "version": "0.1.33",
+  "version": "0.1.34",
   "description": "像聊天一样本地通信",
   "type": "module",
   "main": "./dist/index.js",

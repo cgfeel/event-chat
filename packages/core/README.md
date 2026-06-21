@@ -21,8 +21,6 @@
 
 ## 安装
 
-3 个独立的包，可以根据需要选择安装
-
 ```shell
 npm install @event-chat/core
 ```

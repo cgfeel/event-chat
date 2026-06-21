@@ -33,7 +33,7 @@
 ```shell
 npm install zod # 可选
 npm install @event-chat/core # 可选
-npm install @event-chat/item
+npm install @event-chat/antd-item
 ```
 
 ## 快速上手

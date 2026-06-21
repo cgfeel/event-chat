@@ -23,17 +23,17 @@ import Tag from './components/Tag'
 
 ## 介绍
 
-`NamePath` 采用了 `@formily/path` 作为路径系统，集成在 `@event-chat/core` 中，用于作为触发事件时匹配接受方的事件名。因此，所有集成了 `@event-chat/core` 的扩展库、组件都支持这套路径系统，比如：`@event-chat/ante-item`；所以目前不需要额外安装依赖便可开箱即用。
+`NamePath` 采用了 `@formily/path` 的路径系统，作为 `@event-chat/core` 依赖项用于匹配事件名。因此 `NamePath` 开箱即用，包括 `@event-chat/antd` 也同样支持路径系统。
 
 **用途**：
 
-- 通过路径系统可以触发相对路径更新，或同时向多个事件名发起更新；
-- 和 `formily` 不同的是，路径系统在 `eventChat` 中只用于触发事件时匹配接收方的事件名，路径本身是不存在赋值和获取字段值的概念。
+- 支持相对路径查找，广泛匹配多个事件名批量发送，取反路径排除接收事件等；
+- 和 `formily` 不同的是，路径系统在 `eventChat` 中只用于匹配事件名，不支持手动 `setIn` 和 `getIn`。
 
 **2 套路径系统**：
 
 - `@event-chat/core` 集成了 `@formily/path`，因此默认支持 `formily` 的路径系统；
-- 而 `Antd` 采用数组路径系统，为了兼容数组路径，会将其转换为 `formily` 点路径系统进行匹配。
+- 而 `Antd` 是数组层级路径，为了相互兼容会统一转换为 `formily` 点路径系统进行匹配。
 
 **3 层路径缓存**：
 
@@ -57,7 +57,7 @@ import Tag from './components/Tag'
       <Td>
         <Tag>@event-chat/core</Tag> 事件名
       </Td>
-      <Td>第一层补充缓存，用于记 2 套路径系统处理后的事件名</Td>
+      <Td>第一层缓存，用于记录 2 套路径系统处理后的事件名，减少重复计算</Td>
     </Tr>
     <Tr>
       <Td className="w-30" sticky>
@@ -83,7 +83,7 @@ import Tag from './components/Tag'
 
 > 为了便于演示下面将通过 `@event-chat/antd-item` 来展示用例，这篇文档将按照 `formily` 的 `FormPath` 的顺序描述用例说明。
 >
-> 要了解 `@formily/path` 相关用法建议查阅官方文档 [[查看](https://core.formilyjs.org/zh-CN/api/entry/form-path)]，这里主要演示用例以及在 `EventChat` 使用需要注意的地方。
+> 要了解 `@formily/path` 相关用法建议查阅官方文档 [[查看](https://core.formilyjs.org/zh-CN/api/entry/form-path)]，这里主要演示用例以及补充说明。
 
 ## 目录
 
@@ -106,7 +106,7 @@ console.log(FormPath.getIn(target, 'parent.[aa,bb]')) //[11,22]
 console.log(FormPath.parse('parent.[aa,bb]').toString()) //parent.[aa,bb]
 ```
 
-而 `EventChat` 使用路径用于触发事件，不需要赋值和取值。而解构表达式只能匹配解构表达式，还是引用官方文档示例：
+而 `EventChat` 使用路径仅用于匹配事件名，不需要赋值和取值。而解构表达式无法匹配路径：
 
 ```typescript
 import { FormPath } from '@formily/core'
@@ -116,14 +116,10 @@ console.log(FormPath.parse('target.[aa,bb]').match('target.aa')) //false
 console.log(FormPath.parse('target.[aa,bb]').match('target.bb')) //false
 ```
 
-解构表达式不能匹配解构对象中的子集，那么存在的意义也就用处不大。
-
-**只用到了路径解析和匹配**
+**仅支持路径解析和匹配**
 
 - `Path.parse`：解析路径，包含计算相对路径
-- `Path.match`：用于路径表达式匹配 `eventBus` 中记录的事件，用于触发对应的回调事件
-
-> 包含以上所有 `formily` 路径相关的 `API` 均不对外提供，如需用到清在业务中自行安装 `formily`，或单独安装 `@formily/path`
+- `Path.match`：用于路径表达式匹配 `eventBus` 中记录的事件名，触发回调事件
 
 ## 点路径
 
@@ -146,14 +142,15 @@ console.log(FormPath.parse('target.[aa,bb]').match('target.bb')) //false
 
 1 维路径：
 
-- 这类路径无论是 `formily` 还是 `antd` 都是以字符表示，例如：`aa`、`bb`、`cc`
+- `formily` 和 `Antd` 都支持，例如：`aa`、`bb`、`cc`
+- 在 `Antd` 中还可以通过数组定义：`['aa']`
 
-多维路径支持 2 个类型：
+多维路径：
 
-- `formily` 使用的 `.` 路径：路径仍旧为字符类型，用 `.` 间隔路径，如：`aa.bb.cc`
-- `antd` 使用的数组路径：路径为数组类型，如：`['aa', 'bb', 'cc']`
+- `formily` 使用的 `.` 间隔的字符路径：`aa.bb.cc`
+- `antd` 使用的数组路径：`['aa', 'bb', 'cc']`
 
-对于数组类型的路径，最终会转换成 `formily` 一致的字符类型，例如：
+对于数组类型的路径，最终会转换成字符类型，例如：
 
 - `['aa', 'bb', 'cc']` 等于 `aa.bb.cc`
 
@@ -176,39 +173,36 @@ console.log(FormPath.parse('target.[aa,bb]').match('target.bb')) //false
   sourceState="none"
 />
 
-下标路径同样也支持 2 个类型：
+支持 2 个类型：
 
 - `formily` 字符下标路径：`aa.0.bb` 或 `aa[0].bb` 都符合下标路径，且这两条路径在 `formily` 中是相互匹配的
-- `antd` 数组下标路径：`['aa', '0', 'bb']` 或 `['aa', 0, 'bb']` 都符合下标路径，但这两条路径不能相互匹配
+- `Antd` 数组下标路径：`['aa', '0', 'bb']` 或 `['aa', 0, 'bb']` 都符合下标路径，但这两条路径不能相互匹配
 
-> 于是路径在这里存在逻辑冲突
+数组路径下标转换：
 
-解决办法：
+- 下标路径为数值，如：`['aa', 0, 'bb']` 转换为 `aa[0].bb`
+- 下标路径为字符，如：`['aa', '0', 'bb']` 转换为 `aa.0.bb`
 
-- 采用 `formily` 一致的逻辑，只要是下标路径即相等
-- `@event-chat/antd-item` 的 `name` 下标设置为数值类型，如：`['aa', 0, 'bb']` 转换为 `aa[0].bb`
-- `@event-chat/antd-item` 的 `name` 下标设置为数字类型的字符，如：`['aa', '0', 'bb']` 转换为 `aa.0.bb`
+在 `@formily/path` 中 `aa[0].bb` 等价于 `aa.0.bb`，如果需要区分具体路径，可以通过 `callback` 回调参数判断：
 
-通常来说是不需要区分下标类型，但如果有需要区分可以在注册事件时，提供的属性 `callback` 通过回调参数自行判断：
+- `origin`：当前的接收事件名，配置提供什么得到什么，不解析不转义
+- `originName`：触发事件名，触发时填写什么得到什么，不解析不转义
 
-- `origin`：当前的接收事件名，提供什么得到什么，不解析不转义
-- `originName`：触发事件名，触发什么得到什么，不解析不转义
+**相对路径：**
 
-相对路径：
-
-通常用于 `emit` 触发路径时使用，例如：
+使用相对路径调用 `emit` 作为事件名，例如：
 
 ```typescript
-useEventChat('aa.bb.cc').emit('.dd')
+useEventChat('aa.bb.cc').emit({ name: '.dd' })
 // i.e. `FormPath.parse('.dd', 'aa.bb.cc')` equal: aa.bb.dd
 
-useEventChat('aa.1.cc').emit('..[].dd')
+useEventChat('aa.1.cc').emit({ name: '..[].dd' })
 // i.e. `FormPath.parse('..[].dd', 'aa.1.cc')` equal: aa.1.dd
 
-useEventChat('aa.1.cc').emit('..[+].dd')
+useEventChat('aa.1.cc').emit({ name: '..[+].dd' })
 // i.e. `FormPath.parse('..[+].dd', 'aa.1.cc')` equal: aa.2.dd
 
-useEventChat('aa.1.cc').emit('..[+10].dd')
+useEventChat('aa.1.cc').emit({ name: '..[+10].dd' })
 // i.e. `FormPath.parse('..[+10].dd', 'aa.1.cc')` equal: aa.11.dd
 ```
 
@@ -295,7 +289,7 @@ useEventChat('aa.1.cc').emit('..[+10].dd')
 根据不同的路径类型，分别做如下处理：
 
 - `formily` 字符路径：需要手动转义，例如 `aa.\\\\,.bb`
-- `antd` 数组路径：自动转义，例如 `['aa', ',', 'bb']` 等同 `aa.\\\\,.bb`
+- `Antd` 数组路径：自动转义，例如 `['aa', ',', 'bb']` 等同 `aa.\\\\,.bb`
 
 转义的字符包含：`*~[],:.`
 

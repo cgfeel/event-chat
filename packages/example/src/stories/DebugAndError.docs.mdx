@@ -43,22 +43,22 @@ import ListObserver from './components/ListObserver'
   sourceState="none"
 />
 
-通过 `useEventChat` 返回的 `emit` 发起的更新，并在自身 `Hooks` 上通过 `debug` 调试日志。
+通过 `useEventChat` 返回的 `emit` 发起的更新，并在自身 `Hooks` 上配置 `debug` 调试日志。
 
-当发送信息的事件名，并非 `emit` 所属的事件对象时，可以接受到 3 类信息：
+当发送信息时，发送方可以接受到 3 类信息：
 
-- `init`：主控的 `Hooks` 初始化后触发
-- `emit`：随每次消息发送而触发，无论发送的消息最终是否会被接收
-- `lost`：发送消息时遇到异常不能继续，通常是路径解析异常，`emit` 和 `lost` 二者会根据发送情况只能出现其中 1 个
+- `init`：发送方初始化后回调
+- `emit`：仅在每次消息发送时回调，无论发送的消息最终是否会被接收
+- `lost`：仅在发送消息遇到异常时回调，通常是路径解析异常
 
-常用于主控方发送消息后，受控方没有正常响应时进行调试。因为在发送过程中，尤其 `@event-chat/antd-item` 这样的组件，开发者只能看到提供的路径名，而发送过程中提交的信息、计算的路径可以通过 `debug` 回调函数中获取
+常用于主控方发送消息后，受控方没有正常响应时进行调试。因为在发送过程中，尤其 `@event-chat/antd-item` 这样的组件，开发者只能看到提供的路径名，而发送过程中提交的信息、计算的路径可以通过 `debug` 回调函数中获取并排查异常。
 
 在 `emit` 类型的消息中，可以看到 4 个名称：
 
-- `name`：接收方名称，在发送方看到的是发送方提供的名称，接收方通过 `callback` 拿到的是自身的事件名，二者经过计算会变为一致的路径名，而发送和接收在定义的时候可能不一样
-- `origin`：发送方名称，用于证明来源的事件名
-- `originName`：发送方提供的接收方名称，不做任何转化
-- `rule`：发送后经过计算的名称
+- `name`：接收的事件名；在发送方看到的是 `emit` 提供的 `name`，接收方通过 `callback` 拿到的是 `hooks` 配置的参数 `name`
+- `origin`：发送方配置 `hooks` 时的名称，用于证明来源的事件名，不做路径转换
+- `originName`：发送方 `emit` 提供的 `name`，不做路径转换
+- `rule`：发送事件后根据 `name` 计算得到的路径，用于匹配接收方的事件名
 
 ## 跟踪订阅者
 
@@ -79,12 +79,14 @@ import ListObserver from './components/ListObserver'
   sourceState="none"
 />
 
-在接受事件名的 `useEventCaht` 上通过 `debug` 方法获取调试日志，可以接受到 2 类信息：
+接收消息的 `useEventCaht` 上通过 `debug` 方法获取调试日志，可以接受到 2 类信息：
 
-- `init`：受控的 `Hooks` 初始化后触发
-- `invalid`：发送方通过路径名发送和接受事件名匹配相符，但不符合受控接受规则，例如：组名不符、`schema` 不符等，若发送的信息匹配接受规则，会通过 `callback` 回调信息，不会触发 `debug`
+- `init`：接收方初始化后回调
+- `invalid`：已收到消息但不匹配接收规则，例如：组名、`schema`
 
-常用于主控发送的消息已匹配接收方事件名，但未被接受方匹配的消息；因为开发者只能看到设置的规则，而发送的消息为何没有匹配规则，可以通过 `debug` 获取具体原因。
+> 若收到的信息匹配规则，会通过 `callback` 回调信息，不会触发 `debug`
+
+常用于收到消息，但未触发 `callback` 时作为调试，可以通过 `debug` 获取不匹配的具体原因。
 
 ## 收发一起跟踪
 
@@ -107,8 +109,8 @@ import ListObserver from './components/ListObserver'
 
 收发都是同一事件名的情况下，不建议在 `debug` 中使用 `emit`，为了方便这里使用 `@event-chat/core` 进行演示
 
-- 如果要 `emit` 仅限 `status` 为 `init` 和 `invalid` 的调试信息，否则会陷入无限循环
-- 其他类型的调试信息，可以创建一个新的 `emit` 发送
+- 如果要 `emit` 需要限制 `status` 为 `init` 和 `invalid` 的调试信息，否则会陷入无限循环
+- 或者创建一个新的 `useEventChat` 获取 `emit` 专门用来发送调试日志
 
 ## 提示中的错误信息
 
@@ -139,6 +141,16 @@ import ListObserver from './components/ListObserver'
 - `tokenEmpty`：非私信成员接受到私信
 - `tokenProvider`：私信成员接受到非私信
 
-自定义方法 `filter` 接受一个回调参数，来自发送方向接收方提供的 `emit` 消息对象，和 `callback` 回调接受的信息一致，详细可以查看对应文档。这 5 个错误信息默认展示英文，为了便于查看错误信息允许通过属性 `lang` 自定义对应的信息
+> 这 5 个错误信息默认展示英文，为了便于查看错误信息允许通过属性 `lang` 自定义对应的信息
+
+自定义方法 `filter` 接受一个回调参数，类型和 `callback` 基本一致 [[查看](/docs/document-eventchat--docs#callback回调函数)] ，回调参数 `detail` 来自 `emit` 传递的整个对象
+
+```tsx
+{
+  filter?: (detail: Omit<EventDetailType<unknown>, 'detail'>) => boolean | PromiseLike<boolean>
+}
+```
+
+回调参数对象中的属性 `detail` 为 `unknown`，是因为自定义校验方法会在数据校验前触发，此时还不清楚数据具体类型，可以自行通过 `schema` 判断数据类型。
 
 <Footer />

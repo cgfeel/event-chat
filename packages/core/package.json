@@ -1,6 +1,6 @@
 {
   "name": "@event-chat/core",
-  "version": "0.2.27",
+  "version": "0.2.28",
   "description": "像聊天一样组件通信",
   "type": "module",
   "main": "./dist/index.js",

@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.28](https://github.com/event-chat/event-chat/compare/core@v0.2.27...core@v0.2.28) (2026-06-21)
+
+
+### Bug Fixes
+
+* update package add keywords ([63afaec](https://github.com/event-chat/event-chat/commit/63afaec2cb2100c5f27085d01743a3b2ce4781c9))
+
 ## [0.2.27](https://github.com/event-chat/event-chat/compare/core@v0.2.26...core@v0.2.27) (2026-06-21)
 
 

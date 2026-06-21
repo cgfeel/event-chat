@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.26](https://github.com/event-chat/event-chat/compare/antd-item@v0.3.25...antd-item@v0.3.26) (2026-06-21)
+
+
+### Bug Fixes
+
+* add antd readme & package keywords ([654bd0b](https://github.com/event-chat/event-chat/commit/654bd0bcfdfbfa47ed5e20b84e4edfce89dadd29))
+* update desc ([c2d43a0](https://github.com/event-chat/event-chat/commit/c2d43a02b544bfa7f06dd321b49e5cac815a0d11))
+
 ## [0.3.25](https://github.com/event-chat/event-chat/compare/antd-item@v0.3.24...antd-item@v0.3.25) (2026-04-03)
 
 

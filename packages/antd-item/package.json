@@ -1,6 +1,7 @@
 {
   "name": "@event-chat/antd-item",
   "version": "0.3.25",
+  "description": "扩展 Antd 的表单组件，使其拥有 zod 的 schema 能力，Formily 的 NamePath 能力",
   "type": "module",
   "main": "./dist/index.js",
   "exports": {
@@ -27,7 +28,23 @@
     "test:coverage": "rstest --coverage",
     "test:type": "tsd"
   },
-  "keywords": [],
+  "keywords": [
+    "react",
+    "event",
+    "antd",
+    "zod",
+    "formily"
+  ],
+  "author": "Levi <cgfeel@gmail.com> (https://github.com/cgfeel)",
+  "homepage": "https://event-chat.github.io/event-chat/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/event-chat/event-chat.git"
+  },
+  "bugs": {
+    "url": "https://github.com/event-chat/event-chat/issues",
+    "email": "cgfeel@gmail.com"
+  },
   "license": "MIT",
   "devDependencies": {
     "@event-chat/core": "workspace:*",

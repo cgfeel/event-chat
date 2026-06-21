@@ -1,7 +1,7 @@
 {
   "name": "event-chat",
   "version": "1.1.0",
-  "description": "",
+  "description": "像聊天一样本地通信",
   "engines": {
     "node": ">=18",
     "pnpm": ">=10",
@@ -29,8 +29,26 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "tsc": "tsc --noEmit"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "react",
+    "worker",
+    "event",
+    "rpc",
+    "antd",
+    "react-hooks",
+    "zod",
+    "formily"
+  ],
+  "author": "Levi <cgfeel@gmail.com> (https://github.com/cgfeel)",
+  "homepage": "https://event-chat.github.io/event-chat/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/event-chat/event-chat.git"
+  },
+  "bugs": {
+    "url": "https://github.com/event-chat/event-chat/issues",
+    "email": "cgfeel@gmail.com"
+  },
   "license": "MIT",
   "packageManager": "pnpm@10.25.0",
   "devDependencies": {

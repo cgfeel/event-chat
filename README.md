@@ -37,7 +37,7 @@
 
 ```shell
 npm install @event-chat/core
-npm install @event-chat/antd
+npm install @event-chat/antd-item
 npm install @event-chat/rpc
 ```
 
@@ -71,7 +71,7 @@ const SubMox: FC = () => {
 }
 ```
 
-`@event-chat/antd` 联动更新
+`@event-chat/antd-item` 联动更新
 
 ```tsx
 const fieldInput = ['target', 'input'] as const
@@ -175,7 +175,7 @@ https://event-chat.github.io/event-chat/
 
 - 所有事件通信，在 `React` 中可代替原生的 `addEventListener` 以及自身的合成事件
 
-`@event-chat/antd`:
+`@event-chat/antd-item`:
 
 - 为 `Antd` 的表单提供 `Schema` 类型校验能力
 - 连接 `Antd` 和 `Formily`，明确分工职责，复杂交互由 `Formily` 处理，写业务可以不用管 `Formily` 的内部实现

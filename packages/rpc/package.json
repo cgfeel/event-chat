@@ -1,6 +1,7 @@
 {
   "name": "@event-chat/rpc",
   "version": "0.1.33",
+  "description": "像聊天一样本地通信",
   "type": "module",
   "main": "./dist/index.js",
   "exports": {
@@ -75,7 +76,23 @@
     "test:coverage": "rstest --coverage",
     "test:type": "tsd"
   },
-  "keywords": [],
+  "keywords": [
+    "react",
+    "worker",
+    "event",
+    "rpc",
+    "react-hooks"
+  ],
+  "author": "Levi <cgfeel@gmail.com> (https://github.com/cgfeel)",
+  "homepage": "https://event-chat.github.io/event-chat/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/event-chat/event-chat.git"
+  },
+  "bugs": {
+    "url": "https://github.com/event-chat/event-chat/issues",
+    "email": "cgfeel@gmail.com"
+  },
   "license": "MIT",
   "devDependencies": {
     "@rslib/core": "^0.18.4",

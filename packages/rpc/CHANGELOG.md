@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.34](https://github.com/event-chat/event-chat/compare/rpc@v0.1.33...rpc@v0.1.34) (2026-06-21)
+
+
+### Bug Fixes
+
+* update rpc readme & package.json ([79199d0](https://github.com/event-chat/event-chat/commit/79199d0ea3403492a7120c16880cb858dc4d20b2))
+* update rpc readme & package.json ([371a373](https://github.com/event-chat/event-chat/commit/371a3739b5f3470f916c9444dd20bb4cd86c2287))
+
 ## [0.1.33](https://github.com/event-chat/event-chat/compare/rpc@v0.1.32...rpc@v0.1.33) (2026-06-17)
 
 

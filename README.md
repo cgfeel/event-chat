@@ -31,6 +31,16 @@
 - 纯客户端 `RPC` 库，支持 9 种类型对象通信，提供心跳、消息、广播、多播，跨域、跨线程通信，支持 `Tree Shaking`
 - 抹平了通信方式，从开发消息收发转向通过“上下文“通信，聚焦业务本身
 
+## 安装
+
+3 个独立的包，可以根据需要选择安装
+
+```shell
+npm install @event-chat/core
+npm install @event-chat/antd
+npm install @event-chat/rpc
+```
+
 ## 快速上手
 
 `@event-chat/core` 通信

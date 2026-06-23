@@ -1477,7 +1477,9 @@ const workerCtx = createCtx(() => ({
 - `request` 请求会通过 `Promise.reject` 抛出异常
 - `broadcast` 接受一个参数方法 `fallback` 作为异常捕获的回调函数。
 
-虽然对象只能转移一次，而广播可能会向多个实例进行通信，但仍旧保留了 `broadcast` 通过 `transfer` 转移对象的能力；因为接受广播的数量由业务决定，在允许的情况下确实可以用于转移对象，但不建议这样使用。
+虽然对象只能转移一次，而广播可能会向多个实例进行通信，但仍旧保留了 `broadcast` 通过 `transfer` 转移对象的能力；因为接受广播的数量由业务决定，
+
+> 使用 `iframe` 转移对象时，可以因为浏览器扩展导致异常，这里为了演示用了 `iframe`，对于生产环境跨域、跨 `Window` 的情况更建议仅发送指令，由当前主线程或 <Tag>worker</Tag> 线程完成处理。
 
 ### `WebSocket` 通信
 
